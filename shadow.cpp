@@ -18,7 +18,7 @@
 #include "color.h"
 #include "debugproc.h"
 #include "texture.h"
-#include "player.h"
+//#include "player.h"
 
 //=============================
 // ƒ}ƒNƒ’è‹`

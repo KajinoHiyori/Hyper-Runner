@@ -21,11 +21,11 @@ class CScene : public CObject
 public:
 	typedef enum
 	{
-		MODE_TITLE = 0,	// タイトル画面
-		MODE_TUTORIAL,	// チュートリアル画面
-		MODE_GAME,		// ゲーム画面
-		MODE_RESULT,	// リザルト画面
-		MODE_RANKING,		// ランキング画面
+		//MODE_TITLE = 0,	// タイトル画面
+		//MODE_TUTORIAL,	// チュートリアル画面
+		MODE_GAME = 0,		// ゲーム画面
+		//MODE_RESULT,	// リザルト画面
+		//MODE_RANKING,		// ランキング画面
 		MODE_MAX
 	}MODE;
 	static CScene* Create(MODE mode, bool bClear = false);

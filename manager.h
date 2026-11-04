@@ -33,9 +33,7 @@ class CDebugProc;		// デバッグ表示クラス
 class CSound;			// サウンドクラス
 class CCamera;			// カメラクラス
 class CLight;			// ライトクラス
-class CRankingOnline;		// ランキングデータクラス
 class CRankingOffline;		// ランキングデータクラス
-class CPopCornManager;	// ポップコーン情報クラス
 
 //=============================
 // マネージャークラス定義
@@ -64,9 +62,7 @@ public:
 	static CScene* GetScene(void) { return m_pScene; }
 	static CFade* GetFade(void) { return m_pFade; }
 	static CFade::STATE GetFadeState(void) { return m_pFade->GetState(); }
-	static CRankingOnline* GetRankingOnline(void) { return m_pRankingOnline; }
 	static CRankingOffline* GetRankingOffline(void) { return m_pRankingOffline; }
-	static CPopCornManager* GetPopcornManager(void) { return m_pPopcornManager; }
 	static bool GetPause(void) { return m_bPause; }
 	static bool GetEnableObline(void) { return m_bOnline; }
 
@@ -84,9 +80,7 @@ private:
 	static CLight* m_pLight;	// ライトへのポインタ
 	static CScene* m_pScene;	// シーンへのポインタ
 	static CFade* m_pFade;		// フェードへのポインタ
-	static CRankingOnline* m_pRankingOnline;	// ランキングデータへのポインタ
 	static CRankingOffline* m_pRankingOffline;	// ランキングデータへのポインタ
-	static CPopCornManager* m_pPopcornManager;	// ポップコーン管理クラスへのポインタ
 	static bool m_bPause;		// ポーズ状態の管理
 	static bool m_bOnline;		// オンライン状態管理
 };

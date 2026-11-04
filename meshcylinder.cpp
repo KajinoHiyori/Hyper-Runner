@@ -180,7 +180,7 @@ void CMeshCylinder::Update(void)
 	//	break;
 
 	case CScene::MODE_GAME:		// ƒQ[ƒ€
-		pField = static_cast<CGame*>(CManager::GetScene())->GetField();
+		//pField = static_cast<CGame*>(CManager::GetScene())->GetField();
 		break;
 
 	//case CScene::MODE_RESULT:	// ƒŠƒUƒ‹ƒg

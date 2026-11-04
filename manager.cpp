@@ -16,13 +16,8 @@
 #include "light.h"
 #include "sound.h"
 #include "texture.h"
-#include "ranking_online.h"
 #include "ranking_offline.h"
-#include "popcornmanager.h"
-#include "player.h"
-#include "wall.h"
 #include "field.h"
-#include "stem.h"
 #include "fileX.h"
 
 //=============================
@@ -40,9 +35,7 @@ CCamera* CManager::m_pCamera = NULL;					// カメラへのポインタ
 CLight* CManager::m_pLight = NULL;						// ライトへのポインタ
 CScene* CManager::m_pScene = NULL;						// シーンへのポインタ
 CFade* CManager::m_pFade = NULL;						// フェードへのポインタ
-CRankingOnline* CManager::m_pRankingOnline = NULL;			// ランキングデータへのポインタ
 CRankingOffline* CManager::m_pRankingOffline = NULL;			// ランキングデータへのポインタ
-CPopCornManager* CManager::m_pPopcornManager = NULL;	// ポップコーン管理クラスへのポインタ
 bool CManager::m_bPause = false;						// ポーズ状態管理[true : ポーズ中 / false : 通常]
 bool CManager::m_bOnline = true;						// オンライン状態管理
 
@@ -281,17 +274,6 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 		return E_FAIL;
 	}
 
-	// ポップコーン管理の初期化=======================================================
-	if (m_pPopcornManager == NULL)
-	{
-		m_pPopcornManager = CPopCornManager::Create();
-		if (m_pPopcornManager == NULL)
-		{ // ポップコーン管理生成に失敗
-			nID = MessageBox(hWnd, "ポップコーン管理生成に失敗", WINDOW_NAME, MB_OK);
-			return E_FAIL;
-		}
-	}
-
 	// フェードの初期化=======================================================
 	if (m_pFade == NULL)
 	{
@@ -304,7 +286,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	}
 
 	// モード設定
-	SetMode(CScene::MODE_TITLE);
+	SetMode(CScene::MODE_GAME);
 
 #ifdef ENABLE_ONLINE
 	// ランキングデータ[オンライン]の初期化=========================================================
@@ -357,19 +339,9 @@ void CManager::Uninit(void)
 {
 	// オブジェクトの終了処理
 	CObject::ReleaseAll();
-
-	// ランキングデータの破棄
-	if (m_bOnline == true)
-	{ // ランキングデータの終了処理
-		SAFE_UNINIT(m_pRankingOnline);
-	}
-	else
-	{ // オフラインランキングデータの終了処理
-		SAFE_UNINIT(m_pRankingOffline);
-	}
-
-	// ポップコーン管理の破棄
-	SAFE_UNINIT(m_pPopcornManager);
+	
+	 // オフラインランキングデータの終了処理
+	SAFE_UNINIT(m_pRankingOffline);
 
 	// フェードの破棄
 	SAFE_UNINIT(m_pFade);
@@ -413,7 +385,6 @@ void CManager::Uninit(void)
 //=============================
 void CManager::Update(void)
 {
-	m_pDebugProc->Print("//======================\nexe情報\n//======================\n外部ファイル data\\SCRIPTS\\gamescripts.txt\n外部ファイルリロード R\nカメラモード変更 V\n操作方法\n移動 WASD\nジャンプ&収穫 spase\n回収 C\n\n//======================\n変数情報\n//======================\n");
 	// キーボード入力の更新処理
 	m_pKeyboard->Update();
 
@@ -437,16 +408,7 @@ void CManager::Update(void)
 
 	// デバック表示
 	m_pDebugProc->Print("オブジェクト数 : %d\n", CObject::GetNumAll());
-	m_pDebugProc->Print("プレイヤー数 : %d\n", CPlayer::GetNumAll());
 	m_pDebugProc->Print("フィールド数 : %d\n", CField::GetNumAll());
-	m_pDebugProc->Print("壁数 : %d\n", CWall::GetNumAll());
-	m_pDebugProc->Print("茎数 : %d\n", CStem::GetNumAll());
-	m_pDebugProc->Print("コーンの数 [新鮮 %d] [通常 %d] [ダメージ %d] [ポップコーン %d] [生産ライン %d]\n",
-		m_pPopcornManager->GetFreshCorn(),
-		m_pPopcornManager->GetNormalCorn(),
-		m_pPopcornManager->GetDamageCorn(),
-		m_pPopcornManager->GetPopcorn(),
-		m_pPopcornManager->GetConfectionary());
 
 	// レンダラー更新処理
 	m_pRenderer->Update();

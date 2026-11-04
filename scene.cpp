@@ -8,10 +8,10 @@
 // インクルードファイル
 //=============================
 #include "scene.h"
-#include "title.h"
-#include "tutorial.h"
+//#include "title.h"
+//#include "tutorial.h"
 #include "game.h"
-#include "result.h"
+//#include "result.h"
 #include "ranking.h"
 #include "camera.h"
 #include "light.h"
@@ -42,25 +42,25 @@ CScene* CScene::Create(MODE mode, bool bClear)
 
 	switch (mode)
 	{
-	case MODE_TITLE:	// タイトル画面
-		pScene = new CTitle(mode);
-		break;
-	
-	case MODE_TUTORIAL:	// チュートリアル画面
-		pScene = new CTutorial(mode);
-		break;
+	//case MODE_TITLE:	// タイトル画面
+	//	pScene = new CTitle(mode);
+	//	break;
+	//
+	//case MODE_TUTORIAL:	// チュートリアル画面
+	//	pScene = new CTutorial(mode);
+	//	break;
 
 	case MODE_GAME:	// ゲーム画面
 		pScene = new CGame(mode);
 		break;
 
-	case MODE_RESULT:	// リザルト画面
-		pScene = new CResult(mode);
-		break;
+	//case MODE_RESULT:	// リザルト画面
+	//	pScene = new CResult(mode);
+	//	break;
 
-	case MODE_RANKING:	// ランキング画面
-		pScene = new CRanking(mode);
-		break;
+	//case MODE_RANKING:	// ランキング画面
+	//	pScene = new CRanking(mode);
+	//	break;
 
 	//case MODE_CREDIT:	// クレジット画面
 	//	pScene = new CCredit(mode);

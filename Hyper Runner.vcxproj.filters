@@ -13,5 +13,279 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="main">
+      <UniqueIdentifier>{40f8c202-b126-4a35-8a0a-66d15d61b668}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="main\cpp">
+      <UniqueIdentifier>{50808f69-a55f-46d4-82ff-8c145b574e9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="main\h">
+      <UniqueIdentifier>{14baf63e-40d1-44d1-a31b-c5974e0021db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scene">
+      <UniqueIdentifier>{56059efc-d840-4717-8208-7fe7e3d62071}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scene\cpp">
+      <UniqueIdentifier>{831f3c3b-c9bc-442f-9401-343ca2d519c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scene\h">
+      <UniqueIdentifier>{698bbe38-90c5-4ee6-a809-50819c5f6291}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="object">
+      <UniqueIdentifier>{0e91bb1b-295e-4aa6-b0c3-558bb2426256}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="object\inheritance">
+      <UniqueIdentifier>{b467bbb6-9f54-4855-b9e6-3e5b598045d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="object\no inheritance">
+      <UniqueIdentifier>{6bf36c07-9684-4421-b37d-e6420c4a06b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="object\inheritance\cpp">
+      <UniqueIdentifier>{832ec439-4e1e-43ed-94fd-6a5ef535306c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="object\inheritance\h">
+      <UniqueIdentifier>{72863e6a-5e92-48e5-b6d2-59fc31030059}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="object\no inheritance\cpp">
+      <UniqueIdentifier>{cfc39778-e400-484e-89d6-5191ec2e6e22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="object\no inheritance\h">
+      <UniqueIdentifier>{7e51a7e8-76df-4697-b44f-45ce73fc5d00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="visual effect">
+      <UniqueIdentifier>{47f1ecc8-d8bc-4c95-923c-ccff92ebdedd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="visual effect\cpp">
+      <UniqueIdentifier>{03639f9b-5478-475a-aa13-df45254bf926}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="visual effect\h">
+      <UniqueIdentifier>{27212fe0-52f9-45ca-9fc6-61c0e5f05fb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mesh">
+      <UniqueIdentifier>{e02f5f3c-cd15-4744-836e-141579cda77a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mesh\cpp">
+      <UniqueIdentifier>{d48fe073-ab32-482e-bbd9-472039634dd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mesh\h">
+      <UniqueIdentifier>{8b51c107-3af9-4af0-8a40-ad9281d435d1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="camera.cpp">
+      <Filter>main\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="debugproc.cpp">
+      <Filter>main\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="fileX.cpp">
+      <Filter>main\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="input.cpp">
+      <Filter>main\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="light.cpp">
+      <Filter>main\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="loadscripts.cpp">
+      <Filter>main\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>main\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="manager.cpp">
+      <Filter>main\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="sound.cpp">
+      <Filter>main\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="texture.cpp">
+      <Filter>main\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="fade.cpp">
+      <Filter>scene\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="game.cpp">
+      <Filter>scene\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="scene.cpp">
+      <Filter>scene\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="object.cpp">
+      <Filter>object\inheritance\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="object2D.cpp">
+      <Filter>object\inheritance\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="object2DAnim.cpp">
+      <Filter>object\inheritance\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="object3D.cpp">
+      <Filter>object\inheritance\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="objectBillboard.cpp">
+      <Filter>object\inheritance\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="objectBillboardAnim.cpp">
+      <Filter>object\inheritance\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="objectWall.cpp">
+      <Filter>object\inheritance\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="objectX.cpp">
+      <Filter>object\inheritance\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="number2D.cpp">
+      <Filter>object\no inheritance\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="number3D.cpp">
+      <Filter>object\no inheritance\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="polygon2D.cpp">
+      <Filter>object\no inheritance\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="polygon3D.cpp">
+      <Filter>object\no inheritance\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="polygonField.cpp">
+      <Filter>object\no inheritance\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="effect.cpp">
+      <Filter>visual effect\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="particle.cpp">
+      <Filter>visual effect\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="particleX.cpp">
+      <Filter>visual effect\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="shadow.cpp">
+      <Filter>visual effect\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="smoke.cpp">
+      <Filter>visual effect\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="orbit3D.cpp">
+      <Filter>mesh\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="meshcylinder.cpp">
+      <Filter>mesh\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="meshfield.cpp">
+      <Filter>mesh\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="meshring.cpp">
+      <Filter>mesh\cpp</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="color.h">
+      <Filter>main\h</Filter>
+    </ClInclude>
+    <ClInclude Include="camera.h">
+      <Filter>main\h</Filter>
+    </ClInclude>
+    <ClInclude Include="debugproc.h">
+      <Filter>main\h</Filter>
+    </ClInclude>
+    <ClInclude Include="fileX.h">
+      <Filter>main\h</Filter>
+    </ClInclude>
+    <ClInclude Include="input.h">
+      <Filter>main\h</Filter>
+    </ClInclude>
+    <ClInclude Include="light.h">
+      <Filter>main\h</Filter>
+    </ClInclude>
+    <ClInclude Include="loadscripts.h">
+      <Filter>main\h</Filter>
+    </ClInclude>
+    <ClInclude Include="main.h">
+      <Filter>main\h</Filter>
+    </ClInclude>
+    <ClInclude Include="manager.h">
+      <Filter>main\h</Filter>
+    </ClInclude>
+    <ClInclude Include="sound.h">
+      <Filter>main\h</Filter>
+    </ClInclude>
+    <ClInclude Include="texture.h">
+      <Filter>main\h</Filter>
+    </ClInclude>
+    <ClInclude Include="fade.h">
+      <Filter>scene\h</Filter>
+    </ClInclude>
+    <ClInclude Include="game.h">
+      <Filter>scene\h</Filter>
+    </ClInclude>
+    <ClInclude Include="scene.h">
+      <Filter>scene\h</Filter>
+    </ClInclude>
+    <ClInclude Include="object.h">
+      <Filter>object\inheritance\h</Filter>
+    </ClInclude>
+    <ClInclude Include="object2D.h">
+      <Filter>object\inheritance\h</Filter>
+    </ClInclude>
+    <ClInclude Include="object2DAnim.h">
+      <Filter>object\inheritance\h</Filter>
+    </ClInclude>
+    <ClInclude Include="object3D.h">
+      <Filter>object\inheritance\h</Filter>
+    </ClInclude>
+    <ClInclude Include="objectBillboard.h">
+      <Filter>object\inheritance\h</Filter>
+    </ClInclude>
+    <ClInclude Include="objectBillboardAnim.h">
+      <Filter>object\inheritance\h</Filter>
+    </ClInclude>
+    <ClInclude Include="objectWall.h">
+      <Filter>object\inheritance\h</Filter>
+    </ClInclude>
+    <ClInclude Include="objectX.h">
+      <Filter>object\inheritance\h</Filter>
+    </ClInclude>
+    <ClInclude Include="number2D.h">
+      <Filter>object\no inheritance\h</Filter>
+    </ClInclude>
+    <ClInclude Include="number3D.h">
+      <Filter>object\no inheritance\h</Filter>
+    </ClInclude>
+    <ClInclude Include="polygon2D.h">
+      <Filter>object\no inheritance\h</Filter>
+    </ClInclude>
+    <ClInclude Include="polygon3D.h">
+      <Filter>object\no inheritance\h</Filter>
+    </ClInclude>
+    <ClInclude Include="polygonField.h">
+      <Filter>object\no inheritance\h</Filter>
+    </ClInclude>
+    <ClInclude Include="effect.h">
+      <Filter>visual effect\h</Filter>
+    </ClInclude>
+    <ClInclude Include="particle.h">
+      <Filter>visual effect\h</Filter>
+    </ClInclude>
+    <ClInclude Include="particleX.h">
+      <Filter>visual effect\h</Filter>
+    </ClInclude>
+    <ClInclude Include="shadow.h">
+      <Filter>visual effect\h</Filter>
+    </ClInclude>
+    <ClInclude Include="smoke.h">
+      <Filter>visual effect\h</Filter>
+    </ClInclude>
+    <ClInclude Include="orbit3D.h">
+      <Filter>mesh\h</Filter>
+    </ClInclude>
+    <ClInclude Include="meshcylinder.h">
+      <Filter>mesh\h</Filter>
+    </ClInclude>
+    <ClInclude Include="meshfield.h">
+      <Filter>mesh\h</Filter>
+    </ClInclude>
+    <ClInclude Include="meshring.h">
+      <Filter>mesh\h</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

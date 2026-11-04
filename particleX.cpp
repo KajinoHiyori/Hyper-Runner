@@ -12,15 +12,15 @@
 #include "renderer.h"
 #include "texture.h"
 #include "scene.h"
-#include "title.h"
-#include "tutorial.h"
+//#include "title.h"
+//#include "tutorial.h"
 #include "game.h"
-#include "result.h"
+//#include "result.h"
 #include "ranking.h"
 #include "field.h"
 #include "particleX.h"
 #include "camera.h"
-#include "wall.h"
+//#include "wall.h"
 #include "particle.h"
 #include "debugproc.h"
 #include "effect.h"
@@ -153,29 +153,29 @@ void CParticleX::Update(void)
 	
 	switch (CManager::GetMode())
 	{
-	case CScene::MODE_TITLE:	// タイトル
-		// タイトル処理
-		UpdateTitle();
-		break;
-	
-	case CScene::MODE_TUTORIAL:	// チュートリアル
-		// チュートリアル処理
-		UpdateTutorial();
-		break;
+	//case CScene::MODE_TITLE:	// タイトル
+	//	// タイトル処理
+	//	UpdateTitle();
+	//	break;
+	//
+	//case CScene::MODE_TUTORIAL:	// チュートリアル
+	//	// チュートリアル処理
+	//	UpdateTutorial();
+	//	break;
 
 	case CScene::MODE_GAME:	// ゲーム
 		// ゲーム処理
 		UpdateGame();
 		break;
 
-	case CScene::MODE_RESULT:	// リザルト
-		// リザルト処理
-		UpdateResult();
-		break;
+	//case CScene::MODE_RESULT:	// リザルト
+	//	// リザルト処理
+	//	UpdateResult();
+	//	break;
 
-	case CScene::MODE_RANKING:	// ランキング
-		UpdateRanking();
-		break;
+	//case CScene::MODE_RANKING:	// ランキング
+	//	UpdateRanking();
+	//	break;
 	}
 
 	D3DXVECTOR3 rot = CObjectX::GetRotation();
@@ -201,29 +201,29 @@ void CParticleX::Draw(void)
 //=============================
 void CParticleX::UpdateTitle(void)
 {
-	// フィールド情報を取得
-	CTitle* pTitle = static_cast<CTitle*>(CManager::GetScene());
-	CField* pField = pTitle->GetField();
+	//// フィールド情報を取得
+	//CTitle* pTitle = static_cast<CTitle*>(CManager::GetScene());
+	//CField* pField = pTitle->GetField();
 
-	// 移動処理
-	Move();
+	//// 移動処理
+	//Move();
 
-	// 縮小処理
-	if (DisScale() == false)
-	{ // 自身を破棄済み
-		return;
-	}
+	//// 縮小処理
+	//if (DisScale() == false)
+	//{ // 自身を破棄済み
+	//	return;
+	//}
 
-	// 地面との判定処理
-	CollisionField(pField);
+	//// 地面との判定処理
+	//CollisionField(pField);
 
-	// 寿命を減らして管理
-	m_nLife--;
-	if (m_nLife < 0)
-	{ // 自身を破棄
-		Release();
-		return;
-	}
+	//// 寿命を減らして管理
+	//m_nLife--;
+	//if (m_nLife < 0)
+	//{ // 自身を破棄
+	//	Release();
+	//	return;
+	//}
 }
 
 //=============================
@@ -231,29 +231,29 @@ void CParticleX::UpdateTitle(void)
 //=============================
 void CParticleX::UpdateTutorial(void)
 {
-	// フィールド情報を取得
-	CTutorial* pTutorial = static_cast<CTutorial*>(CManager::GetScene());
-	CField* pField = pTutorial->GetField();
+	//// フィールド情報を取得
+	//CTutorial* pTutorial = static_cast<CTutorial*>(CManager::GetScene());
+	//CField* pField = pTutorial->GetField();
 
-	// 移動処理
-	Move();
+	//// 移動処理
+	//Move();
 
-	// 縮小処理
-	if (DisScale() == false)
-	{ // 自身を破棄済み
-		return;
-	}
+	//// 縮小処理
+	//if (DisScale() == false)
+	//{ // 自身を破棄済み
+	//	return;
+	//}
 
-	// 地面との判定処理
-	CollisionField(pField);
+	//// 地面との判定処理
+	//CollisionField(pField);
 
-	// 寿命を減らして管理
-	m_nLife--;
-	if (m_nLife < 0)
-	{ // 自身を破棄
-		Release();
-		return;
-	}
+	//// 寿命を減らして管理
+	//m_nLife--;
+	//if (m_nLife < 0)
+	//{ // 自身を破棄
+	//	Release();
+	//	return;
+	//}
 }
 
 //=============================
@@ -261,31 +261,31 @@ void CParticleX::UpdateTutorial(void)
 //=============================
 void CParticleX::UpdateGame(void)
 {
-	// フィールド情報を取得
-	CGame* pGame = static_cast<CGame*>(CManager::GetScene());
-	CField* pField = pGame->GetField();
+	//// フィールド情報を取得
+	//CGame* pGame = static_cast<CGame*>(CManager::GetScene());
+	//CField* pField = pGame->GetField();
 
-	if (pGame->GetEnablePause() == true) return;
+	//if (pGame->GetEnablePause() == true) return;
 
-	// 移動処理
-	Move();
+	//// 移動処理
+	//Move();
 
-	// 縮小処理
-	if (DisScale() == false)
-	{ // 自身を破棄済み
-		return;
-	}
+	//// 縮小処理
+	//if (DisScale() == false)
+	//{ // 自身を破棄済み
+	//	return;
+	//}
 
-	// 地面との判定処理
-	CollisionField(pField);
+	//// 地面との判定処理
+	//CollisionField(pField);
 
-	// 寿命を減らして管理
-	m_nLife--;
-	if (m_nLife < 0)
-	{ // 自身を破棄
-		Release();
-		return;
-	}
+	//// 寿命を減らして管理
+	//m_nLife--;
+	//if (m_nLife < 0)
+	//{ // 自身を破棄
+	//	Release();
+	//	return;
+	//}
 }
 
 //=============================
@@ -293,29 +293,29 @@ void CParticleX::UpdateGame(void)
 //=============================
 void CParticleX::UpdateResult(void)
 {
-	// フィールド情報を取得
-	CResult* pResult = static_cast<CResult*>(CManager::GetScene());
-	CField* pField = pResult->GetField();
+	//// フィールド情報を取得
+	//CResult* pResult = static_cast<CResult*>(CManager::GetScene());
+	//CField* pField = pResult->GetField();
 
-	// 移動処理
-	Move();
+	//// 移動処理
+	//Move();
 
-	// 縮小処理
-	if (DisScale() == false)
-	{ // 自身を破棄済み
-		return;
-	}
+	//// 縮小処理
+	//if (DisScale() == false)
+	//{ // 自身を破棄済み
+	//	return;
+	//}
 
-	// 地面との判定処理
-	CollisionField(pField);
+	//// 地面との判定処理
+	//CollisionField(pField);
 
-	// 寿命を減らして管理
-	m_nLife--;
-	if (m_nLife < 0)
-	{ // 自身を破棄
-		Release();
-		return;
-	}
+	//// 寿命を減らして管理
+	//m_nLife--;
+	//if (m_nLife < 0)
+	//{ // 自身を破棄
+	//	Release();
+	//	return;
+	//}
 }
 
 //=============================
@@ -323,29 +323,29 @@ void CParticleX::UpdateResult(void)
 //=============================
 void CParticleX::UpdateRanking(void)
 {
-	// フィールド情報を取得
-	CRanking* pRanking = static_cast<CRanking*>(CManager::GetScene());
-	CField* pField = pRanking->GetField();
+	//// フィールド情報を取得
+	//CRanking* pRanking = static_cast<CRanking*>(CManager::GetScene());
+	//CField* pField = pRanking->GetField();
 
-	// 移動処理
-	Move();
+	//// 移動処理
+	//Move();
 
-	// 縮小処理
-	if (DisScale() == false)
-	{ // 自身を破棄済み
-		return;
-	}
+	//// 縮小処理
+	//if (DisScale() == false)
+	//{ // 自身を破棄済み
+	//	return;
+	//}
 
-	// 地面との判定処理
-	CollisionField(pField);
+	//// 地面との判定処理
+	//CollisionField(pField);
 
-	// 寿命を減らして管理
-	m_nLife--;
-	if (m_nLife < 0)
-	{ // 自身を破棄
-		Release();
-		return;
-	}
+	//// 寿命を減らして管理
+	//m_nLife--;
+	//if (m_nLife < 0)
+	//{ // 自身を破棄
+	//	Release();
+	//	return;
+	//}
 }
 
 //=============================

@@ -188,10 +188,10 @@ void CEffect::UpdateGame(void)
 {
 	// メッシュフィールド情報を取得
 	CGame* pGame = static_cast<CGame*>(CManager::GetScene());
-	CField* pField = pGame->GetField();
+	//CField* pField = pGame->GetField();
 	
 	// 通常の更新処理
-	UpdateDefault(pField);
+	//UpdateDefault(pField);
 }
 
 //=============================

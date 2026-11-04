@@ -13,9 +13,9 @@
 #include "debugproc.h"
 #include "renderer.h"
 #include "game.h"
-#include "tutorial.h"
-#include "result.h"
-#include "player.h"
+//#include "tutorial.h"
+//#include "result.h"
+//#include "player.h"
 #include "field.h"
 
 //=============================
@@ -108,19 +108,19 @@ void CCamera::Update(void)
 	//case CScene::MODE_TITLE:	// タイトル
 	//	break;
 	//
-	case CScene::MODE_TUTORIAL:	// チュートリアル
-		UpdateTutorial();
-		break;
+	//case CScene::MODE_TUTORIAL:	// チュートリアル
+	//	UpdateTutorial();
+	//	break;
 
 	case CScene::MODE_GAME:		// ゲーム
 		// ゲーム処理
 		UpdateGame();
 		break;
 
-	case CScene::MODE_RESULT:	// リザルト
-		// リザルト処理
-		UpdateResult();
-		break;
+	//case CScene::MODE_RESULT:	// リザルト
+	//	// リザルト処理
+	//	UpdateResult();
+	//	break;
 	//
 	//case CScene::MODE_CREDIT:	// クレジット
 	//	break;
@@ -200,24 +200,24 @@ void CCamera::UpdateTutorial(void)
 		return;
 	}
 
-	CPlayer* pPlayer = static_cast<CTutorial*>(CManager::GetScene())->GetPlayer();
-	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
-	float fSizePlayer = pPlayer->GetSize();
+	//CPlayer* pPlayer = static_cast<CTutorial*>(CManager::GetScene())->GetPlayer();
+	//D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
+	//float fSizePlayer = pPlayer->GetSize();
 
-	m_posRDest.x = posPlayer.x;
-	m_posRDest.y = posPlayer.y + fSizePlayer;
-	m_posRDest.z = posPlayer.z;
+	//m_posRDest.x = posPlayer.x;
+	//m_posRDest.y = posPlayer.y + fSizePlayer;
+	//m_posRDest.z = posPlayer.z;
 
-	CDebugProc* pDebug = CManager::GetDebugProc();
-	pDebug->Print("rotDest.y %f\n", m_rotDest.y);
+	//CDebugProc* pDebug = CManager::GetDebugProc();
+	//pDebug->Print("rotDest.y %f\n", m_rotDest.y);
 
-	// 視点情報更新
-	m_posR.x += (m_posRDest.x - m_posR.x) * CORRECTION_ROT;
-	m_posR.y += (m_posRDest.y - m_posR.y) * CORRECTION_ROT;
-	m_posR.z += (m_posRDest.z - m_posR.z) * CORRECTION_ROT;
-	m_posV.x = m_posR.x - sinf(m_rot.y) * (DISTANCE + (fSizePlayer * 5.0f));
-	m_posV.y = GAME_HEIGHT;
-	m_posV.z = m_posR.z - cosf(m_rot.y) * (DISTANCE + (fSizePlayer * 5.0f));
+	//// 視点情報更新
+	//m_posR.x += (m_posRDest.x - m_posR.x) * CORRECTION_ROT;
+	//m_posR.y += (m_posRDest.y - m_posR.y) * CORRECTION_ROT;
+	//m_posR.z += (m_posRDest.z - m_posR.z) * CORRECTION_ROT;
+	//m_posV.x = m_posR.x - sinf(m_rot.y) * (DISTANCE + (fSizePlayer * 5.0f));
+	//m_posV.y = GAME_HEIGHT;
+	//m_posV.z = m_posR.z - cosf(m_rot.y) * (DISTANCE + (fSizePlayer * 5.0f));
 }
 
 //=============================
@@ -230,24 +230,24 @@ void CCamera::UpdateGame(void)
 		return;
 	}
 
-	CPlayer* pPlayer = static_cast<CGame*>(CManager::GetScene())->GetPlayer();
-	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
-	float fSizePlayer = pPlayer->GetSize();
-	
-	m_posRDest.x = posPlayer.x;
-	m_posRDest.y = posPlayer.y + fSizePlayer;
-	m_posRDest.z = posPlayer.z;
+	//CPlayer* pPlayer = static_cast<CGame*>(CManager::GetScene())->GetPlayer();
+	//D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
+	//float fSizePlayer = pPlayer->GetSize();
+	//
+	//m_posRDest.x = posPlayer.x;
+	//m_posRDest.y = posPlayer.y + fSizePlayer;
+	//m_posRDest.z = posPlayer.z;
 
-	CDebugProc* pDebug = CManager::GetDebugProc();
-	pDebug->Print("rotDest.y %f\n", m_rotDest.y);
+	//CDebugProc* pDebug = CManager::GetDebugProc();
+	//pDebug->Print("rotDest.y %f\n", m_rotDest.y);
 
-	// 視点情報更新
-	m_posR.x += (m_posRDest.x - m_posR.x) * CORRECTION_ROT;
-	m_posR.y += (m_posRDest.y - m_posR.y) * CORRECTION_ROT;
-	m_posR.z += (m_posRDest.z - m_posR.z) * CORRECTION_ROT;
-	m_posV.x = m_posR.x - sinf(m_rot.y) * (DISTANCE + (fSizePlayer * 5.0f));
-	m_posV.y = GAME_HEIGHT;
-	m_posV.z = m_posR.z - cosf(m_rot.y) * (DISTANCE + (fSizePlayer * 5.0f));
+	//// 視点情報更新
+	//m_posR.x += (m_posRDest.x - m_posR.x) * CORRECTION_ROT;
+	//m_posR.y += (m_posRDest.y - m_posR.y) * CORRECTION_ROT;
+	//m_posR.z += (m_posRDest.z - m_posR.z) * CORRECTION_ROT;
+	//m_posV.x = m_posR.x - sinf(m_rot.y) * (DISTANCE + (fSizePlayer * 5.0f));
+	//m_posV.y = GAME_HEIGHT;
+	//m_posV.z = m_posR.z - cosf(m_rot.y) * (DISTANCE + (fSizePlayer * 5.0f));
 }
 
 //=============================
@@ -266,7 +266,7 @@ void CCamera::UpdateResult(void)
 //=============================
 void CCamera::SetSceneCamera(CScene::MODE mode, CScene* pScene)
 {
-	D3DXVECTOR3 posPlayer = INIT_D3DVEC3;
+	/*D3DXVECTOR3 posPlayer = INIT_D3DVEC3;
 	CPlayer* pPlayer = NULL;
 	float fSizePlayer = 0.0f;
 	switch (mode)
@@ -297,7 +297,7 @@ void CCamera::SetSceneCamera(CScene::MODE mode, CScene* pScene)
 		m_posV = D3DXVECTOR3(0.0f, 240.0f, -740.0f);
 		m_posR = D3DXVECTOR3(0.0f, 200.0f, -535.0f);
 		break;
-	}
+	}*/
 }
 
 //=============================
