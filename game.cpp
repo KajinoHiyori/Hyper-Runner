@@ -17,12 +17,13 @@
 #include "particle.h"
 #include "meshcylinder.h"
 #include "debugproc.h"
+#include "player.h"
 
 
 //=============================
 // 静的メンバ変数宣言
 //=============================
-//CPlayer* CGame::m_pPlayer = NULL;	// プレイヤーへのポインタ
+CPlayer* CGame::m_pPlayer = NULL;	// プレイヤーへのポインタ
 //CField* CGame::m_pField = NULL;	// フィールドへのポインタ
 //CWall* CGame::m_apWall[MAX_GAMEWALL] = {};	// 壁のポインタ
 //CMachine* CGame::m_pMachine = NULL;	// マシンへのポインタ
@@ -60,10 +61,10 @@ HRESULT CGame::Init(void)
 	// ステート初期化
 	m_state = STATE_START;
 
-	//// プレイヤー生成
-	//if (m_pPlayer != NULL)return E_FAIL;
-	//// 使用されていない場合
-	//m_pPlayer = CPlayer::Create(GAMESCRIPTS_PATH);
+	// プレイヤー生成
+	if (m_pPlayer != NULL)return E_FAIL;
+	// 使用されていない場合
+	m_pPlayer = CPlayer::Create(INIT_D3DVEC3, INIT_D3DVEC3);
 
 	//// フィールド生成
 	//if (m_pField != NULL) return E_FAIL;
@@ -124,7 +125,7 @@ HRESULT CGame::Init(void)
 void CGame::Uninit(void)
 {
 	// 各ポインタのクリア
-	//m_pPlayer = NULL;	// プレイヤーへのポインタ
+	m_pPlayer = NULL;	// プレイヤーへのポインタ
 	//m_pField = NULL;		// フィールドへのポインタ
 	//m_pMachine = NULL;		// マシンへのポインタ
 	//m_pTimer = NULL;		// タイマーのクリア

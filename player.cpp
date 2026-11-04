@@ -29,7 +29,6 @@
 //#include "tutorialUI.h"
 #include "particle.h"
 #include "sound.h"
-#include "loadscripts.h"
 
 //=============================
 // マクロ定義
@@ -52,6 +51,10 @@ CPlayer::CPlayer(CObject::PRIORITY priority) : CObject(priority)
 	m_nNumModel = 0;			// モデル総数
 	m_pMotion = NULL;			// モーション情報
 	m_pShadow = NULL;			// 影情報
+	for (int nCntModel = 0; nCntModel < MODEL_MAX; nCntModel++)
+	{
+		memset(&m_aFileName[nCntModel][0], 0, sizeof m_aFileName[nCntModel]);
+	}
 }
 
 //=============================
@@ -98,6 +101,9 @@ HRESULT CPlayer::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 	m_rot = rot;
 	m_rotDest = rot;
 
+	// モデル読み込み
+	LoadScripts("data\\SCRIPTS\\player.txt");
+
 	return S_OK;
 }
 
@@ -109,19 +115,13 @@ void CPlayer::Uninit(void)
 	// モデルの終了処理
 	for (int nCntModel = 0; nCntModel < m_nNumModel; nCntModel++)
 	{
-		if (m_apModel[nCntModel] == NULL) continue;
-
-		// 使用されていた場合
-		m_apModel[nCntModel]->Uninit();
-		delete m_apModel[nCntModel];
-		m_apModel[nCntModel] = NULL;
+		SAFE_UNINIT(m_apModel[nCntModel]);
 	}
 
 	// モーションの破棄
 	if (m_pMotion != NULL)
 	{ // モーションが用意されていた場合
-		delete m_pMotion;
-		m_pMotion = NULL;
+		SAFE_DELETE_SINGULAR(m_pMotion);
 	}
 
 	// 影の破棄
@@ -179,8 +179,10 @@ void CPlayer::Update(void)
 	}
 
 	// モーションの更新
-	m_pMotion->Update();
-
+	if (m_pMotion != NULL)
+	{
+		m_pMotion->Update();
+	}
 	// デバック表示=================================================================================
 	CDebugProc* pDebugProc = CManager::GetDebugProc();
 	pDebugProc->Print("Playerの位置 : (%.2f, %.2f, %.2f)\n", m_pos.x, m_pos.y, m_pos.z);
@@ -331,6 +333,233 @@ void CPlayer::Move(void)
 	// 入力情報取得
 	CInputKeyboard* pKeyboard = CManager::GetInputKeyboard();
 	CInputJoypad* pJoypad = CManager::GetInputJoypad();
+}
 
-	
+//=============================
+// 情報読み取り処理
+//=============================
+HRESULT CPlayer::LoadScripts(const char* pFilePath)
+{
+	// キャラクター情報読み取り
+	if (LoadCharactor(pFilePath) == false)
+	{
+		return E_FAIL;
+	}
+
+	return S_OK;
+}
+
+#define NUM_MODEL		("NUM_MODEL")	// NUM_MODEL
+#define MODEL_FILENAME	("MODEL_FILENAME")	// MODEL_FILENAME
+
+//=============================
+// キャラクター情報読み取り処理
+//=============================
+bool CPlayer::LoadCharactor(const char* pFilePath)
+{
+	// モデル名取得
+	if (LoadModelFile(pFilePath) == false) return false;
+
+	// 設定
+	if (LoadModelSetting(pFilePath) == false) return false;
+		 
+	return true;
+}
+
+//=============================
+// モデル名取得
+//=============================
+bool CPlayer::LoadModelFile(const char* pFilePath)
+{
+	FILE* pFile = fopen(pFilePath, "r");
+
+	if (pFile == NULL)
+	{ // 読み込みに失敗
+		return false;
+	}
+
+	// 外部ファイル読み取り処理を生成
+	CLoadScripts* pLoadScripts = new CLoadScripts();
+
+	bool bLoadEnd = false;		// 読み込み終了フラグ
+	char aString[MAX_STRING];		// ローカルで文字列を格納
+	char aStringCopy[MAX_STRING];	// ローカルで文字列を格納[コピー]
+	int nCntModel = 0;	// モデルの読み込み数を格納
+
+	// モデルファイル名取得
+	do
+	{ // 文字列のクリア
+		memset(&aString[0], 0, sizeof aString);
+		memset(&aStringCopy[0], 0, sizeof aStringCopy);
+
+		// 読み込んだ行の文字列判定
+		fgets(&aString[0], MAX_STRING, pFile);	// 1行読み込む
+		pLoadScripts->Judgment(&aString[0], &aStringCopy[0]);	// 有効文字抜き取り
+
+		if (strstr(&aStringCopy[0], NUM_MODEL) != NULL)
+		{ // NUM_MODELを読み込んだ
+			m_nNumModel = pLoadScripts->LoadInt(&aStringCopy[0]);
+			if (m_nNumModel != MODEL_MAX)
+			{
+				// ファイルを閉じる
+				fclose(pFile);	
+				// 外部ファイル読み取り処理を破棄
+				SAFE_DELETE_SINGULAR(pLoadScripts); 
+				return false;	// スクリプトと内部指定値が異なる場合早期リターン
+			}
+		}
+
+		if (strstr(&aStringCopy[0], MODEL_FILENAME) != NULL)
+		{ // MODEL_FILENAMEを読み込んだ
+			pLoadScripts->LoadFileName(&aStringCopy[0]);
+			memcpy(&m_aFileName[nCntModel][0], &aStringCopy[0], sizeof aStringCopy);
+			nCntModel++;
+			if (nCntModel == m_nNumModel)
+			{
+				bLoadEnd = true;
+			}
+		}
+	} while (bLoadEnd == false);
+
+	// ファイルを閉じる
+	fclose(pFile);
+
+	// 外部ファイル読み取り処理を破棄
+	SAFE_DELETE_SINGULAR(pLoadScripts);
+
+	return true;
+}
+
+#define CHARACTERSET		("CHARACTERSET")		// CHARACTERSET
+#define END_CHARACTERSET	("END_CHARACTERSET")	// END_CHARACTERSET
+#define NUM_PARTS			("NUM_PARTS")			// NUM_PARTS
+#define PARTSSET			("PARTSSET")			// PARTSSET
+#define END_PARTSSET		("END_PARTSSET")		// END_PARTSSET
+#define INDEX				("INDEX")				// INDEX
+#define PARENT				("PARENT")				// PARENT
+#define POS					("POS")					// POS
+#define ROT					("ROT")					// ROT
+
+//=============================
+// モデル設置情報
+//=============================
+bool CPlayer::LoadModelSetting(const char* pFilePath)
+{
+	FILE* pFile = fopen(pFilePath, "r");
+
+	if (pFile == NULL)
+	{ // 読み込みに失敗
+		return false;
+	}
+
+	// 外部ファイル読み取り処理を生成
+	CLoadScripts* pLoadScripts = new CLoadScripts();
+
+	bool bLoadEnd = false;		// 読み込み終了フラグ
+	char aString[MAX_STRING];		// ローカルで文字列を格納
+	char aStringCopy[MAX_STRING];	// ローカルで文字列を格納[コピー]
+	int nIdx = 0;
+	int aParentIdx[MODEL_MAX];	// 親を指定
+
+	do
+	{ // 文字列のクリア
+		memset(&aString[0], 0, sizeof aString);
+		memset(&aStringCopy[0], 0, sizeof aStringCopy);
+
+		// 読み込んだ行の文字列判定
+		fgets(&aString[0], MAX_STRING, pFile);	// 1行読み込む
+		pLoadScripts->Judgment(&aString[0], &aStringCopy[0]);	// 有効文字抜き取り
+
+		if (strstr(&aStringCopy[0], CHARACTERSET) != NULL)
+		{ // CHARACTERSETを読み込んだ
+			while (1)
+			{
+				// 文字列のクリア
+				memset(&aString[0], 0, sizeof aString);
+				memset(&aStringCopy[0], 0, sizeof aStringCopy);
+
+				// 読み込んだ行の文字列判定
+				fgets(&aString[0], MAX_STRING, pFile);	// 1行読み込む
+				pLoadScripts->Judgment(&aString[0], &aStringCopy[0]);	// 有効文字抜き取り
+
+				if (strstr(&aStringCopy[0], NUM_PARTS) != NULL)
+				{ // NUM_PARTSを読み込んだ
+					int nNumParts = pLoadScripts->LoadInt(&aStringCopy[0]);
+					if (m_nNumModel != nNumParts)
+					{ // モデル数とパーツ数が合わない場合早期リターン
+						// ファイルを閉じる
+						fclose(pFile);
+						// 外部ファイル読み取り処理を破棄
+						SAFE_DELETE_SINGULAR(pLoadScripts);
+						return false;
+					}
+				}
+
+				if (strstr(&aStringCopy[0], PARTSSET) != NULL)
+				{ // PARTSSETを読み込んだ
+					int nParent = -1;
+					D3DXVECTOR3 pos = INIT_D3DVEC3;
+					D3DXVECTOR3 rot = INIT_D3DVEC3;
+					
+					while (1)
+					{
+						// 文字列のクリア
+						memset(&aString[0], 0, sizeof aString);
+						memset(&aStringCopy[0], 0, sizeof aStringCopy);
+
+						// 読み込んだ行の文字列判定
+						fgets(&aString[0], MAX_STRING, pFile);	// 1行読み込む
+						pLoadScripts->Judgment(&aString[0], &aStringCopy[0]);	// 有効文字抜き取り
+
+						if (strstr(&aStringCopy[0], INDEX) != NULL)
+						{ // INDEXを読み込んだ
+							nIdx = pLoadScripts->LoadInt(&aStringCopy[0]);
+						}
+						if (strstr(&aStringCopy[0], PARENT) != NULL)
+						{ // PARENTを読み込んだ
+							aParentIdx[nIdx] = pLoadScripts->LoadInt(&aStringCopy[0]);
+						}
+						if (strstr(&aStringCopy[0], POS) != NULL)
+						{ // POSを読み込んだ
+							pos = pLoadScripts->LoadVector3(&aStringCopy[0]);
+						}
+						if (strstr(&aStringCopy[0], ROT) != NULL)
+						{ // ROTを読み込んだ
+							rot = pLoadScripts->LoadVector3(&aStringCopy[0]);
+						}
+						if (strstr(&aStringCopy[0], END_PARTSSET) != NULL)
+						{ // END_PARTSSETを読み込んだ
+							m_apModel[nIdx] = CModel::Create(pos, rot, &m_aFileName[nIdx][0]);
+							break;
+						}
+					}
+				}
+				
+				if (strstr(&aStringCopy[0], END_CHARACTERSET) != NULL)
+				{ // END_CHARACTERSETを読み込んだ
+					bLoadEnd = true;
+					break;
+				}
+			}
+		}
+	} while (bLoadEnd == false);
+
+	// ファイルを閉じる
+	fclose(pFile);
+
+	// 外部ファイル読み取り処理を破棄
+	SAFE_DELETE_SINGULAR(pLoadScripts);
+
+	// モデルの親を指定
+	for (int nCntModel = 0; nCntModel < m_nNumModel; nCntModel++)
+	{
+		if (aParentIdx[nCntModel] == -1)
+		{
+			m_apModel[nCntModel]->SetParent(NULL);
+			continue;
+		}
+		m_apModel[nCntModel]->SetParent(m_apModel[aParentIdx[nCntModel]]);
+	}
+
+	return true;
 }

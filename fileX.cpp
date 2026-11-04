@@ -11,6 +11,13 @@
 #include "manager.h"
 #include "fileX.h"
 #include "loadscripts.h"
+//=============================
+// マクロ定義
+//=============================
+#define LOADMODEL		("LOADMODEL")		// LOADMODEL
+#define END_LOADMODEL	("END_LOADMODEL")	// END_LOADMODEL
+#define MAXMODEL		("MAXMODEL")		// MAXMODEL
+#define MODELNAME		("MODELNAME")		// MODELNAME
 
 //=============================
 // 静的メンバ変数宣言
@@ -43,10 +50,6 @@ CFileX::~CFileX()
 
 }
 
-#define LOADMODEL		("LOADMODEL")		// LOADMODEL
-#define END_LOADMODEL	("END_LOADMODEL")	// END_LOADMODEL
-#define MAXMODEL		("MAXMODEL")		// MAXMODEL
-#define MODELNAME		("MODELNAME")		// MODELNAME
 //=============================
 // 登録済Xファイルの読み込み
 //=============================
@@ -114,7 +117,6 @@ HRESULT CFileX::Load(void)
 
 	// ファイルを閉じる
 	fclose(pFile);
-
 
 	// 外部ファイル読み込みインスタンスを破棄
 	SAFE_DELETE_SINGULAR(pLoadScripts);

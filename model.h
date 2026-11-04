@@ -40,7 +40,6 @@ public:
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
-	void Draw(CObject::TYPE type, D3DXCOLOR col);
 	void SetParent(CModel* pModel) { m_pParent = pModel; }
 	void SetPosition(D3DXVECTOR3 pos) { m_pos = pos; }
 	void SetRotation(D3DXVECTOR3 rot) { m_rot = rot; }
@@ -58,10 +57,7 @@ private:
 	D3DXVECTOR3	m_vtxMin;	// モデルの大きさ(最小)
 	D3DXVECTOR3	m_vtxMax;	// モデルの大きさ(最大)
 	CModel* m_pParent;		// 親モデルへのポインタ
-	LPD3DXMESH			m_pMesh;		// メッシュ(頂点情報)へのポインタ
-	LPD3DXBUFFER		m_pBuffMat;		// マテリアルへのポインタ
-	DWORD				m_dwNumMat;		// マテリアルの数
-	int m_aIdxTexture[MAX_MAT];	// テクスチャのインデックスを格納
+	int m_nIdx;				// Xファイルインデックス
 	COLORTYPE m_colType;	// モデルの色状態
 	D3DXCOLOR m_col;		// モデルの色
 };

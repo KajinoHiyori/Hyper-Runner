@@ -22,7 +22,7 @@
 //=============================
 // 前方宣言
 //=============================
-//class CPlayer;		// プレイヤークラス
+class CPlayer;		// プレイヤークラス
 //class CField;		// フィールドクラス
 //class CWall;		// 壁クラス
 //class CMachine;		// マシンクラス
@@ -55,7 +55,7 @@ public:
 	void Draw(void);
 	void SetState(STATE state) { m_state = state; }
 	STATE GetState(void) { return m_state; }
-	//static CPlayer* GetPlayer(void) { return m_pPlayer; }
+	static CPlayer* GetPlayer(void) { return m_pPlayer; }
 	//static CField* GetField(void) { return m_pField; }
 	//static CWall* GetWall(int nIdx){ return m_apWall[nIdx]; }
 	//static CMachine* GetMachine(void) { return m_pMachine; }
@@ -65,7 +65,7 @@ public:
 	//static bool GetEnablePause(void) { return m_pPause->GetPauseState(); }
 
 private:
-	//static CPlayer* m_pPlayer;		// プレイヤークラスへのポインタ
+	static CPlayer* m_pPlayer;		// プレイヤークラスへのポインタ
 	//static CField* m_pField;		// フィールドへのポインタ
 	//static CWall* m_apWall[MAX_GAMEWALL];		// 壁へのポインタ
 	//static CMachine* m_pMachine;	// マシンクラスへのポインタ

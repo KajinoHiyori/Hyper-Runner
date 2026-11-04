@@ -383,7 +383,7 @@ void CObjectX::Draw(void)
 		pMat[nCntMat].MatD3D.Diffuse.g = fGreen;
 		pMat[nCntMat].MatD3D.Diffuse.b = fBlue;
 		pMat[nCntMat].MatD3D.Diffuse.a = fAlpha;
-}
+	}
 
 #else
 	// マテリアルデータへのポインタを取得

@@ -12,6 +12,7 @@
 #include "main.h"
 #include "object.h"
 #include "motion.h"
+#include "loadscripts.h"
 
 //=============================
 // マクロ定義
@@ -85,6 +86,10 @@ private:
 	void UpdateGame(void);
 	void UpdateResult(void);
 	void Move(void);
+	HRESULT LoadScripts(const char* pFilePath);
+	bool LoadCharactor(const char* pFilePath);
+	bool LoadModelFile(const char* pFilePath);
+	bool LoadModelSetting(const char* pFilePath);
 	D3DXVECTOR3	m_pos;		// モデルの位置
 	D3DXVECTOR3	m_posOld;	// モデルの1フレーム前の位置
 	D3DXVECTOR3	m_move;		// モデルの移動量
@@ -95,6 +100,7 @@ private:
 	int m_nNumModel;		// モデル総数
 	CMotion* m_pMotion;		// モーション情報
 	CShadow* m_pShadow;		// 影情報
+	char m_aFileName[MODEL_MAX][MAX_STRING];	// ローカルで文字列を格納[コピー]
 };
 
 #endif
