@@ -70,6 +70,15 @@
     <Filter Include="mesh\h">
       <UniqueIdentifier>{8b51c107-3af9-4af0-8a40-ad9281d435d1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="event">
+      <UniqueIdentifier>{6a8f8d1d-1dd6-4de6-922d-d3208725e954}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="event\cpp">
+      <UniqueIdentifier>{c2a87300-ece1-49dd-887d-adb471992f18}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="event\h">
+      <UniqueIdentifier>{c8d8b6ce-2709-47b0-9d1c-9745a04b38c7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp">
@@ -182,6 +191,15 @@
     </ClCompile>
     <ClCompile Include="ranking_offline.cpp">
       <Filter>main\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="model.cpp">
+      <Filter>object\no inheritance\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="motion.cpp">
+      <Filter>object\no inheritance\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="player.cpp">
+      <Filter>event\cpp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -298,6 +316,15 @@
     </ClInclude>
     <ClInclude Include="ranking_offline.h">
       <Filter>main\h</Filter>
+    </ClInclude>
+    <ClInclude Include="model.h">
+      <Filter>object\no inheritance\h</Filter>
+    </ClInclude>
+    <ClInclude Include="motion.h">
+      <Filter>object\no inheritance\h</Filter>
+    </ClInclude>
+    <ClInclude Include="player.h">
+      <Filter>event\h</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
