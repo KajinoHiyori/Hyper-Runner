@@ -57,6 +57,9 @@ compile_commands.json
 *.bak
 *.swp
 
+# Visual Studio cache and temporary files
+.vs/
+
 # vcpkg
 vcpkg_installed/
 
