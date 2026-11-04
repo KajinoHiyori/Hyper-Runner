@@ -199,17 +199,17 @@ void CEffect::UpdateGame(void)
 //=============================
 void CEffect::CollisionField(CField* pField)
 {
-	// 位置情報取得
-	D3DXVECTOR3 pos = CBillboard::GetPosition();
+	//// 位置情報取得
+	//D3DXVECTOR3 pos = CBillboard::GetPosition();
 
-	if (pos.y < pField->GetHeight(pos))
-	{ // 地面に埋まった場合
-		pos.y = CBillboard::GetPosition().y;
-		m_move.y *= -1.0f;	// 跳ね返り処理
-	}
+	//if (pos.y < pField->GetHeight(pos))
+	//{ // 地面に埋まった場合
+	//	pos.y = CBillboard::GetPosition().y;
+	//	m_move.y *= -1.0f;	// 跳ね返り処理
+	//}
 
-	// 位置情報の更新
-	CBillboard::SetPosition(pos);
+	//// 位置情報の更新
+	//CBillboard::SetPosition(pos);
 }
 
 //=============================

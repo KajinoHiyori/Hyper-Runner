@@ -353,38 +353,38 @@ void CParticleX::UpdateRanking(void)
 //=============================
 void CParticleX::CollisionField(CField* pField)
 {
-	D3DXVECTOR3 pos = CObjectX::GetPosition();
-	float fHeight = pField->GetHeight(D3DXVECTOR3(pos.x, pos.y + m_fSize, pos.z));
-	
-	if (pos.y - m_fSize <= fHeight)
-	{ // 地面に埋まった場合
-		pos.y = fHeight + m_fSize;
-		m_move.x *= -1.0f;	// 地面に跳ね返る
-		m_move.y *= -2.0f;	// 地面に跳ね返る
-		m_move.x *= -1.0f;	// 地面に跳ね返る
-	}
+	//D3DXVECTOR3 pos = CObjectX::GetPosition();
+	//float fHeight = pField->GetHeight(D3DXVECTOR3(pos.x, pos.y + m_fSize, pos.z));
+	//
+	//if (pos.y - m_fSize <= fHeight)
+	//{ // 地面に埋まった場合
+	//	pos.y = fHeight + m_fSize;
+	//	m_move.x *= -1.0f;	// 地面に跳ね返る
+	//	m_move.y *= -2.0f;	// 地面に跳ね返る
+	//	m_move.x *= -1.0f;	// 地面に跳ね返る
+	//}
 
-	// フィールド上で行動範囲を制限[X]
-	if (pField->GetPosition().x - pField->GetWidth() >= pos.x - m_fSize)
-	{
-		pos.x = pField->GetPosition().x - pField->GetWidth() + m_fSize;
-	}
-	else if (pField->GetPosition().x + pField->GetWidth() <= pos.x + m_fSize)
-	{
-		pos.x = pField->GetPosition().x + pField->GetWidth() - m_fSize;
-	}
-	// フィールド上で行動範囲を制限[Z]
-	if (pField->GetPosition().z - pField->GetDepth() >= pos.z - m_fSize)
-	{
-		pos.z = pField->GetPosition().z - pField->GetDepth() + m_fSize;
-	}
-	else if (pField->GetPosition().z + pField->GetDepth() <= pos.z + m_fSize)
-	{
-		pos.z = pField->GetPosition().z + pField->GetDepth() - m_fSize;
-	}
+	//// フィールド上で行動範囲を制限[X]
+	//if (pField->GetPosition().x - pField->GetWidth() >= pos.x - m_fSize)
+	//{
+	//	pos.x = pField->GetPosition().x - pField->GetWidth() + m_fSize;
+	//}
+	//else if (pField->GetPosition().x + pField->GetWidth() <= pos.x + m_fSize)
+	//{
+	//	pos.x = pField->GetPosition().x + pField->GetWidth() - m_fSize;
+	//}
+	//// フィールド上で行動範囲を制限[Z]
+	//if (pField->GetPosition().z - pField->GetDepth() >= pos.z - m_fSize)
+	//{
+	//	pos.z = pField->GetPosition().z - pField->GetDepth() + m_fSize;
+	//}
+	//else if (pField->GetPosition().z + pField->GetDepth() <= pos.z + m_fSize)
+	//{
+	//	pos.z = pField->GetPosition().z + pField->GetDepth() - m_fSize;
+	//}
 
-	// 位置更新
-	CObjectX::SetPosition(pos);
+	//// 位置更新
+	//CObjectX::SetPosition(pos);
 }
 
 //=============================

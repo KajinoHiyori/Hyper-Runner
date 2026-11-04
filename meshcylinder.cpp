@@ -192,12 +192,12 @@ void CMeshCylinder::Update(void)
 	//	break;
 	}
 
-	// 高度変更
-	if (pField != NULL)
-	{
-		float fHeight = pField->GetHeight(m_pos);
-		m_pos.y = fHeight;
-	}
+	//// 高度変更
+	//if (pField != NULL)
+	//{
+	//	float fHeight = pField->GetHeight(m_pos);
+	//	m_pos.y = fHeight;
+	//}
 
 	// 上端の波を表現
 	m_fCounter += WAVE;

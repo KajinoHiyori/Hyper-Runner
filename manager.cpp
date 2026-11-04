@@ -408,7 +408,7 @@ void CManager::Update(void)
 
 	// デバック表示
 	m_pDebugProc->Print("オブジェクト数 : %d\n", CObject::GetNumAll());
-	m_pDebugProc->Print("フィールド数 : %d\n", CField::GetNumAll());
+	//m_pDebugProc->Print("フィールド数 : %d\n", CField::GetNumAll());
 
 	// レンダラー更新処理
 	m_pRenderer->Update();

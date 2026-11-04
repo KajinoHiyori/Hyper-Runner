@@ -48,7 +48,7 @@
 #define FVF_VERTEX_2D					(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1)	// 頂点フォーマット
 #define FVF_VERTEX_3D					(D3DFVF_XYZ		|	D3DFVF_NORMAL		| D3DFVF_DIFFUSE	|	D3DFVF_TEX1)	// 頂点フォーマット[3D]
 #define FVF_VERTEX_3D_MULTI				(D3DFVF_XYZ		|	D3DFVF_NORMAL		| D3DFVF_DIFFUSE	|	D3DFVF_TEX2)	// 頂点フォーマット[3D]
-#define WINDOW_NAME						"MARUNEKO TO POPCORN"	// ウィンドウの名前(キャプションに表示)
+#define WINDOW_NAME						"Hyper Runner"	// ウィンドウの名前(キャプションに表示)
 #define HALF_D3DXPI						(D3DX_PI * 0.5f)	// 円周率の約半分
 #define DOUBLE_D3DXPI					(D3DX_PI * 2.0f)	// 円周率の約2倍
 #define INIT_D3DVEC3					(D3DXVECTOR3(0.0f, 0.0f, 0.0f))	// D3DXVECTOR3型の初期値

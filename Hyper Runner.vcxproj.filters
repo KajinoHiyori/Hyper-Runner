@@ -177,6 +177,12 @@
     <ClCompile Include="meshring.cpp">
       <Filter>mesh\cpp</Filter>
     </ClCompile>
+    <ClCompile Include="renderer.cpp">
+      <Filter>main\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="ranking_offline.cpp">
+      <Filter>main\cpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="color.h">
@@ -286,6 +292,12 @@
     </ClInclude>
     <ClInclude Include="meshring.h">
       <Filter>mesh\h</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer.h">
+      <Filter>main\h</Filter>
+    </ClInclude>
+    <ClInclude Include="ranking_offline.h">
+      <Filter>main\h</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
