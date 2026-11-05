@@ -9,7 +9,6 @@
 //=============================
 #include "object2D.h"
 #include "ranking.h"
-#include "ranking_ui.h"
 #include "object2D.h"
 #include "result.h"
 #include "manager.h"
@@ -17,21 +16,11 @@
 #include "sound.h"
 #include "player.h"
 #include "field.h"
-#include "wall.h"
-#include "stem.h"
-#include "corn.h"
-#include "popcorn.h"
 #include "loadscripts.h"
-#include "ranking_online.h"
 #include "ranking_offline.h"
-#include "block.h"
-#include "machine.h"
-#include "timer.h"
 #include "particle.h"
 #include "meshcylinder.h"
-#include "decoration.h"
 #include "debugproc.h"
-#include "popcornmanager.h"
 
 //=============================
 // マクロ定義
@@ -43,10 +32,6 @@
 //=============================
 // 静的メンバ変数宣言
 //=============================
-CPlayer* CRanking::m_pPlayer = NULL;	// プレイヤーへのポインタ
-CField* CRanking::m_pField = NULL;	// フィールドへのポインタ
-CWall* CRanking::m_apWall[MAX_RANKINGWALL] = {};	// 壁のポインタ
-CRankingUI* CRanking::m_pRankingUI = NULL;	// ランキングUIへのポインタ
 
 //=============================
 // コンストラクタ
@@ -73,39 +58,6 @@ HRESULT CRanking::Init(void)
 	CSound* pSound = CManager::GetSound();
 	pSound->Play(CSound::BGM_RANKING);
 
-	// プレイヤー生成
-	if (m_pPlayer != NULL)return E_FAIL;
-	// 使用されていない場合
-	m_pPlayer = CPlayer::Create(RANKINGSCRIPTS_PATH);
-
-	// フィールド生成
-	if (m_pField != NULL) return E_FAIL;
-	// 使用されていない場合
-	m_pField = CField::Create(INIT_D3DVEC3, INIT_D3DVEC3);
-
-	// 壁の総数を読み取り
-	int nNumWall = CWall::LoadNumAll(RANKINGSCRIPTS_PATH);
-
-	for (int nCntWall = 0; nCntWall < nNumWall; nCntWall++)
-	{ // 壁を生成
-		m_apWall[nCntWall] = NULL;
-		m_apWall[nCntWall] = CWall::Create(RANKINGSCRIPTS_PATH, nCntWall);
-	}
-
-	// ブロック情報読み込み
-	CBlock::LoadScripts(RESULTSCRIPTS_PATH);
-
-	// 茎の生成
-	CStem::Reset(m_pField->GetWidth(), m_pField->GetDepth());
-	CManager::GetSound()->Stop(CSound::SE_GROW);
-
-	// 飾りを生成
-	CDecoration::Create();
-
-	// ランキングUIの表示
-	if (m_pRankingUI != NULL) return E_FAIL;
-	m_pRankingUI = CRankingUI::Create();
-	
 	return E_FAIL;
 }
 
@@ -114,18 +66,6 @@ HRESULT CRanking::Init(void)
 //=============================
 void CRanking::Uninit(void)
 {
-	// 値のクリア
-		// 各ポインタのクリア
-	m_pPlayer = NULL;	// プレイヤーへのポインタ
-	m_pField = NULL;		// フィールドへのポインタ
-	for (int nCntWall = 0; nCntWall < MAX_RESULTWALL; nCntWall++)
-	{
-		if (m_apWall[nCntWall] != NULL)
-		{
-			m_apWall[nCntWall] = NULL;
-		}
-	}
-	m_pRankingUI = NULL;
 }
 
 //=============================

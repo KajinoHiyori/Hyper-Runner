@@ -201,6 +201,15 @@
     <ClCompile Include="player.cpp">
       <Filter>event\cpp</Filter>
     </ClCompile>
+    <ClCompile Include="ranking.cpp">
+      <Filter>scene\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="result.cpp">
+      <Filter>scene\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="title.cpp">
+      <Filter>scene\cpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="color.h">
@@ -325,6 +334,15 @@
     </ClInclude>
     <ClInclude Include="player.h">
       <Filter>event\h</Filter>
+    </ClInclude>
+    <ClInclude Include="ranking.h">
+      <Filter>scene\h</Filter>
+    </ClInclude>
+    <ClInclude Include="result.h">
+      <Filter>scene\h</Filter>
+    </ClInclude>
+    <ClInclude Include="title.h">
+      <Filter>scene\h</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

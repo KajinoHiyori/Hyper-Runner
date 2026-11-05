@@ -180,13 +180,16 @@
     <ClCompile Include="polygon2D.cpp" />
     <ClCompile Include="polygon3D.cpp" />
     <ClCompile Include="polygonField.cpp" />
+    <ClCompile Include="ranking.cpp" />
     <ClCompile Include="ranking_offline.cpp" />
     <ClCompile Include="renderer.cpp" />
+    <ClCompile Include="result.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="shadow.cpp" />
     <ClCompile Include="smoke.cpp" />
     <ClCompile Include="sound.cpp" />
     <ClCompile Include="texture.cpp" />
+    <ClCompile Include="title.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
@@ -223,13 +226,16 @@
     <ClInclude Include="polygon2D.h" />
     <ClInclude Include="polygon3D.h" />
     <ClInclude Include="polygonField.h" />
+    <ClInclude Include="ranking.h" />
     <ClInclude Include="ranking_offline.h" />
     <ClInclude Include="renderer.h" />
+    <ClInclude Include="result.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="shadow.h" />
     <ClInclude Include="smoke.h" />
     <ClInclude Include="sound.h" />
     <ClInclude Include="texture.h" />
+    <ClInclude Include="title.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

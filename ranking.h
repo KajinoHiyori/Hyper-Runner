@@ -21,10 +21,6 @@
 //=============================
 // 前方宣言
 //=============================
-class CRankingUI;	// ランキングUIクラス
-class CPlayer;		// プレイヤークラス
-class CField;		// フィールドクラス
-class CWall;		// 壁クラス
 
 //=============================
 // ランキングクラス
@@ -38,16 +34,8 @@ public:
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
-	static CPlayer* GetPlayer(void) { return m_pPlayer; }
-	static CField* GetField(void) { return m_pField; }
-	static CWall* GetWall(int nIdx) { return m_apWall[nIdx]; }
-	static CRankingUI* GetRankingUI(void) { return m_pRankingUI; }
 
 private:
-	static CPlayer* m_pPlayer;		// プレイヤークラスへのポインタ
-	static CField* m_pField;		// フィールドへのポインタ
-	static CWall* m_apWall[MAX_RANKINGWALL];		// 壁へのポインタ
-	static CRankingUI* m_pRankingUI;	// ランキングUIへのポインタ
 	int m_nCounter;		// 次に遷移するまでの間隔をカウント
 };
 #endif

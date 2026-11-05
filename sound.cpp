@@ -55,7 +55,7 @@ CSound::SOUNDINFO CSound::m_aSoundInfo[SOUND_LABEL_MAX] =
 // マクロ定義
 //===============================
 #define PLAYSOUND	// 音再生
-//#undef	PLAYSOUND	// PLAYSOUNDを無効化
+#undef	PLAYSOUND	// PLAYSOUNDを無効化
 
 //===============================
 // コンストラクタ

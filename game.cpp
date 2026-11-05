@@ -66,6 +66,8 @@ HRESULT CGame::Init(void)
 	// 使用されていない場合
 	m_pPlayer = CPlayer::Create(INIT_D3DVEC3, INIT_D3DVEC3);
 
+	CManager::GetSound()->Play(CSound::BGM_GAME);
+
 	//// フィールド生成
 	//if (m_pField != NULL) return E_FAIL;
 	//// 使用されていない場合
@@ -150,12 +152,10 @@ void CGame::Update(void)
 	CInputJoypad* pJoypad = CManager::GetInputJoypad();
 	
 	
-	//if ((pKeyboard->GetAnyTrigger() == true || pJoypad->GetAnyButton() == true) && CManager::GetFadeState() == CFade::STATE_FADENONE && GetEnablePause() == false && m_state == STATE_END)
-	//{ // リザルトに遷移
-	//	CManager::GetFade()->SetFade(CFade::TYPE_ALPHA, SCREEN_CENTER, COLOR_WHITE, CScene::MODE_RESULT);
-	//}
-
-	//CManager::GetDebugProc()->Print("NumStem %d\n", CStem::GetNumAll());
+	if ((pKeyboard->GetTrigger(DIK_RETURN) == true || pJoypad->GetAnyButton() == true) /* && CManager::GetFadeState() == CFade::STATE_FADENONE && m_state == STATE_END*/)
+	{ // リザルトに遷移
+		CManager::GetFade()->SetFade(CFade::TYPE_ALPHA, SCREEN_CENTER, COLOR_WHITE, CScene::MODE_RESULT);
+	}
 }
 
 //=============================
