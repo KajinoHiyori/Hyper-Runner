@@ -50,16 +50,6 @@ public:
 	{
 		MOTIONTYPE_NUTORAL = 0,	// 待機
 		MOTIONTYPE_MOVE,		// 移動
-		MOTIONTYPE_ATTACK,		// 攻撃
-		MOTIONTYPE_RANKING,		// ランキング
-		MOTIONTYPE_GAMECLEAR,	// ゲームクリア
-		MOTIONTYPE_GAMEOVER,	// ゲームオーバー
-		MOTIONTYPE_BYE,			// バイバイ
-		MOTIONTYPE_SELECT_GAME,		// GAME START
-		MOTIONTYPE_SELECT_TUTORIAL,	// TUTORIAL,
-		MOTIONTYPE_SELECT_RANKING,	// RANKING
-		MOTIONTYPE_SELECT_CREDIT,	// CREDIT
-		MOTIONTYPE_APPLAUSE,		// 拍手
 		MOTIONTYPE_MAX
 	}MOTIONTYPE;
 
@@ -90,6 +80,7 @@ private:
 	bool LoadCharactor(const char* pFilePath);
 	bool LoadModelFile(const char* pFilePath);
 	bool LoadModelSetting(const char* pFilePath);
+	bool LoadMotion(const char* pFilePath);
 	D3DXVECTOR3	m_pos;		// モデルの位置
 	D3DXVECTOR3	m_posOld;	// モデルの1フレーム前の位置
 	D3DXVECTOR3	m_move;		// モデルの移動量
