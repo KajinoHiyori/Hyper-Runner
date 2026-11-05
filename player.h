@@ -93,6 +93,7 @@ private:
 	CMotion* m_pMotion;		// モーション情報
 	CShadow* m_pShadow;		// 影情報
 	char m_aFileName[MODEL_MAX][MAX_STRING];	// ローカルで文字列を格納[コピー]
+	float m_fSpeed;	// 移動速度
 };
 
 #endif

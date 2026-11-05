@@ -30,8 +30,29 @@
 //=============================
 // マクロ定義
 //=============================
-#define FILE_NAME		("data\\SCRIPTS\\Player.txt")	// ファイル名
-#define PRESSANIM_NAME	("data\\TEXTURE\\pressAnim_L.png")	// 有効攻撃表示テクスチャ名
+#define FILE_NAME			("data\\SCRIPTS\\Player.txt")	// ファイル名
+#define PRESSANIM_NAME		("data\\TEXTURE\\pressAnim_L.png")	// 有効攻撃表示テクスチャ名
+#define NUM_MODEL			("NUM_MODEL")			// NUM_MODEL
+#define MODEL_FILENAME		("MODEL_FILENAME")		// MODEL_FILENAME
+#define CHARACTERSET		("CHARACTERSET")		// CHARACTERSET
+#define END_CHARACTERSET	("END_CHARACTERSET")	// END_CHARACTERSET
+#define NUM_PARTS			("NUM_PARTS")			// NUM_PARTS
+#define PARTSSET			("PARTSSET")			// PARTSSET
+#define END_PARTSSET		("END_PARTSSET")		// END_PARTSSET
+#define INDEX				("INDEX")				// INDEX
+#define PARENT				("PARENT")				// PARENT
+#define POS					("POS")					// POS
+#define ROT					("ROT")					// ROT
+#define MOTIONSET			("MOTIONSET")			// MOTIONSET
+#define END_MOTIONSET		("END_MOTIONSET")		// END_MOTIONSET
+#define LOOP				("LOOP")				// LOOP
+#define NUM_KEY				("NUM_KEY")				// NUM_KEY
+#define KEYSET				("KEYSET")				// KEYSET
+#define END_KEYSET			("END_KEYSET")			// END_KEYSET
+#define FRAME				("FRAME")				// FRAME
+#define KEY					("KEY")					// KEY
+#define END_KEY				("END_KEY")				// END_KEY
+#define SPEED				(1.0f)
 
 //=============================
 // コンストラクタ
@@ -52,6 +73,7 @@ CPlayer::CPlayer(CObject::PRIORITY priority) : CObject(priority)
 	{
 		memset(&m_aFileName[nCntModel][0], 0, sizeof m_aFileName[nCntModel]);
 	}
+	m_fSpeed = 0.0f;
 }
 
 //=============================
@@ -94,7 +116,8 @@ HRESULT CPlayer::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 	// 初期化
 	m_pos = pos;
 	m_posOld = pos;
-	m_move = INIT_D3DVEC3;
+	m_fSpeed = SPEED;
+	m_move = D3DXVECTOR3(0.0f, 0.0f, m_fSpeed);
 	m_rot = rot;
 	m_rotDest = rot;
 
@@ -286,7 +309,8 @@ void CPlayer::UpdateTutorial(void)
 //=============================
 void CPlayer::UpdateGame(void)
 {
-	
+	// 移動処理
+	Move();
 }
 
 //=============================
@@ -302,23 +326,12 @@ void CPlayer::UpdateResult(void)
 //=============================
 void CPlayer::Move(void)
 {
-	// カメラ取得
-	CCamera* pCamera = CManager::GetCamera();
-	D3DXVECTOR3 rotCamera = pCamera->GetRotation();
-
-	// スティックの角度を取得
-	float fRotDiffKey = 0.0f;	// キー入力時の角度補正計算用
-	float fRotDiffPad = 0.0f;	// ジョイパッド入力時の角度補正計算用
-
-	// 移動管理
-	D3DXVECTOR3 moveDirection = INIT_D3DVEC3;	// 移動方向の設定
-	float fMoveDirection = 0.0f;	// 移動方向の管理
-
-	float fAngle = 0.0f;	// 角度管理
-
 	// 入力情報取得
 	CInputKeyboard* pKeyboard = CManager::GetInputKeyboard();
 	CInputJoypad* pJoypad = CManager::GetInputJoypad();
+
+	// 移動量更新
+	m_pos += m_move;
 }
 
 //=============================
@@ -334,9 +347,6 @@ HRESULT CPlayer::LoadScripts(const char* pFilePath)
 
 	return S_OK;
 }
-
-#define NUM_MODEL		("NUM_MODEL")	// NUM_MODEL
-#define MODEL_FILENAME	("MODEL_FILENAME")	// MODEL_FILENAME
 
 //=============================
 // キャラクター情報読み取り処理
@@ -418,16 +428,6 @@ bool CPlayer::LoadModelFile(const char* pFilePath)
 
 	return true;
 }
-
-#define CHARACTERSET		("CHARACTERSET")		// CHARACTERSET
-#define END_CHARACTERSET	("END_CHARACTERSET")	// END_CHARACTERSET
-#define NUM_PARTS			("NUM_PARTS")			// NUM_PARTS
-#define PARTSSET			("PARTSSET")			// PARTSSET
-#define END_PARTSSET		("END_PARTSSET")		// END_PARTSSET
-#define INDEX				("INDEX")				// INDEX
-#define PARENT				("PARENT")				// PARENT
-#define POS					("POS")					// POS
-#define ROT					("ROT")					// ROT
 
 //=============================
 // モデル設置情報
@@ -552,16 +552,6 @@ bool CPlayer::LoadModelSetting(const char* pFilePath)
 
 	return true;
 }
-
-#define MOTIONSET		("MOTIONSET")		// MOTIONSET
-#define END_MOTIONSET	("END_MOTIONSET")	// END_MOTIONSET
-#define LOOP			("LOOP")			// LOOP
-#define NUM_KEY			("NUM_KEY")			// NUM_KEY
-#define KEYSET			("KEYSET")			// KEYSET
-#define END_KEYSET		("END_KEYSET")		// END_KEYSET
-#define FRAME			("FRAME")			// FRAME
-#define KEY				("KEY")				// KEY
-#define END_KEY			("END_KEY")			// END_KEY
 
 //=============================
 // モデル設置情報

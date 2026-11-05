@@ -27,14 +27,14 @@
 #define MOVE			(5.5f)		// 移動量
 #define ROTATE			(0.005f)	// 回転量
 #define DISTANCE		(300.0f)	// 視点と注視点の距離
-#define FORWARD			(50.0f)		// プレイヤーの少し前に注視点置く
+#define FORWARD			(150.0f)		// プレイヤーの少し前に注視点置く
 #define CORRECTION		(0.05f)		// カメラの位置補正
 #define CORRECTION_ROT	(0.035f)	// カメラの回り込み補正
 #define SPEED			(1.0f)		// 停止カメラになる速度の基準
 #define CAMERA_ROLL		(120)		// カメラの回り込み間隔
 #define CAMERA_ROLL_MIN	(0)			// カメラの回り込み間隔(最小)
 #define CAMERA_ROLL_MAX	(360)		// カメラの回り込み間隔(最大)
-#define	GAME_HEIGHT		(200.0f)	// カメラ高度
+#define	GAME_HEIGHT		(300.0f)	// カメラ高度
 #define	RESULT_HEIGHT	(100.0f)	// カメラ高度
 #define CAMERA_POS		(D3DXVECTOR3(0.0f, GAME_HEIGHT, -DISTANCE))	// カメラの位置
 #define DEFAULT			(D3DXVECTOR3(0.0f, 0.0f, 0.0f))			// デフォルトの座標値
@@ -204,7 +204,7 @@ void CCamera::UpdateGame(void)
 	
 	m_posRDest.x = posPlayer.x;
 	m_posRDest.y = posPlayer.y;
-	m_posRDest.z = posPlayer.z + 100.0f;
+	m_posRDest.z = posPlayer.z + FORWARD;
 
 	CDebugProc* pDebug = CManager::GetDebugProc();
 	pDebug->Print("rotDest.y %f\n", m_rotDest.y);
