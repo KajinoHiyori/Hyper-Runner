@@ -36,7 +36,6 @@ public:
 	void SetSceneCamera(CScene::MODE mode, CScene* pScene);
 
 private:
-	void UpdateTutorial(void);
 	void UpdateGame(void);
 	void UpdateResult(void);
 	void UpdateOperate(void);

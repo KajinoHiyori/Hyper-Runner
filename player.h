@@ -62,6 +62,7 @@ public:
 	void Update(void);
 	void Draw(void);
 	void SetPosition(D3DXVECTOR3 pos) { m_pos = pos; }
+	D3DXVECTOR3 GetPosition(void) { return m_pos; }
 	D3DXVECTOR3 GetRotation(void) { return m_rot; }
 	void SetRotationDest(D3DXVECTOR3 rot) { m_rotDest = rot; }
 	void SetMove(D3DXVECTOR3 move) { m_move = move; }

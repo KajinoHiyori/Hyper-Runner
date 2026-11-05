@@ -64,7 +64,7 @@ HRESULT CGame::Init(void)
 	// プレイヤー生成
 	if (m_pPlayer != NULL)return E_FAIL;
 	// 使用されていない場合
-	m_pPlayer = CPlayer::Create(INIT_D3DVEC3, INIT_D3DVEC3);
+	m_pPlayer = CPlayer::Create(INIT_D3DVEC3, D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));
 
 	CManager::GetSound()->Play(CSound::BGM_GAME);
 

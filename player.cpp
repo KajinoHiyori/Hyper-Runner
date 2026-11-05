@@ -20,13 +20,10 @@
 #include "shadow.h"
 #include "meshfield.h"
 #include "scene.h"
-//#include "title.h"
-//#include "tutorial.h"
+#include "title.h"
 #include "game.h"
-//#include "result.h"
-//#include "ranking.h"
-//#include "credit.h"
-//#include "tutorialUI.h"
+#include "result.h"
+#include "ranking.h"
 #include "particle.h"
 #include "sound.h"
 
@@ -104,7 +101,7 @@ HRESULT CPlayer::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 	// モデル読み込み
 	LoadScripts("data\\SCRIPTS\\player.txt");
 
-	m_pMotion->Set(MOTIONTYPE_NUTORAL, false, 0);
+	m_pMotion->Set(MOTIONTYPE_MOVE, false, 0);
 
 	return S_OK;
 }
@@ -147,17 +144,10 @@ void CPlayer::Update(void)
 	// シーンごとに処理を分割
 	switch (mode)
 	{
-	//case CScene::MODE_TITLE:	// タイトル
-	//	// タイトル処理
-	//	UpdateTitle();
-	//	pMeshField = static_cast<CTitle*>(CManager::GetScene())->GetMeshField();
-	//	break;
-
-	//case CScene::MODE_TUTORIAL:	// チュートリアル
-	//	// チュートリアル処理
-	//	UpdateTutorial();
-	//	pMeshField = static_cast<CTutorial*>(CManager::GetScene())->GetMeshField();
-	//	break;
+	case CScene::MODE_TITLE:	// タイトル
+		// タイトル処理
+		UpdateTitle();
+		break;
 
 	case CScene::MODE_GAME:		// ゲーム
 		// ゲーム処理
@@ -165,19 +155,13 @@ void CPlayer::Update(void)
 		//pMeshField = static_cast<CGame*>(CManager::GetScene())->GetMeshField();
 		break;
 
-	//case CScene::MODE_RESULT:	// リザルト
-	//	// リザルト処理
-	//	UpdateResult();
-	//	pMeshField = static_cast<CResult*>(CManager::GetScene())->GetMeshField();
-	//	break;
+	case CScene::MODE_RESULT:	// リザルト
+		// リザルト処理
+		UpdateResult();
+		break;
 
-	//case CScene::MODE_RANKING:	// ランキング
-	//	pMeshField = static_cast<CRanking*>(CManager::GetScene())->GetMeshField();
-	//	break;
-
-	//case CScene::MODE_CREDIT:	// クレジット
-	//	pMeshField = static_cast<CCredit*>(CManager::GetScene())->GetMeshField();
-	//	break;
+	case CScene::MODE_RANKING:	// ランキング
+		break;
 	}
 
 	// モーションの更新
@@ -653,7 +637,7 @@ bool CPlayer::LoadMotion(const char* pFilePath)
 				else if (strstr(&aStringCopy[0], NUM_KEY) != NULL)
 				{ // NUM_KEYを読み込んだ
 					motionInfo[nCntMotion].nNumKey = pLoadScripts->LoadInt(&aStringCopy[0]);
-					int nCntKey = 0;
+					nCntKey = 0;
 				}
 				else if (strstr(&aStringCopy[0], KEYSET) != NULL)
 				{ // KEYSETを読み込んだ

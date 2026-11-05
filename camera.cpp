@@ -13,9 +13,8 @@
 #include "debugproc.h"
 #include "renderer.h"
 #include "game.h"
-//#include "tutorial.h"
-//#include "result.h"
-//#include "player.h"
+#include "result.h"
+#include "player.h"
 #include "field.h"
 
 //=============================
@@ -191,36 +190,6 @@ void CCamera::SetCamera(void)
 }
 
 //=============================
-// チュートリアル処理
-//=============================
-void CCamera::UpdateTutorial(void)
-{
-	if (m_bCameraType == false)
-	{
-		return;
-	}
-
-	//CPlayer* pPlayer = static_cast<CTutorial*>(CManager::GetScene())->GetPlayer();
-	//D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
-	//float fSizePlayer = pPlayer->GetSize();
-
-	//m_posRDest.x = posPlayer.x;
-	//m_posRDest.y = posPlayer.y + fSizePlayer;
-	//m_posRDest.z = posPlayer.z;
-
-	//CDebugProc* pDebug = CManager::GetDebugProc();
-	//pDebug->Print("rotDest.y %f\n", m_rotDest.y);
-
-	//// 視点情報更新
-	//m_posR.x += (m_posRDest.x - m_posR.x) * CORRECTION_ROT;
-	//m_posR.y += (m_posRDest.y - m_posR.y) * CORRECTION_ROT;
-	//m_posR.z += (m_posRDest.z - m_posR.z) * CORRECTION_ROT;
-	//m_posV.x = m_posR.x - sinf(m_rot.y) * (DISTANCE + (fSizePlayer * 5.0f));
-	//m_posV.y = GAME_HEIGHT;
-	//m_posV.z = m_posR.z - cosf(m_rot.y) * (DISTANCE + (fSizePlayer * 5.0f));
-}
-
-//=============================
 // ゲーム処理
 //=============================
 void CCamera::UpdateGame(void)
@@ -230,24 +199,23 @@ void CCamera::UpdateGame(void)
 		return;
 	}
 
-	//CPlayer* pPlayer = static_cast<CGame*>(CManager::GetScene())->GetPlayer();
-	//D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
-	//float fSizePlayer = pPlayer->GetSize();
-	//
-	//m_posRDest.x = posPlayer.x;
-	//m_posRDest.y = posPlayer.y + fSizePlayer;
-	//m_posRDest.z = posPlayer.z;
+	CPlayer* pPlayer = static_cast<CGame*>(CManager::GetScene())->GetPlayer();
+	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
+	
+	m_posRDest.x = posPlayer.x;
+	m_posRDest.y = posPlayer.y;
+	m_posRDest.z = posPlayer.z + 100.0f;
 
-	//CDebugProc* pDebug = CManager::GetDebugProc();
-	//pDebug->Print("rotDest.y %f\n", m_rotDest.y);
+	CDebugProc* pDebug = CManager::GetDebugProc();
+	pDebug->Print("rotDest.y %f\n", m_rotDest.y);
 
-	//// 視点情報更新
-	//m_posR.x += (m_posRDest.x - m_posR.x) * CORRECTION_ROT;
-	//m_posR.y += (m_posRDest.y - m_posR.y) * CORRECTION_ROT;
-	//m_posR.z += (m_posRDest.z - m_posR.z) * CORRECTION_ROT;
-	//m_posV.x = m_posR.x - sinf(m_rot.y) * (DISTANCE + (fSizePlayer * 5.0f));
-	//m_posV.y = GAME_HEIGHT;
-	//m_posV.z = m_posR.z - cosf(m_rot.y) * (DISTANCE + (fSizePlayer * 5.0f));
+	// 視点情報更新
+	m_posR.x += (m_posRDest.x - m_posR.x) * CORRECTION_ROT;
+	m_posR.y += (m_posRDest.y - m_posR.y) * CORRECTION_ROT;
+	m_posR.z += (m_posRDest.z - m_posR.z) * CORRECTION_ROT;
+	m_posV.x = m_posR.x - sinf(m_rot.y) * (DISTANCE);
+	m_posV.y = GAME_HEIGHT;
+	m_posV.z = m_posR.z - cosf(m_rot.y) * (DISTANCE);
 }
 
 //=============================
