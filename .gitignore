@@ -70,5 +70,6 @@ vcpkg_installed/
 Testing/
 .cache/
 
+# Build output
 Debug/
 Release/
