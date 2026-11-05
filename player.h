@@ -23,6 +23,7 @@
 //=============================
 class CModel;	// モデルクラス
 class CShadow;	// 影クラス
+class CField;	// フィールドクラス
 
 //=============================
 // プレイヤークラス
@@ -53,6 +54,15 @@ public:
 		MOTIONTYPE_MAX
 	}MOTIONTYPE;
 
+	// 移動しているラインを選択
+	typedef enum
+	{
+		LINE_LEFT = 0,	// 移動ライン[左]
+		LINE_CENTER,	// 移動ライン[中央]
+		LINE_RIGHT,		// 移動ライン[右]
+		LINE_MAX
+	}LINE;
+
 	CPlayer(CObject::PRIORITY priority = CObject::PRIORITY_CHARACTOR);
 	~CPlayer();
 	static CPlayer* Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot);
@@ -77,6 +87,8 @@ private:
 	void UpdateGame(void);
 	void UpdateResult(void);
 	void Move(void);
+	void ChangeLine(int nChangeDir);
+	void CollisionField(CField* pField);
 	HRESULT LoadScripts(const char* pFilePath);
 	bool LoadCharactor(const char* pFilePath);
 	bool LoadModelFile(const char* pFilePath);
@@ -94,6 +106,8 @@ private:
 	CShadow* m_pShadow;		// 影情報
 	char m_aFileName[MODEL_MAX][MAX_STRING];	// ローカルで文字列を格納[コピー]
 	float m_fSpeed;	// 移動速度
+	bool m_bJump;	// ジャンプ
+	int m_nLine;	// 移動しているラインを取得
 };
 
 #endif

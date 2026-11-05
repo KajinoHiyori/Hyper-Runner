@@ -26,33 +26,15 @@
 #include "ranking.h"
 #include "particle.h"
 #include "sound.h"
+#include "field.h"
 
 //=============================
 // マクロ定義
 //=============================
 #define FILE_NAME			("data\\SCRIPTS\\Player.txt")	// ファイル名
 #define PRESSANIM_NAME		("data\\TEXTURE\\pressAnim_L.png")	// 有効攻撃表示テクスチャ名
-#define NUM_MODEL			("NUM_MODEL")			// NUM_MODEL
-#define MODEL_FILENAME		("MODEL_FILENAME")		// MODEL_FILENAME
-#define CHARACTERSET		("CHARACTERSET")		// CHARACTERSET
-#define END_CHARACTERSET	("END_CHARACTERSET")	// END_CHARACTERSET
-#define NUM_PARTS			("NUM_PARTS")			// NUM_PARTS
-#define PARTSSET			("PARTSSET")			// PARTSSET
-#define END_PARTSSET		("END_PARTSSET")		// END_PARTSSET
-#define INDEX				("INDEX")				// INDEX
-#define PARENT				("PARENT")				// PARENT
-#define POS					("POS")					// POS
-#define ROT					("ROT")					// ROT
-#define MOTIONSET			("MOTIONSET")			// MOTIONSET
-#define END_MOTIONSET		("END_MOTIONSET")		// END_MOTIONSET
-#define LOOP				("LOOP")				// LOOP
-#define NUM_KEY				("NUM_KEY")				// NUM_KEY
-#define KEYSET				("KEYSET")				// KEYSET
-#define END_KEYSET			("END_KEYSET")			// END_KEYSET
-#define FRAME				("FRAME")				// FRAME
-#define KEY					("KEY")					// KEY
-#define END_KEY				("END_KEY")				// END_KEY
-#define SPEED				(1.0f)
+#define SPEED				(1.0f)					// 移動速度
+#define CORRECTION_MOVE		(0.1f)				// 移動の減衰係数
 
 //=============================
 // コンストラクタ
@@ -73,7 +55,9 @@ CPlayer::CPlayer(CObject::PRIORITY priority) : CObject(priority)
 	{
 		memset(&m_aFileName[nCntModel][0], 0, sizeof m_aFileName[nCntModel]);
 	}
-	m_fSpeed = 0.0f;
+	m_fSpeed = 0.0f;	// 速度
+	m_nLine = LINE_CENTER;		// 移動しているライン
+	m_bJump = false;	// ジャンプフラグ
 }
 
 //=============================
@@ -311,6 +295,9 @@ void CPlayer::UpdateGame(void)
 {
 	// 移動処理
 	Move();
+
+	// 地面との判定
+	CollisionField(static_cast<CGame*>(CManager::GetScene())->GetField(m_nLine));
 }
 
 //=============================
@@ -329,9 +316,85 @@ void CPlayer::Move(void)
 	// 入力情報取得
 	CInputKeyboard* pKeyboard = CManager::GetInputKeyboard();
 	CInputJoypad* pJoypad = CManager::GetInputJoypad();
+	int nChangeDir = 0;	// 移動方向設定
+
+	if ((pKeyboard->GetTrigger(DIK_D) == true
+		|| pKeyboard->GetTrigger(DIK_RIGHTARROW) == true
+		|| pJoypad->GetTrigger(CInputJoypad::JOYKEY_RIGHT) == true
+		|| pJoypad->GetLeftStickTrigger(CInputJoypad::JOYKEY_LSTICK_RIGHT) == true)
+		&& m_bJump == false)
+	{ // 右のラインに移動
+		switch (m_nLine)
+		{
+		case LINE_RIGHT:	// 右端
+			nChangeDir = 0;
+			break;
+
+		default:
+			m_nLine++;
+			nChangeDir = 1;
+			break;
+		}
+		// 列切り替え処理
+		ChangeLine(nChangeDir);
+	}
+	else if ((pKeyboard->GetTrigger(DIK_A) == true
+		|| pKeyboard->GetTrigger(DIK_LEFTARROW) == true
+		|| pJoypad->GetTrigger(CInputJoypad::JOYKEY_LEFT) == true
+		|| pJoypad->GetLeftStickTrigger(CInputJoypad::JOYKEY_LSTICK_LEFT) == true)
+		&& m_bJump == false)
+	{ // 左のラインに移動
+		switch (m_nLine)
+		{
+		case LINE_LEFT:	// 右端
+			nChangeDir = 0;
+			break;
+
+		default:
+			m_nLine--;
+			nChangeDir = -1;
+			break;
+		}
+
+		// 列切り替え処理
+		ChangeLine(nChangeDir);
+	}
+
+	// 重力
+	m_move.y -= GRAVITY;
 
 	// 移動量更新
 	m_pos += m_move;
+
+	// 移動量の更新
+	m_move.x += (0.0f - m_move.x) * CORRECTION_MOVE;
+	m_move.y += (0.0f - m_move.y) * CORRECTION_MOVE;
+}
+
+#define JUMP		(40.0f)	// ジャンプ
+#define CHANGE_X	(40.0f)	// X方向切り替え
+
+//=============================
+// 列切り替え処理
+//=============================
+void CPlayer::ChangeLine(int nChangeDir)
+{
+	m_move.x = CHANGE_X * nChangeDir;
+	m_move.y = JUMP;
+	m_bJump = true;
+}
+
+//=============================
+// フィールド判定処理
+//=============================
+void CPlayer::CollisionField(CField* pField)
+{
+	if (m_pos.y > pField->GetHeight(m_pos))return;
+	// 設置処理
+	m_move.x = 0.0f;
+	m_move.y = 0.0f;
+	m_bJump = false;
+	m_pos.y = pField->GetHeight(m_pos);
 }
 
 //=============================

@@ -61,7 +61,7 @@
 #define FOV_DEFAULT						(45.0f)	// 基本の視野角
 #define CAMERA_CLOSEST					(10.0f)		// カメラとの距離がこれ以上近い場合、描画を行わない
 #define CAMERA_FARTHEST					(10000.0f)	// カメラとの距離がこれ以上遠い場合、描画を行わない
-#define GRAVITY							(1.5f)			// 重力
+#define GRAVITY							(1.0f)			// 重力
 #define SAFE_UNINIT(pointer)			if (pointer != NULL){pointer->Uninit(); delete pointer; pointer = NULL;}		// Uninit
 #define SAFE_UNLOAD(pointer)			if (pointer != NULL){pointer->Unload(); delete pointer; pointer = NULL;}		// Unload
 #define SAFE_RELEASE(pointer)			if (pointer != NULL){pointer->Release(); pointer = NULL;}						// Release

@@ -34,13 +34,13 @@ public:
 		float fRotX;	// 向きX
 		float fRotY;	// 向きY
 		float fRotZ;	// 向きZ
-	}KEY;
+	}MOTIONKEY;
 
 	// キー情報の構造体
 	typedef struct
 	{
 		int nFrame;				// 再生フレーム
-		KEY aKey[MAX_MODEL];	// 各パーツごとのキー要素
+		MOTIONKEY aKey[MAX_MODEL];	// 各パーツごとのキー要素
 	}KEY_INFO;
 
 	// モーション情報の構造体

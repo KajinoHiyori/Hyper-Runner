@@ -118,10 +118,10 @@ void CMotion::Update(void)
 	// 全モデル(パーツ)ごとに位置、向きを更新
 	for (int nCntModel = 0; nCntModel < m_nNumModel; nCntModel++)
 	{
-		KEY Key = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel];											// 現在のキー
-		KEY KeyNext = m_aInfo[m_nType].aKeyInfo[(m_nKey + 1) % m_nNumKey].aKey[nCntModel];						// 次のフレームのキー
-		KEY KeyBlend = m_aInfo[m_nTypeBlend].aKeyInfo[m_nKeyBlend].aKey[nCntModel];								// ブレンドモーションの現在のキー
-		KEY KeyNextBlend = m_aInfo[m_nTypeBlend].aKeyInfo[(m_nKeyBlend + 1) % m_nNumKeyBlend].aKey[nCntModel];	// ブレンドモーションの次のキー
+		MOTIONKEY Key = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel];											// 現在のキー
+		MOTIONKEY KeyNext = m_aInfo[m_nType].aKeyInfo[(m_nKey + 1) % m_nNumKey].aKey[nCntModel];						// 次のフレームのキー
+		MOTIONKEY KeyBlend = m_aInfo[m_nTypeBlend].aKeyInfo[m_nKeyBlend].aKey[nCntModel];								// ブレンドモーションの現在のキー
+		MOTIONKEY KeyNextBlend = m_aInfo[m_nTypeBlend].aKeyInfo[(m_nKeyBlend + 1) % m_nNumKeyBlend].aKey[nCntModel];	// ブレンドモーションの次のキー
 		float fRateKey = (float)m_nCounter / (float)m_aInfo[m_nType].aKeyInfo[m_nKey].nFrame;					// 現在のモーションカウンター / 現在の再生フレーム
 		float fRateKeyBlend = (float)m_nCounterMotionBlend / (float)m_aInfo[m_nTypeBlend].aKeyInfo[m_nKeyBlend].nFrame;	// ブレンドモーションカウンター / ブレンドモーションフレーム
 		float fRateBlend = (float)m_nCounterBlend / (float)m_nFrameBlend;	// ブレンドフレームを処理している比率

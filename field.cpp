@@ -43,7 +43,7 @@ int CField::m_nNumAll = 0;
 //=============================
 // コンストラクタ
 //=============================
-CField::CField(CObject::PRIORITY priority) : CMeshField(priority)
+CField::CField(CObject::PRIORITY priority) : CObject3D(priority)
 {
 	m_nNumAll++;
 }
@@ -59,7 +59,7 @@ CField::~CField()
 //=============================
 // フィールド生成処理
 //=============================
-CField* CField::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
+CField* CField::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fDepth)
 {
 	CField* pField = NULL;
 
@@ -70,7 +70,7 @@ CField* CField::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 		if (pField != NULL)
 		{ // インスタンス生成に成功
 			// フィールドの初期化処理
-			pField->Init(pos, rot);
+			pField->Init(pos, rot, fWidth, fDepth);
 
 			return pField;
 		}
@@ -83,15 +83,13 @@ CField* CField::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 //=============================
 // 初期化処理
 //=============================
-HRESULT CField::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
+HRESULT CField::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fDepth)
 {
-	if (FAILED(LoadScripts(GAMESCRIPTS_PATH)))
-	{
-		return E_FAIL;
-	}
-
+	// オブジェクト初期化
+	CObject3D::Init(pos, rot, COLOR_WHITE, fWidth, fDepth, CObject3D::CENTER_BUTTON);
+	
 	// オブジェクトにタイプを指定
-	CMeshField::SetType(CObject::TYPE_FIELD);
+	CObject3D::SetType(CObject::TYPE_FIELD);
 
 	return S_OK;
 }
@@ -105,7 +103,7 @@ void CField::Uninit(void)
 	m_nNumAll--;
 
 	// 3Dオブジェクトの終了処理
-	CMeshField::Uninit();
+	CObject3D::Uninit();
 }
 
 //=============================
@@ -113,8 +111,7 @@ void CField::Uninit(void)
 //=============================
 void CField::Update(void)
 {
-	// メッシュフィールドの更新処理
-	CMeshField::Update();
+	CManager::GetDebugProc()->Print("pos %f %f %f\n", CObject3D::GetPosition().x, CObject3D::GetPosition().y, CObject3D::GetPosition().z);
 }
 
 //=============================
@@ -123,7 +120,7 @@ void CField::Update(void)
 void CField::Draw(void)
 {
 	// 3Dオブジェクトの描画処理
-	CMeshField::Draw();
+	CObject3D::Draw();
 }
 
 //=============================
@@ -131,127 +128,5 @@ void CField::Draw(void)
 //=============================
 float CField::GetHeight(D3DXVECTOR3 pos)
 {
-	return CMeshField::GetHeight(pos);
+	return CObject3D::GetPosition().y;
 }
-
-//=============================
-// 外部ファイル読み込み処理
-//=============================
-HRESULT CField::LoadScripts(const char* pFileName)
-{
-	// スクリプト読み込み処理インスタンス生成
-	CLoadScripts* pLoadScripts = NULL;
-	pLoadScripts = new CLoadScripts;
-
-	bool bLoadEnd = false;		// 読み込み終了フラグ
-	char aString[MAX_STRING];		// ローカルで文字列を格納
-	char aStringCopy[MAX_STRING];	// ローカルで文字列を格納[コピー]
-
-	char aTextureName[MAX_STRING];	// モデル名
-	memset(&aTextureName[0], 0, sizeof aTextureName);
-	D3DXVECTOR3 pos = INIT_D3DVEC3;	// 位置
-	D3DXVECTOR3 rot = INIT_D3DVEC3;	// 向き
-	float fWidth = 0.0f;	// 幅
-	float fDepth = 0.0f;	// 奥行き
-	int nDivison = 0;		// 分割数
-	int nMaxHeight = 0;	// 最高高度基準値
-	float fHeightValue = 0.0f;	// 高度乗算値
-	float fTexRange = 0.0f;			// テクスチャ読み込み幅
-	CMeshField::TYPE type = CMeshField::TYPE_FLAT;	// フィールドの状態
-	// ファイルを開く
-	FILE* pFile = fopen(pFileName, "r");
-
-	if (pFile == NULL)
-	{ // 読み込みに失敗
-		return E_FAIL;
-	}
-
-	do
-	{
-		// 文字列のクリア
-		memset(&aString[0], 0, sizeof aString);
-		memset(&aStringCopy[0], 0, sizeof aStringCopy);
-
-		// 読み込んだ行の文字列判定
-		fgets(&aString[0], MAX_STRING, pFile);	// 1行読み込む
-		pLoadScripts->Judgment(&aString[0], &aStringCopy[0]);	// 有効文字抜き取り
-
-		if (strstr(&aStringCopy[0], FIELDSET) != NULL)
-		{ // FIELDSETを読み込んだ
-			while (1)
-			{
-				// 文字列のクリア
-				memset(&aString[0], 0, sizeof aString);
-				memset(&aStringCopy[0], 0, sizeof aStringCopy);
-
-				// 読み込んだ行の文字列判定
-				fgets(&aString[0], MAX_STRING, pFile);	// 1行読み込む
-				pLoadScripts->Judgment(&aString[0], &aStringCopy[0]);	// 有効文字抜き取り
-
-				if (strstr(&aStringCopy[0], TEXTURENAME) != NULL)
-				{ // TEXTURENAMEを読み込んだ
-					pLoadScripts->LoadFileName(&aStringCopy[0]);
-					memcpy(&aTextureName[0], &aStringCopy[0], sizeof aStringCopy);
-				}
-				if (strstr(&aStringCopy[0], POS) != NULL)
-				{ // POSを読み込んだ
-					pos = pLoadScripts->LoadVector3(&aStringCopy[0]);
-				}
-				if (strstr(&aStringCopy[0], ROT) != NULL)
-				{ // ROTを読み込んだ
-					rot = pLoadScripts->LoadVector3(&aStringCopy[0]);
-				}
-				if (strstr(&aStringCopy[0], WIDTH) != NULL)
-				{ // WIDTHを読み込んだ
-					fWidth = pLoadScripts->LoadFloat(&aStringCopy[0]);
-				}
-				if (strstr(&aStringCopy[0], DEPTH) != NULL)
-				{ // DEPTHを読み込んだ
-					fDepth = pLoadScripts->LoadFloat(&aStringCopy[0]);
-				}
-				if (strstr(&aStringCopy[0], DIVISION) != NULL)
-				{ // DIVISIONを読み込んだ
-					nDivison = pLoadScripts->LoadInt(&aStringCopy[0]);
-				}
-				if (strstr(&aStringCopy[0], MAXHEIGHT) != NULL)
-				{ // MAXHEIGHTを読み込んだ
-					nMaxHeight = pLoadScripts->LoadInt(&aStringCopy[0]);
-				}
-				if (strstr(&aStringCopy[0], HEIGHTVALUE) != NULL)
-				{ // HEIGHTVALUEを読み込んだ
-					fHeightValue = pLoadScripts->LoadFloat(&aStringCopy[0]);
-				}
-				if (strstr(&aStringCopy[0], TEXTURERANGE) != NULL)
-				{ // TEXTURERANGEを読み込んだ
-					fTexRange = pLoadScripts->LoadFloat(&aStringCopy[0]);
-				}
-				if (strstr(&aStringCopy[0], FIELDTYPE) != NULL)
-				{ // FIELDTYPEを読み込んだ
-					int nType = pLoadScripts->LoadInt(&aStringCopy[0]);
-					type = (CMeshField::TYPE)nType;
-				}
-				if (strstr(&aStringCopy[0], END_FIELDSET) != NULL)
-				{ // END_PLAYERSETを読み込んだ
-					bLoadEnd = true;
-					break;
-				}
-			}
-		}
-	} while (bLoadEnd == false);
-
-	// テクスチャの取得
-	CTexture* pTexture = CManager::GetTexture();
-
-	// 3Dオブジェクトの初期化
-	CMeshField::Init(pos, type, fWidth, fDepth, nDivison, nMaxHeight, fHeightValue, fTexRange);
-	CMeshField::SetTextureIdx(CManager::GetTexture()->Register(&aTextureName[0]));
-
-	// スクリプト破棄
-	SAFE_DELETE_SINGULAR(pLoadScripts);
-
-	return S_OK;
-}
-
-
-
-

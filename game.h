@@ -18,12 +18,13 @@
 // マクロ定義
 //=============================
 #define MAX_GAMEWALL	(128)	// 壁の最大数
+#define MAX_FIELDLINE	(3)		// 移動レーン数
 
 //=============================
 // 前方宣言
 //=============================
 class CPlayer;		// プレイヤークラス
-//class CField;		// フィールドクラス
+class CField;		// フィールドクラス
 //class CWall;		// 壁クラス
 //class CMachine;		// マシンクラス
 //class CTimer;		// タイマークラス
@@ -56,7 +57,7 @@ public:
 	void SetState(STATE state) { m_state = state; }
 	STATE GetState(void) { return m_state; }
 	static CPlayer* GetPlayer(void) { return m_pPlayer; }
-	//static CField* GetField(void) { return m_pField; }
+	static CField* GetField(int nIdx) { return m_apField[nIdx]; }
 	//static CWall* GetWall(int nIdx){ return m_apWall[nIdx]; }
 	//static CMachine* GetMachine(void) { return m_pMachine; }
 	//static CTimer* GetTimer(void) { return m_pTimer; }
@@ -66,7 +67,7 @@ public:
 
 private:
 	static CPlayer* m_pPlayer;		// プレイヤークラスへのポインタ
-	//static CField* m_pField;		// フィールドへのポインタ
+	static CField* m_apField[MAX_FIELDLINE];		// フィールドへのポインタ
 	//static CWall* m_apWall[MAX_GAMEWALL];		// 壁へのポインタ
 	//static CMachine* m_pMachine;	// マシンクラスへのポインタ
 	//static CTimer* m_pTimer;		// タイマーへのポインタ

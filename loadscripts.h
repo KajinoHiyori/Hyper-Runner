@@ -21,7 +21,26 @@
 #define RESULTSCRIPTS_PATH		("data\\SCRIPTS\\resultscripts.txt")	// 外部ファイル名
 #define RANKINGSCRIPTS_PATH		("data\\SCRIPTS\\rankingscripts.txt")	// 外部ファイル名
 #define LOADMODELSCRIPTS_PATH	("data\\SCRIPTS\\loadmodel.txt")		// 外部ファイル名
-
+#define NUM_MODEL			("NUM_MODEL")			// NUM_MODEL
+#define MODEL_FILENAME		("MODEL_FILENAME")		// MODEL_FILENAME
+#define CHARACTERSET		("CHARACTERSET")		// CHARACTERSET
+#define END_CHARACTERSET	("END_CHARACTERSET")	// END_CHARACTERSET
+#define NUM_PARTS			("NUM_PARTS")			// NUM_PARTS
+#define PARTSSET			("PARTSSET")			// PARTSSET
+#define END_PARTSSET		("END_PARTSSET")		// END_PARTSSET
+#define INDEX				("INDEX")				// INDEX
+#define PARENT				("PARENT")				// PARENT
+#define POS					("POS")					// POS
+#define ROT					("ROT")					// ROT
+#define MOTIONSET			("MOTIONSET")			// MOTIONSET
+#define END_MOTIONSET		("END_MOTIONSET")		// END_MOTIONSET
+#define LOOP				("LOOP")				// LOOP
+#define NUM_KEY				("NUM_KEY")				// NUM_KEY
+#define KEYSET				("KEYSET")				// KEYSET
+#define END_KEYSET			("END_KEYSET")			// END_KEYSET
+#define FRAME				("FRAME")				// FRAME
+#define KEY					("KEY")					// KEY
+#define END_KEY				("END_KEY")				// END_KEY
 //=============================
 // テキスト読み込みクラス
 //=============================

@@ -202,7 +202,10 @@ void CObject3D::SetVtx(void)
 		break;
 
 	case CENTER_BUTTON:	// íÜâõëµÇ¶â∫äÒÇπ
-		
+		pVtx[0].pos = D3DXVECTOR3(-m_fWidth, 0.0f, +m_fDepth);
+		pVtx[1].pos = D3DXVECTOR3(+m_fWidth, 0.0f, +m_fDepth);
+		pVtx[2].pos = D3DXVECTOR3(-m_fWidth, 0.0f, 0.0f);
+		pVtx[3].pos = D3DXVECTOR3(+m_fWidth, 0.0f, 0.0f);
 		break;
 
 	case RIGHT_TOP:	// âEëµÇ¶è„äÒÇπ

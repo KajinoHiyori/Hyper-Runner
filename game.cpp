@@ -18,13 +18,14 @@
 #include "meshcylinder.h"
 #include "debugproc.h"
 #include "player.h"
+#include "field.h"
 
 
 //=============================
 // 静的メンバ変数宣言
 //=============================
 CPlayer* CGame::m_pPlayer = NULL;	// プレイヤーへのポインタ
-//CField* CGame::m_pField = NULL;	// フィールドへのポインタ
+CField* CGame::m_apField[MAX_FIELDLINE] = {};	// フィールドへのポインタ
 //CWall* CGame::m_apWall[MAX_GAMEWALL] = {};	// 壁のポインタ
 //CMachine* CGame::m_pMachine = NULL;	// マシンへのポインタ
 //CTimer* CGame::m_pTimer = NULL;		// タイマーへのポインタ
@@ -34,8 +35,11 @@ CPlayer* CGame::m_pPlayer = NULL;	// プレイヤーへのポインタ
 //=============================
 // マクロ定義
 //=============================
-#define TIMER_POS	(D3DXVECTOR3(10.0f, 10.0f, 0.0f))	// タイマー生成位置
-#define GAME_TIME	(60)	// ゲーム時間
+#define GAME_TIME		(60)	// ゲーム時間
+#define FIELD_WIDTH		(100.0f)	// フィールド幅
+#define FIELD_DEPTH		(5000.0f)	// フィールド奥行き
+#define FIELD_SPACE		(200.0f)		// フィールド間の隙間
+#define FIELD_POS(x)	(D3DXVECTOR3(FIELD_SPACE * 2.0f * (float)(x - 1), 0.0f, 0.0f))	// フィールド位置
 
 //=============================
 // コンストラクタ
@@ -68,10 +72,13 @@ HRESULT CGame::Init(void)
 
 	CManager::GetSound()->Play(CSound::BGM_GAME);
 
-	//// フィールド生成
-	//if (m_pField != NULL) return E_FAIL;
-	//// 使用されていない場合
-	//m_pField = CField::Create(INIT_D3DVEC3, INIT_D3DVEC3);
+	// フィールド生成
+	for (int nCntLine = 0; nCntLine < MAX_FIELDLINE; nCntLine++)
+	{
+		if (m_apField[nCntLine] != NULL) return E_FAIL;
+		// 使用されていない場合
+		m_apField[nCntLine] = CField::Create(FIELD_POS(nCntLine), INIT_D3DVEC3, FIELD_WIDTH, FIELD_DEPTH);
+	}
 
 	//// 壁の総数を読み取り
 	//int nNumWall = CWall::LoadNumAll(GAMESCRIPTS_PATH);
@@ -128,6 +135,10 @@ void CGame::Uninit(void)
 {
 	// 各ポインタのクリア
 	m_pPlayer = NULL;	// プレイヤーへのポインタ
+	for (int nCntLine = 0; nCntLine < MAX_FIELDLINE; nCntLine++)
+	{
+		m_apField[nCntLine] = NULL;
+	}
 	//m_pField = NULL;		// フィールドへのポインタ
 	//m_pMachine = NULL;		// マシンへのポインタ
 	//m_pTimer = NULL;		// タイマーのクリア

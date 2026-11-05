@@ -146,7 +146,7 @@ void CShadow::SetPosition(D3DXVECTOR3 pos, D3DXVECTOR3 rot, CField* pField)
 
 	if (pField != NULL)
 	{
-		fHeight = pField->CMeshField::GetHeight(pos, &nor);	// 高度取得
+		fHeight = pField->GetHeight(pos);	// 高度取得
 		// 角度の変更
   		rot.x = atan2f(-nor.z, -nor.y);
 		rot.y = 0.0f;

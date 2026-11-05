@@ -25,29 +25,25 @@
 //=============================
 // フィールドクラス
 //=============================
-class CField : public CMeshField
+class CField : public CObject3D
 {
 public:
 	CField(CObject::PRIORITY priority = CObject::PRIORITY_FIELD);
 	~CField();
+	static CField* Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fDepth);
 	HRESULT Init(void) { return E_FAIL; }
-	HRESULT Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot);
+	HRESULT Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fDepth);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
-	void SetPosition(D3DXVECTOR3 pos) { CMeshField::SetPosition(pos); }
+	void SetPosition(D3DXVECTOR3 pos) { CObject3D::SetPosition(pos); }
 	float GetHeight(D3DXVECTOR3 pos);
-	D3DXVECTOR3 GetNormalize(D3DXVECTOR3 pos) { return CMeshField::GetNormalize(); }
-	float GetWidth(void) { return CMeshField::GetWidth(); }
-	float GetDepth(void) { return CMeshField::GetDepth(); }
-	static CField* Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot);
+	float GetWidth(void) { return CObject3D::GetWidth(); }
+	float GetDepth(void) { return CObject3D::GetDepth(); }
 	static int GetNumAll(void) { return m_nNumAll; }
-	D3DXVECTOR3 GetPosition(void) { return CMeshField::GetPosition(); }
-	void Dent(D3DXVECTOR3 pos, float fSize, float fDepth) { CMeshField::Dent(pos, fSize, fDepth); }
-	void Bump(D3DXVECTOR3 pos, float fSize, float fPeak) { CMeshField::Bump(pos, fSize, fPeak); }
+	D3DXVECTOR3 GetPosition(void) { return CObject3D::GetPosition(); }
 
 private:
-	HRESULT LoadScripts(const char* pFileName);
 	static int m_nNumAll;	// フィールドの総数
 };
 #endif

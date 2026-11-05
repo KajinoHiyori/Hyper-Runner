@@ -26,7 +26,7 @@
 #define MAX_V			(1200.0f)	// 視点Yの制限
 #define MOVE			(5.5f)		// 移動量
 #define ROTATE			(0.005f)	// 回転量
-#define DISTANCE		(300.0f)	// 視点と注視点の距離
+#define DISTANCE		(750.0f)	// 視点と注視点の距離
 #define FORWARD			(150.0f)		// プレイヤーの少し前に注視点置く
 #define CORRECTION		(0.05f)		// カメラの位置補正
 #define CORRECTION_ROT	(0.035f)	// カメラの回り込み補正
