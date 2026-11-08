@@ -106,9 +106,12 @@ HRESULT CPlayer::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 	m_rotDest = rot;
 
 	// ƒ‚ƒfƒ‹“Ç‚İ‚İ
-	LoadScripts("data\\SCRIPTS\\player.txt");
+	LoadScripts("data\\SCRIPTS\\player_setting.txt");
 
-	m_pMotion->Set(MOTIONTYPE_MOVE, false, 0);
+	if (m_pMotion != NULL)
+	{
+		m_pMotion->Set(MOTIONTYPE_MOVE, false, 0);
+	}
 
 	return S_OK;
 }
@@ -423,7 +426,7 @@ bool CPlayer::LoadCharactor(const char* pFilePath)
 	if (LoadModelSetting(pFilePath) == false) return false;
 
 	// ƒ‚[ƒVƒ‡ƒ“İ’è
-	if (LoadMotion(pFilePath) == false) return false;
+	//if (LoadMotion(pFilePath) == false) return false;
 		 
 	return true;
 }

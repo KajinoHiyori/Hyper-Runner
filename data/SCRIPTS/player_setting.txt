@@ -1,0 +1,142 @@
+#==============================================================================
+#
+# 『モーションビューワ』スクリプトファイル [motion_sword.txt]
+# Author : AKIRA TANAKA
+#
+#==============================================================================
+SCRIPT			# この行は絶対消さないこと！
+
+#------------------------------------------------------------------------------
+# モデル数
+#------------------------------------------------------------------------------
+NUM_MODEL = 14
+
+#------------------------------------------------------------------------------
+# モデルファイル名
+#------------------------------------------------------------------------------
+MODEL_FILENAME = data/MODEL/player/player_00lowerback.x	# [00]
+MODEL_FILENAME = data/MODEL/player/player_01leftfoot.x		# [01]
+MODEL_FILENAME = data/MODEL/player/player_02leftfoot.x		# [02]
+MODEL_FILENAME = data/MODEL/player/player_03leftfoot.x		# [03]
+MODEL_FILENAME = data/MODEL/player/player_04rightfoot.x	# [04]
+MODEL_FILENAME = data/MODEL/player/player_05rightfoot.x	# [05]
+MODEL_FILENAME = data/MODEL/player/player_06rightfoot.x	# [06]
+MODEL_FILENAME = data/MODEL/player/player_07body.x			# [07]
+MODEL_FILENAME = data/MODEL/player/player_08head.x			# [08]
+MODEL_FILENAME = data/MODEL/player/player_09head.x			# [09]
+MODEL_FILENAME = data/MODEL/player/player_10leftarm.x		# [10]
+MODEL_FILENAME = data/MODEL/player/player_11leftarm.x		# [11]
+MODEL_FILENAME = data/MODEL/player/player_12rightarm.x		# [12]
+MODEL_FILENAME = data/MODEL/player/player_13rightarm.x		# [13]
+
+#------------------------------------------------------------------------------
+# キャラクター情報
+#------------------------------------------------------------------------------
+CHARACTERSET
+	NUM_PARTS = 14				# パーツ数
+
+	PARTSSET
+		INDEX = 0					# 腰
+		PARENT = -1					# (親)NULL
+		POS = 0.0 67.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 1					# 左腿
+		PARENT = 0					# (親)腰
+		POS = 6.0 1.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 2					# 左脛
+		PARENT = 1					# (親)左腿
+		POS = -2.0 -28.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 3					# 左足
+		PARENT = 2					# (親)左脛
+		POS = 0.0 -27.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 4					# 右腿
+		PARENT = 0					# (親)腰
+		POS = -6.0 1.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 5					# 右脛
+		PARENT = 4					# (親)右腿
+		POS = 2.0 -28.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 6					# 右足
+		PARENT = 5					# (親)右脛
+		POS = 0.0 -27.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 7					# 胴
+		PARENT = 0					# (親)腰
+		POS = 0.0 9.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 8					# 顎
+		PARENT = 7					# (親)胴
+		POS = 0.0 28.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 9					# 頭
+		PARENT = 8					# (親)顎
+		POS = 0.0 6.0 9.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 10					# 左上腕
+		PARENT = 7					# (親)胴
+		POS = 12.0 22.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 11					# 左下腕
+		PARENT = 10					# (親)左上腕
+		POS = 0.0 -18.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 12					# 右上腕
+		PARENT = 7					# (親)胴
+		POS = -12.0 22.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+	PARTSSET
+		INDEX = 13					# 右下腕
+		PARENT = 12					# (親)右上腕
+		POS = 0.0 -18.0 0.0
+		ROT = 0.0 0.0 0.0
+	END_PARTSSET
+
+END_CHARACTERSET
+
+#------------------------------------------------------------------------------
+# モーション情報
+#------------------------------------------------------------------------------
+
+END_SCRIPT		# この行は絶対消さないこと！

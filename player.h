@@ -34,15 +34,20 @@ public:
 	// モデルの種類
 	typedef enum
 	{
-		MODEL_LOWERBACK = 0,	// 腰[0]
-		MODEL_BODY,				// 胴体[1]
-		MODEL_HEAD,				// 頭[2]
-		MODEL_LEFTARM,			// 左腕[3]
-		MODEL_LEFTHAND,			// 左手[4]
-		MODEL_RIGHTARM,			// 右腕[5]
-		MODEL_RIGHTHAND,		// 右手[6]
-		MODEL_LEFTFOOT,			// 左足[7]
-		MODEL_RIGHTFOOT,		// 右足[8]
+		MODEL_00LOWERBACK,		// [00] 腰
+		MODEL_01LEFTFOOT,		// [01] 左腿
+		MODEL_02LEFTFOOT,		// [02] 左脛
+		MODEL_03LEFTFOOT,		// [03] 左足
+		MODEL_04RIGHTFOOT,		// [04] 右腿
+		MODEL_05RIGHTFOOT,		// [05] 右脛
+		MODEL_06RIGHTFOOT,		// [06] 右足
+		MODEL_07BODY,			// [07] 胴体
+		MODEL_08HEAD,			// [08] 顎
+		MODEL_09HEAD,			// [09] 頭
+		MODEL_10LEFTARM,		// [10] 左上腕
+		MODEL_11LEFTARM,		// [11] 左下腕
+		MODEL_12RIGHTARM,		// [12] 右上腕
+		MODEL_13RIGHTARM,		// [13] 右下腕
 		MODEL_MAX
 	}MODEL;
 
