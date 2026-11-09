@@ -61,6 +61,7 @@
 #define FOV_DEFAULT						(45.0f)	// Šî–{‚ÌŽ‹–ìŠp
 #define CAMERA_CLOSEST					(10.0f)		// ƒJƒƒ‰‚Æ‚Ì‹——£‚ª‚±‚êˆÈã‹ß‚¢ê‡A•`‰æ‚ðs‚í‚È‚¢
 #define CAMERA_FARTHEST					(10000.0f)	// ƒJƒƒ‰‚Æ‚Ì‹——£‚ª‚±‚êˆÈã‰“‚¢ê‡A•`‰æ‚ðs‚í‚È‚¢
+#define CORRECTION_MOVE					(0.1f)	// ˆÚ“®‚ÌŒ¸ŠŒW”
 #define GRAVITY							(1.0f)			// d—Í
 #define SAFE_UNINIT(pointer)			if (pointer != NULL){pointer->Uninit(); delete pointer; pointer = NULL;}		// Uninit
 #define SAFE_UNLOAD(pointer)			if (pointer != NULL){pointer->Unload(); delete pointer; pointer = NULL;}		// Unload

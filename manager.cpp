@@ -18,6 +18,7 @@
 #include "texture.h"
 #include "ranking_offline.h"
 #include "field.h"
+#include "block.h"
 #include "fileX.h"
 
 //=============================
@@ -284,6 +285,9 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 			return E_FAIL;
 		}
 	}
+
+	// ブロックモデルの読み込み
+	CBlock::LoadInfo();
 
 	// モード設定
 	SetMode(CScene::MODE_GAME);

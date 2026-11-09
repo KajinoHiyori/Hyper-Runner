@@ -27,6 +27,7 @@
 #include "particle.h"
 #include "sound.h"
 #include "field.h"
+#include "block.h"
 
 //=============================
 // マクロ定義
@@ -34,7 +35,11 @@
 #define NUM_DIVGAME			(7)		// 分割時のモデル数
 #define BLEND_FRAME			(10)	// ブレンドモーションのフレーム数
 #define SPEED				(1.0f)	// 移動速度
-#define CORRECTION_MOVE		(0.1f)	// 移動の減衰係数
+#define JUMP		(40.0f)	// ジャンプ
+#define CHANGE_X	(40.0f)	// X方向切り替え
+#define RADIUS		(45.0f)		// 半径
+#define HEIGHT		(117.0f)	// 身長
+#define MARGINE		(0.1f)		// 余白
 // ファイルパス
 #define SETTING_PATH		("data\\SCRIPTS\\player_setting.txt")	// プレイヤー設定情報
 #define UPPERMOTION_PATH	("data\\SCRIPTS\\player_uppermotion.txt")	// 上半身モーション
@@ -192,6 +197,7 @@ void CPlayer::Update(void)
 	pDebugProc->Print("Playerの位置 : (%.2f, %.2f, %.2f)\n", m_pos.x, m_pos.y, m_pos.z);
 	pDebugProc->Print("Player向き : (%.2f, %.2f, %.2f)\n", m_rot.x, m_rot.y, m_rot.z);
 	pDebugProc->Print("Player移動量 : (%.2f, %.2f, %.2f)\n", m_move.x, m_move.y, m_move.z);
+	pDebugProc->Print("Player存在ライン : %d\n", m_nLine);
 }
 
 //=============================
@@ -304,8 +310,11 @@ void CPlayer::UpdateTutorial(void)
 //=============================
 void CPlayer::UpdateGame(void)
 {
+	// ブロックとの判定
+	bool bMove = CollisionBloack();
+
 	// 移動処理
-	Move();
+	Move(bMove);
 
 	// 地面との判定
 	CollisionField(static_cast<CGame*>(CManager::GetScene())->GetField(m_nLine));
@@ -322,7 +331,7 @@ void CPlayer::UpdateResult(void)
 //=============================
 // 移動処理
 //=============================
-void CPlayer::Move(void)
+void CPlayer::Move(bool bMove)
 {
 	// 入力情報取得
 	CInputKeyboard* pKeyboard = CManager::GetInputKeyboard();
@@ -335,17 +344,16 @@ void CPlayer::Move(void)
 		|| pJoypad->GetLeftStickTrigger(CInputJoypad::JOYKEY_LSTICK_RIGHT) == true)
 		&& m_bJump == false)
 	{ // 右のラインに移動
-		switch (m_nLine)
+		if (m_nLine == LINE_RIGHT && bMove == false)
 		{
-		case LINE_RIGHT:	// 右端
 			nChangeDir = 0;
-			break;
-
-		default:
+		}
+		else
+		{
 			m_nLine++;
 			nChangeDir = 1;
-			break;
 		}
+		
 		// 列切り替え処理
 		ChangeLine(nChangeDir);
 
@@ -358,18 +366,16 @@ void CPlayer::Move(void)
 		|| pJoypad->GetLeftStickTrigger(CInputJoypad::JOYKEY_LSTICK_LEFT) == true)
 		&& m_bJump == false)
 	{ // 左のラインに移動
-		switch (m_nLine)
+		if (m_nLine == LINE_LEFT && bMove == false)
 		{
-		case LINE_LEFT:	// 右端
 			nChangeDir = 0;
-			break;
-
-		default:
+		}
+		else
+		{
 			m_nLine--;
 			nChangeDir = -1;
-			break;
 		}
-
+		
 		// 列切り替え処理
 		ChangeLine(nChangeDir);
 
@@ -387,9 +393,6 @@ void CPlayer::Move(void)
 	m_move.x += (0.0f - m_move.x) * CORRECTION_MOVE;
 	m_move.y += (0.0f - m_move.y) * CORRECTION_MOVE;
 }
-
-#define JUMP		(40.0f)	// ジャンプ
-#define CHANGE_X	(40.0f)	// X方向切り替え
 
 //=============================
 // 列切り替え処理
@@ -415,6 +418,45 @@ void CPlayer::CollisionField(CField* pField)
 	
 	if (m_apMotion[DIV_MOTION_UNDER]->GetBlendType() != MOTIONTYPE_MOVE)
 	m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONTYPE_MOVE, true, BLEND_FRAME);
+}
+
+//=============================
+// ブロック判定処理
+//=============================
+bool CPlayer::CollisionBloack(void)
+{
+	for (int nCntPriority = 0; nCntPriority < MAX_PRIORITYS; nCntPriority++)
+	{
+		CObject* pObject = GetTop(nCntPriority);	// 先頭アドレスを取得
+
+		while (pObject != NULL)
+		{ // 次のオブジェクトがある限りループ
+			CObject* pObjectNext = pObject->GetNext();	// 次のオブジェクトへのポインタを設定
+			bool bOneCollision = false;
+
+			// オブジェクトとの当たり判定
+			if (pObject->GetType() != CObject::TYPE_BLOCK)
+			{
+				pObject = pObjectNext;	// NULL判定を行う
+				continue;
+			}
+			// アイテムの場合
+			CBlock* pBlock = static_cast<CBlock*>(pObject);
+
+			// 当たり判定処理を実行
+			if (pBlock->Collision(&m_pos, m_posOld, RADIUS, MARGINE))
+			{
+				m_move.z = 0.0f;
+			}
+			else
+			{
+				m_move.z = SPEED;
+			}
+			pObject = pObjectNext;	// NULL判定を行う
+		}
+	}
+
+	return false;
 }
 
 //=============================

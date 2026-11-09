@@ -213,6 +213,9 @@
     <ClCompile Include="field.cpp">
       <Filter>event\cpp</Filter>
     </ClCompile>
+    <ClCompile Include="block.cpp">
+      <Filter>event\cpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="color.h">
@@ -348,6 +351,9 @@
       <Filter>scene\h</Filter>
     </ClInclude>
     <ClInclude Include="field.h">
+      <Filter>event\h</Filter>
+    </ClInclude>
+    <ClInclude Include="block.h">
       <Filter>event\h</Filter>
     </ClInclude>
   </ItemGroup>

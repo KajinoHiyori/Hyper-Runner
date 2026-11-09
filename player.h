@@ -99,9 +99,10 @@ private:
 	void UpdateTutorial(void);
 	void UpdateGame(void);
 	void UpdateResult(void);
-	void Move(void);
+	void Move(bool bMove);
 	void ChangeLine(int nChangeDir);
 	void CollisionField(CField* pField);
+	bool CollisionBloack(void);
 	HRESULT LoadScripts(void);
 	bool LoadCharactor(void);
 	bool LoadModelFile(void);

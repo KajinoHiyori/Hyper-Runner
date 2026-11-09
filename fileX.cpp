@@ -55,71 +55,7 @@ CFileX::~CFileX()
 //=============================
 HRESULT CFileX::Load(void)
 {
-	// 外部ファイル読み込みインスタンス生成
-	CLoadScripts* pLoadScripts = new CLoadScripts;
-
-	bool bLoadEnd = false;		// 読み込み終了フラグ
-	char aString[MAX_STRING];		// ローカルで文字列を格納
-	char aStringCopy[MAX_STRING];	// ローカルで文字列を格納[コピー]
-	char aFileName[MAX_STRING];	// ローカルで文字列を格納[コピー]
-	memset(&aFileName[0], 0, sizeof aFileName);
-	int nNumModel = 0;
-	int nCntModel = 0;
-
-	// ファイルを開く
-	FILE* pFile = fopen(LOADMODELSCRIPTS_PATH, "r");
-
-	if (pFile == NULL)
-	{ // 読み込みに失敗
-		return E_FAIL;
-	}
-
-	do
-	{ // 文字列のクリア
-		memset(&aString[0], 0, sizeof aString);
-		memset(&aStringCopy[0], 0, sizeof aStringCopy);
-
-		// 読み込んだ行の文字列判定
-		fgets(&aString[0], MAX_STRING, pFile);	// 1行読み込む
-		pLoadScripts->Judgment(&aString[0], &aStringCopy[0]);	// 有効文字抜き取り
-
-		if (strstr(&aStringCopy[0], LOADMODEL) != NULL)
-		{ // LOADMODELを読み込んだ
-			while (1)
-			{
-				// 文字列のクリア
-				memset(&aString[0], 0, sizeof aString);
-				memset(&aStringCopy[0], 0, sizeof aStringCopy);
-
-				// 読み込んだ行の文字列判定
-				fgets(&aString[0], MAX_STRING, pFile);	// 1行読み込む
-				pLoadScripts->Judgment(&aString[0], &aStringCopy[0]);	// 有効文字抜き取り
-
-				if (strstr(&aStringCopy[0], MAXMODEL) != NULL)
-				{ // MAXMODELを読み込んだ
-					nNumModel = pLoadScripts->LoadInt(&aStringCopy[0]);
-				}
-				if (strstr(&aStringCopy[0], MODELNAME) != NULL)
-				{ // MODELNAMEを読み込んだ
-					pLoadScripts->LoadFileName(&aStringCopy[0]);
-					memcpy(&aFileName[0], &aStringCopy[0], sizeof aStringCopy);
-					Register(&aFileName[0]);
-					nCntModel++;
-				}
-				if (strstr(&aStringCopy[0], END_LOADMODEL) != NULL && nCntModel == nNumModel)
-				{ // END_LOADMODELを読み込んだ
-					bLoadEnd = true;
-					break;
-				}
-			}
-		}
-	} while (bLoadEnd == false);
-
-	// ファイルを閉じる
-	fclose(pFile);
-
-	// 外部ファイル読み込みインスタンスを破棄
-	SAFE_DELETE_SINGULAR(pLoadScripts);
+	
 	return S_OK;
 }
 
