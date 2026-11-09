@@ -36,7 +36,7 @@ public:
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
-	bool Collision(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld, float fRadius, float fMargin);
+	bool Collision(D3DXVECTOR3* pos, D3DXVECTOR3 posOld, float fRadius, float fMargin);
 	bool CollisionHeight(D3DXVECTOR3 pos, D3DXVECTOR3 posOld, float fHeight, float fMargin, bool bCollision);
 	bool SetCollision(D3DXVECTOR3* pPos, float fRadius);
 	static int GetNumAll(void) { return m_nNumAll; }

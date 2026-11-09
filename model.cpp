@@ -78,11 +78,6 @@ HRESULT CModel::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot, const char* pFileName)
 	CRenderer* pRenderer = CManager::GetRenderer();
 	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
 
-	D3DXMATERIAL* pMat;	// マテリアル
-	int nNumVtx = 0;	// 頂点数
-	DWORD dwSizeFVF;			// 頂点フォーマットのサイズ
-	BYTE* pVtxBuff;				// 頂点バッファへのポインタ
-
 	// 初期化
 	m_pos = pos;		// モデル位置
 	m_posOffset = pos;	// モデル位置[オフセット]

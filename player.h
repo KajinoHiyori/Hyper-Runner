@@ -121,6 +121,7 @@ private:
 	char m_aFileName[MODEL_MAX][MAX_STRING];	// ローカルで文字列を格納[コピー]
 	float m_fSpeed;	// 移動速度
 	bool m_bJump;	// ジャンプ
+	bool m_bJumpOld;	// ジャンプ
 	int m_nLine;	// 移動しているラインを取得
 };
 

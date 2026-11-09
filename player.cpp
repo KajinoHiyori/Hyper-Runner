@@ -67,6 +67,7 @@ CPlayer::CPlayer(CObject::PRIORITY priority) : CObject(priority)
 	m_fSpeed = 0.0f;	// 速度
 	m_nLine = LINE_CENTER;		// 移動しているライン
 	m_bJump = false;	// ジャンプフラグ
+	m_bJumpOld = false;	// ジャンプフラグ
 }
 
 //=============================
@@ -161,6 +162,7 @@ void CPlayer::Update(void)
 
 	// 過去の位置を保存
 	m_posOld = m_pos;
+	m_bJumpOld = m_bJump;
 
 	// シーンごとに処理を分割
 	switch (mode)
@@ -415,9 +417,11 @@ void CPlayer::CollisionField(CField* pField)
 	m_move.y = 0.0f;
 	m_bJump = false;
 	m_pos.y = pField->GetHeight(m_pos);
-	
-	if (m_apMotion[DIV_MOTION_UNDER]->GetBlendType() != MOTIONTYPE_MOVE)
-	m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONTYPE_MOVE, true, BLEND_FRAME);
+
+	if (m_bJumpOld == true)
+	{ // 移動モーションに戻す
+		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONTYPE_MOVE, true, BLEND_FRAME);
+	}
 }
 
 //=============================
@@ -446,7 +450,20 @@ bool CPlayer::CollisionBloack(void)
 			// 当たり判定処理を実行
 			if (pBlock->Collision(&m_pos, m_posOld, RADIUS, MARGINE))
 			{
-				m_move.z = 0.0f;
+				if (pBlock->CollisionHeight(m_pos, m_posOld, 0.0f, MARGINE, false) == true)
+				{
+					m_pos.y = pBlock->GetPosition().y + pBlock->GetVtxMax().y;
+					m_bJump = false;
+					m_move.z = SPEED;
+					if (m_bJumpOld == true)
+					{ // 移動モーションに戻す
+						m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONTYPE_MOVE, true, BLEND_FRAME);
+					}
+				}
+				else
+				{
+					m_move.z = 0.0f;
+				}
 			}
 			else
 			{

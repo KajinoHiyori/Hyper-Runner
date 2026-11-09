@@ -278,8 +278,8 @@ void COrbit3D::SetVtx(void)
 		pVtx[0].col = m_colPoint[nOrbit];
 
 		// テクスチャ座標の設定
-		float fTexU = nOrbit % 2;
-		pVtx[0].tex = D3DXVECTOR2(nOrbit, fTexU);
+		float fTexU = (float)(nOrbit % 2);
+		pVtx[0].tex = D3DXVECTOR2((float)nOrbit, fTexU);
 	}
 
 	// 頂点バッファをアンロック

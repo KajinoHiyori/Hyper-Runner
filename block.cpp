@@ -308,6 +308,14 @@ bool CBlock::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld, float fRadius, flo
 //=============================
 bool CBlock::CollisionHeight(D3DXVECTOR3 pos, D3DXVECTOR3 posOld, float fHeight, float fMargi, bool bCollisionn)
 {
+	D3DXVECTOR3 posBlock = CObjectX::GetPosition();
+	D3DXVECTOR3 vtxMax = CObjectX::GetVtxMax(); 
+	if (posOld.y < pos.y || pos.y <= posBlock.y)return false;
+	
+	if (pos.y < posBlock.y + vtxMax.y)
+	{
+		return true;
+	}
 	return false;
 }
 
