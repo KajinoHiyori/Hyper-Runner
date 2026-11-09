@@ -32,9 +32,9 @@
 //=============================
 // マクロ定義
 //=============================
-#define NUM_DIVGAME			(7)		// 分割時のモデル数
+#define NUM_DIVMOTION		(7)		// 分割時のモデル数
 #define BLEND_FRAME			(10)	// ブレンドモーションのフレーム数
-#define SPEED				(1.0f)	// 移動速度
+#define SPEED				(3.0f)	// 移動速度
 #define JUMP		(40.0f)	// ジャンプ
 #define CHANGE_X	(40.0f)	// X方向切り替え
 #define RADIUS		(45.0f)		// 半径
@@ -69,6 +69,7 @@ CPlayer::CPlayer(CObject::PRIORITY priority) : CObject(priority)
 	m_bJump = false;	// ジャンプフラグ
 	m_bJumpOld = false;	// ジャンプフラグ
 	m_fRadius = 0.0f;	// 当たり判定半径
+	m_speed = SPEED_SLOWWALK;	// 移動速度管理
 }
 
 //=============================
@@ -127,6 +128,10 @@ HRESULT CPlayer::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 	{
 		m_apMotion[DIV_MOTION_UPPER]->Set(MOTIONUPPER_NUTORAL, false, 0);
 	}
+
+	// 基本速度管理
+	SpeedManager();
+
 	return S_OK;
 }
 
@@ -197,16 +202,16 @@ void CPlayer::Update(void)
 		if (m_apMotion[nCntDiv] == NULL) continue;
 		m_apMotion[nCntDiv]->Update();
 	}
-	
-	if (CManager::GetInputKeyboard()->GetTrigger(DIK_S) == true)
-	{
-		ChangeSpeed(1.0f);
-	}
+
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_W) == true)
 	{
-		ChangeSpeed(-1.0f);
+		ChangeSpeed(true);
 	}
-
+	else if (CManager::GetInputKeyboard()->GetTrigger(DIK_S) == true)
+	{
+		ChangeSpeed(false);
+	}
+	
 	// デバック表示=================================================================================
 	CDebugProc* pDebugProc = CManager::GetDebugProc();
 	pDebugProc->Print("Playerの位置 : (%.2f, %.2f, %.2f)\n", m_pos.x, m_pos.y, m_pos.z);
@@ -305,6 +310,27 @@ void CPlayer::Draw(void)
 #endif
 }
 
+//=============================
+// 速度設定処理
+// bChangeUP == true : 加速
+// bChangeUP == false : 減速
+//=============================
+void CPlayer::ChangeSpeed(bool bChangeUP)
+{
+	if (bChangeUP == true)
+	{ // 加速処理
+		SpeedUp();
+	}
+	else
+	{ // 減速処理
+		SpeedDown();
+	}
+
+	// 基本速度管理
+	SpeedManager();
+}
+
+#if 0
 #define MAX_SPEED		(15.0f)	// 移動速度
 #define MIN_SPEED		(1.0f)	// 移動速度
 #define FRAME_SET		(100)	// フレーム設定
@@ -314,23 +340,17 @@ void CPlayer::Draw(void)
 //=============================
 void CPlayer::ChangeSpeed(float fSpeed)
 {
-	m_fSpeed += fSpeed;
-	if (m_fSpeed > MAX_SPEED)
-	{
-		m_fSpeed = MAX_SPEED;
-	}
-	else if (m_fSpeed < MIN_SPEED)
-	{
-		m_fSpeed = MIN_SPEED;
-	}
-	float frameSpeed = m_fSpeed / 2.0f;
-	int nFrame = (FRAME_SET / frameSpeed) * FRAME_NORMALIZE;
-	// モーションの処理フレームも変更
-	for (int nCntMotion = 0; nCntMotion < DIV_MOTION_MAX; nCntMotion++)
-	{
-		//m_apMotion[nCntMotion]->SetFrame((int)(MOTIONTYPE_MOVE), nFrame);
-	}
+	m_fSpeed = fSpeed;
+	
+	//float frameSpeed = m_fSpeed / 2.0f;
+	//int nFrame = (FRAME_SET / frameSpeed) * FRAME_NORMALIZE;
+	//// モーションの処理フレームも変更
+	//for (int nCntMotion = 0; nCntMotion < DIV_MOTION_MAX; nCntMotion++)
+	//{
+	//	//m_apMotion[nCntMotion]->SetFrame((int)(MOTIONTYPE_MOVE), nFrame);
+	//}
 }
+#endif
 
 //=============================
 // タイトル処理
@@ -354,7 +374,7 @@ void CPlayer::UpdateTutorial(void)
 void CPlayer::UpdateGame(void)
 {
 	// ブロックとの判定
-	bool bMove = CollisionBloack();
+	bool bMove = CollisionBlock();
 
 	// 移動処理
 	Move(bMove);
@@ -467,7 +487,7 @@ void CPlayer::CollisionField(CField* pField)
 //=============================
 // ブロック判定処理
 //=============================
-bool CPlayer::CollisionBloack(void)
+bool CPlayer::CollisionBlock(void)
 {
 	for (int nCntPriority = 0; nCntPriority < MAX_PRIORITYS; nCntPriority++)
 	{
@@ -514,6 +534,72 @@ bool CPlayer::CollisionBloack(void)
 	}
 
 	return false;
+}
+
+#define SLOWWALK_FRAME	(40)	// 遅く歩く際のフレーム数
+#define FASTWALK_FRAME	(30)	// 早く歩く際のフレーム数
+#define SLOWRUN_FRAME	(20)	// 遅く走る際のフレーム数
+#define FASTRUN_FRAME	(10)	// 早く走る際のフレーム数
+//=============================
+// 加速管理
+//=============================
+void CPlayer::SpeedUp(void)
+{
+	if (m_speed == SPEED_FASTRUN) return;	// これ以上加速しない
+
+	switch (m_speed)
+	{
+	case SPEED_SLOWWALK:	// 遅く歩く
+		m_speed = SPEED_FASTWALK;
+		m_apMotion[DIV_MOTION_UNDER]->SetFrame(MOTIONUNDER_WALK, FASTWALK_FRAME);
+		break;
+
+	case SPEED_FASTWALK:	// 早く歩く
+		m_speed = SPEED_SLOWRUN;
+		m_apMotion[DIV_MOTION_UNDER]->SetFrame(MOTIONUNDER_RUN, SLOWRUN_FRAME);
+		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_RUN, true, BLEND_FRAME);
+		break;
+
+	case SPEED_SLOWRUN:	// 遅く走る
+		m_speed = SPEED_FASTRUN;
+		m_apMotion[DIV_MOTION_UNDER]->SetFrame(MOTIONUNDER_RUN, FASTRUN_FRAME);
+		break;
+	}
+}
+
+//=============================
+// 減速管理
+//=============================
+void CPlayer::SpeedDown(void)
+{
+	if (m_speed == SPEED_SLOWWALK) return;	// これ以上減速しない
+
+	switch (m_speed)
+	{
+	case SPEED_FASTWALK:	// 早く歩く
+		m_speed = SPEED_SLOWWALK;
+		m_apMotion[DIV_MOTION_UNDER]->SetFrame(MOTIONUNDER_WALK, SLOWWALK_FRAME);
+		break;
+
+	case SPEED_SLOWRUN:	// 遅く走る
+		m_speed = SPEED_FASTWALK;
+		m_apMotion[DIV_MOTION_UNDER]->SetFrame(MOTIONUNDER_WALK, FASTWALK_FRAME);
+		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_WALK, true, BLEND_FRAME);
+		break;
+
+	case SPEED_FASTRUN:	// 早く走る
+		m_speed = SPEED_SLOWRUN;
+		m_apMotion[DIV_MOTION_UNDER]->SetFrame(MOTIONUNDER_RUN, SLOWRUN_FRAME);
+		break;
+	}
+}
+
+//=============================
+// 基本速度管理
+//=============================
+void CPlayer::SpeedManager(void)
+{
+	m_fSpeed = (float)m_speed;
 }
 
 //=============================
@@ -736,171 +822,164 @@ bool CPlayer::LoadModelSetting(void)
 }
 
 //=============================
-// モデル設置情報
+// モーション設置情報
 //=============================
 bool CPlayer::LoadMotion(void)
 {
-	for (int nCntDiv = 0; nCntDiv < DIV_MOTION_MAX; nCntDiv++)
-	{
-		FILE* pFile = NULL; 
-		switch (nCntDiv)
-		{
-		case DIV_MOTION_UNDER:	// 下半身モーション
-			pFile = fopen(UNDERMOTION_PATH, "r");
-			break;
+	// 下半身モーションを読み込み
+	LoadMotion(NUM_DIVMOTION, MODEL_00LOWERBACK, UNDERMOTION_PATH, DIV_MOTION_UNDER, MOTIONUNDER_MAX);
 
-		case DIV_MOTION_UPPER:	// 上半身モーション
-			pFile = fopen(UPPERMOTION_PATH, "r");
-			break;
-		}
+	// 上半身モーションを読み込み
+	LoadMotion(NUM_DIVMOTION, MODEL_07BODY, UPPERMOTION_PATH, DIV_MOTION_UPPER, MOTIONUPPER_MAX);
 
-		if (pFile == NULL)
-		{ // 読み込みに失敗
-			return false;
-		}
+	return true;
+}
 
-		// 外部ファイル読み取り処理を生成
-		CLoadScripts* pLoadScripts = new CLoadScripts();
+//=============================
+// モーション設置情報
+//=============================
+bool CPlayer::LoadMotion(int nNumModel, int nModelStart, const char* pFileName, DIV_MOTION div, int nNumMotion)
+{
+	FILE* pFile = fopen(pFileName, "r");
 
-		m_apMotion[nCntDiv] = new CMotion();
+	if (pFile == NULL)
+	{ // 読み込みに失敗
+		return false;
+	}
 
-		// モーションにモデルの情報を設定
-		switch (nCntDiv)
-		{
-		case DIV_MOTION_UNDER:	// 下半身モーション
-			m_apMotion[nCntDiv]->SetModel(&m_apModel[0], NUM_DIVGAME);
-			break;
+	// 外部ファイル読み取り処理を生成
+	CLoadScripts* pLoadScripts = new CLoadScripts();
 
-		case DIV_MOTION_UPPER:	// 上半身モーション
-			m_apMotion[nCntDiv]->SetModel(&m_apModel[MODEL_07BODY], NUM_DIVGAME);
-			break;
-		}
+	m_apMotion[div] = new CMotion();
 
-		bool bLoadEnd = false;		// 読み込み終了フラグ
-		char aString[MAX_STRING];		// ローカルで文字列を格納
-		char aStringCopy[MAX_STRING];	// ローカルで文字列を格納[コピー]
-		int nIdx = 0;
-		int aParentIdx[MODEL_MAX] = {};	// 親を指定
-		CMotion::INFO motionInfo[MOTIONTYPE_MAX] = {};	// モーション情報
-		int nCntMotion = 0;
-		int nCntKey = 0;
-		do
-		{ // 文字列のクリア
-			memset(&aString[0], 0, sizeof aString);
-			memset(&aStringCopy[0], 0, sizeof aStringCopy);
+	// モーションにモデルの情報を設定
+	m_apMotion[div]->SetModel(&m_apModel[nModelStart], nNumModel);
 
-			// 読み込んだ行の文字列判定
-			fgets(&aString[0], MAX_STRING, pFile);	// 1行読み込む
-			pLoadScripts->Judgment(&aString[0], &aStringCopy[0]);	// 有効文字抜き取り
-			if (strstr(&aStringCopy[0], MOTIONSET) != NULL)
-			{ // MOTIONSETを読み込んだ
-				while (1)
-				{
-					// 文字列のクリア
-					memset(&aString[0], 0, sizeof aString);
-					memset(&aStringCopy[0], 0, sizeof aStringCopy);
+	bool bLoadEnd = false;		// 読み込み終了フラグ
+	char aString[MAX_STRING];		// ローカルで文字列を格納
+	char aStringCopy[MAX_STRING];	// ローカルで文字列を格納[コピー]
+	int nIdx = 0;
+	int aParentIdx[MODEL_MAX] = {};	// 親を指定
+	CMotion::INFO motionInfo[MOTIONTYPE_MAX] = {};	// モーション情報
+	int nCntMotion = 0;
+	int nCntKey = 0;
+	do
+	{ // 文字列のクリア
+		memset(&aString[0], 0, sizeof aString);
+		memset(&aStringCopy[0], 0, sizeof aStringCopy);
 
-					// 読み込んだ行の文字列判定
-					fgets(&aString[0], MAX_STRING, pFile);	// 1行読み込む
-					pLoadScripts->Judgment(&aString[0], &aStringCopy[0]);	// 有効文字抜き取り
+		// 読み込んだ行の文字列判定
+		fgets(&aString[0], MAX_STRING, pFile);	// 1行読み込む
+		pLoadScripts->Judgment(&aString[0], &aStringCopy[0]);	// 有効文字抜き取り
+		if (strstr(&aStringCopy[0], MOTIONSET) != NULL)
+		{ // MOTIONSETを読み込んだ
+			while (1)
+			{
+				// 文字列のクリア
+				memset(&aString[0], 0, sizeof aString);
+				memset(&aStringCopy[0], 0, sizeof aStringCopy);
 
-					if (strstr(&aStringCopy[0], END_MOTIONSET) != NULL)
-					{ // END_MOTIONSETを読み込んだ
-						m_apMotion[nCntDiv]->SetInfo(motionInfo[nCntMotion]);
-						nCntMotion++;
-						if (nCntMotion == MOTIONTYPE_MAX)
-						{
-							bLoadEnd = true;
-						}
+				// 読み込んだ行の文字列判定
+				fgets(&aString[0], MAX_STRING, pFile);	// 1行読み込む
+				pLoadScripts->Judgment(&aString[0], &aStringCopy[0]);	// 有効文字抜き取り
+
+				if (strstr(&aStringCopy[0], END_MOTIONSET) != NULL)
+				{ // END_MOTIONSETを読み込んだ
+					m_apMotion[div]->SetInfo(motionInfo[nCntMotion]);
+					nCntMotion++;
+					if (nCntMotion == nNumMotion)
+					{
+						bLoadEnd = true;
+					}
+					break;
+				}
+				else if (strstr(&aStringCopy[0], LOOP) != NULL)
+				{ // LOOPを読み込んだ
+					int nLoop = pLoadScripts->LoadInt(&aStringCopy[0]);
+					switch (nLoop)
+					{
+					case 0:	// ループなし
+						motionInfo[nCntMotion].bLoop = false;
+						break;
+
+					case 1:	// ループあり
+						motionInfo[nCntMotion].bLoop = true;
 						break;
 					}
-					else if (strstr(&aStringCopy[0], LOOP) != NULL)
-					{ // LOOPを読み込んだ
-						int nLoop = pLoadScripts->LoadInt(&aStringCopy[0]);
-						switch (nLoop)
-						{
-						case 0:	// ループなし
-							motionInfo[nCntMotion].bLoop = false;
-							break;
-
-						case 1:	// ループあり
-							motionInfo[nCntMotion].bLoop = true;
-							break;
-						}
-					}
-					else if (strstr(&aStringCopy[0], NUM_KEY) != NULL)
-					{ // NUM_KEYを読み込んだ
-						motionInfo[nCntMotion].nNumKey = pLoadScripts->LoadInt(&aStringCopy[0]);
-						nCntKey = 0;
-					}
-					else if (strstr(&aStringCopy[0], KEYSET) != NULL)
-					{ // KEYSETを読み込んだ
-						int nCntModel = 0;
-						while (1)
-						{
-							// 文字列のクリア
-							memset(&aString[0], 0, sizeof aString);
-							memset(&aStringCopy[0], 0, sizeof aStringCopy);
-
-							// 読み込んだ行の文字列判定
-							fgets(&aString[0], MAX_STRING, pFile);	// 1行読み込む
-							pLoadScripts->Judgment(&aString[0], &aStringCopy[0]);	// 有効文字抜き取り
-
-							if (strstr(&aStringCopy[0], END_KEYSET) != NULL)
-							{ // END_KEYSETを読み込んだ
-								nCntKey++;	// キー数の加算
-								break;
-							}
-							else if (strstr(&aStringCopy[0], FRAME) != NULL)
-							{ // FRAMEを読み込んだ
-								motionInfo[nCntMotion].aKeyInfo[nCntKey].nFrame = pLoadScripts->LoadInt(&aStringCopy[0]);
-							}
-							else if (strstr(&aStringCopy[0], KEY) != NULL)
-							{ // KEYを読み込んだ
-								while (1)
-								{
-									// 文字列のクリア
-									memset(&aString[0], 0, sizeof aString);
-									memset(&aStringCopy[0], 0, sizeof aStringCopy);
-
-									// 読み込んだ行の文字列判定
-									fgets(&aString[0], MAX_STRING, pFile);	// 1行読み込む
-									pLoadScripts->Judgment(&aString[0], &aStringCopy[0]);	// 有効文字抜き取り
-
-									if (strstr(&aStringCopy[0], END_KEY) != NULL)
-									{ // END_KEYを読み込んだ
-										nCntModel++;
-										break;
-									}
-									else if (strstr(&aStringCopy[0], POS) != NULL)
-									{ // POSを読み込んだ
-										D3DXVECTOR3 pos = pLoadScripts->LoadVector3(&aStringCopy[0]);
-										motionInfo[nCntMotion].aKeyInfo[nCntKey].aKey[nCntModel].fPosX = pos.x;
-										motionInfo[nCntMotion].aKeyInfo[nCntKey].aKey[nCntModel].fPosY = pos.y;
-										motionInfo[nCntMotion].aKeyInfo[nCntKey].aKey[nCntModel].fPosZ = pos.z;
-									}
-									else if (strstr(&aStringCopy[0], ROT) != NULL)
-									{ // ROTを読み込んだ
-										D3DXVECTOR3 rot = pLoadScripts->LoadVector3(&aStringCopy[0]);
-										motionInfo[nCntMotion].aKeyInfo[nCntKey].aKey[nCntModel].fRotX = rot.x;
-										motionInfo[nCntMotion].aKeyInfo[nCntKey].aKey[nCntModel].fRotY = rot.y;
-										motionInfo[nCntMotion].aKeyInfo[nCntKey].aKey[nCntModel].fRotZ = rot.z;
-									}
-								}
-
-							}
-						}
-					}
-
 				}
+				else if (strstr(&aStringCopy[0], NUM_KEY) != NULL)
+				{ // NUM_KEYを読み込んだ
+					motionInfo[nCntMotion].nNumKey = pLoadScripts->LoadInt(&aStringCopy[0]);
+					nCntKey = 0;
+				}
+				else if (strstr(&aStringCopy[0], KEYSET) != NULL)
+				{ // KEYSETを読み込んだ
+					int nCntModel = 0;
+					while (1)
+					{
+						// 文字列のクリア
+						memset(&aString[0], 0, sizeof aString);
+						memset(&aStringCopy[0], 0, sizeof aStringCopy);
+
+						// 読み込んだ行の文字列判定
+						fgets(&aString[0], MAX_STRING, pFile);	// 1行読み込む
+						pLoadScripts->Judgment(&aString[0], &aStringCopy[0]);	// 有効文字抜き取り
+
+						if (strstr(&aStringCopy[0], END_KEYSET) != NULL)
+						{ // END_KEYSETを読み込んだ
+							nCntKey++;	// キー数の加算
+							break;
+						}
+						else if (strstr(&aStringCopy[0], FRAME) != NULL)
+						{ // FRAMEを読み込んだ
+							motionInfo[nCntMotion].aKeyInfo[nCntKey].nFrame = pLoadScripts->LoadInt(&aStringCopy[0]);
+						}
+						else if (strstr(&aStringCopy[0], KEY) != NULL)
+						{ // KEYを読み込んだ
+							while (1)
+							{
+								// 文字列のクリア
+								memset(&aString[0], 0, sizeof aString);
+								memset(&aStringCopy[0], 0, sizeof aStringCopy);
+
+								// 読み込んだ行の文字列判定
+								fgets(&aString[0], MAX_STRING, pFile);	// 1行読み込む
+								pLoadScripts->Judgment(&aString[0], &aStringCopy[0]);	// 有効文字抜き取り
+
+								if (strstr(&aStringCopy[0], END_KEY) != NULL)
+								{ // END_KEYを読み込んだ
+									nCntModel++;
+									break;
+								}
+								else if (strstr(&aStringCopy[0], POS) != NULL)
+								{ // POSを読み込んだ
+									D3DXVECTOR3 pos = pLoadScripts->LoadVector3(&aStringCopy[0]);
+									motionInfo[nCntMotion].aKeyInfo[nCntKey].aKey[nCntModel].fPosX = pos.x;
+									motionInfo[nCntMotion].aKeyInfo[nCntKey].aKey[nCntModel].fPosY = pos.y;
+									motionInfo[nCntMotion].aKeyInfo[nCntKey].aKey[nCntModel].fPosZ = pos.z;
+								}
+								else if (strstr(&aStringCopy[0], ROT) != NULL)
+								{ // ROTを読み込んだ
+									D3DXVECTOR3 rot = pLoadScripts->LoadVector3(&aStringCopy[0]);
+									motionInfo[nCntMotion].aKeyInfo[nCntKey].aKey[nCntModel].fRotX = rot.x;
+									motionInfo[nCntMotion].aKeyInfo[nCntKey].aKey[nCntModel].fRotY = rot.y;
+									motionInfo[nCntMotion].aKeyInfo[nCntKey].aKey[nCntModel].fRotZ = rot.z;
+								}
+							}
+
+						}
+					}
+				}
+
 			}
-		} while (bLoadEnd == false);
+		}
+	} while (bLoadEnd == false);
 
-		// ファイルを閉じる
-		fclose(pFile);
+	// ファイルを閉じる
+	fclose(pFile);
 
-		// 外部ファイル読み取り処理を破棄
-		SAFE_DELETE_SINGULAR(pLoadScripts);
-	}
+	// 外部ファイル読み取り処理を破棄
+	SAFE_DELETE_SINGULAR(pLoadScripts);
+
 	return true;
 }

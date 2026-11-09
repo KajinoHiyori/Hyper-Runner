@@ -112,7 +112,7 @@ void CSpeedDown::Draw(void)
 //=============================
 void CSpeedDown::Release (CPlayer* pPlayer)
 {
-	pPlayer->ChangeSpeed(-CHANGE_SPEED);
+	pPlayer->ChangeSpeed(false);
 
 	// ƒAƒCƒeƒ€‚ğ”jŠü
 	CItem::Release();

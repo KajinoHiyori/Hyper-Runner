@@ -17,7 +17,7 @@
 //=============================
 // マクロ定義
 //=============================
-#define MOTIONTYPE_MAX	(256)	// モーション情報
+#define MOTIONTYPE_MAX	(16)	// モーション情報
 //=============================
 // 前方宣言
 //=============================
@@ -63,7 +63,7 @@ public:
 	typedef enum
 	{
 		MOTIONUNDER_WALK = 0,		// 歩き
-		MOTIONUNDER_RUN,				// 走る
+		MOTIONUNDER_RUN,			// 走る
 		MOTIONUNDER_JUMP,			// ジャンプ
 		MOTIONUNDER_MAX
 	}MOTIONUNDER;
@@ -84,6 +84,15 @@ public:
 		LINE_MAX
 	}LINE;
 
+	// 速度管理
+	typedef enum
+	{
+		SPEED_SLOWWALK = 1,	// 遅く歩く
+		SPEED_FASTWALK,		// 早く歩く
+		SPEED_SLOWRUN = 3,	// 遅く走る
+		SPEED_FASTRUN,		// 早く走る
+	}SPEED;
+
 	CPlayer(CObject::PRIORITY priority = CObject::PRIORITY_CHARACTOR);
 	~CPlayer();
 	static CPlayer* Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot);
@@ -102,7 +111,8 @@ public:
 	MOTIONUPPER GetUpperMotionType(void) { return static_cast<MOTIONUPPER>(m_apMotion[DIV_MOTION_UPPER]->GetType()); }
 	D3DXMATRIX GetMatrix(void) { return m_mtxWorld; }
 	float GetRadius(void) { return m_fRadius; }
-	void ChangeSpeed(float fSpeed);
+	SPEED GetSpeed(void) { return m_speed; }
+	void ChangeSpeed(bool bChangeUP);
 
 private:
 	void UpdateTitle(void);
@@ -112,13 +122,16 @@ private:
 	void Move(bool bMove);
 	void ChangeLine(int nChangeDir);
 	void CollisionField(CField* pField);
-	bool CollisionBloack(void);
+	bool CollisionBlock(void);
+	void SpeedUp(void);
+	void SpeedDown(void);
+	void SpeedManager(void);
 	HRESULT LoadScripts(void);
 	bool LoadCharactor(void);
 	bool LoadModelFile(void);
 	bool LoadModelSetting(void);
-	bool LoadMotion(int nNumModel, int nStart, const char* pFileName);
 	bool LoadMotion(void);
+	bool LoadMotion(int nNumModel, int nModelStart, const char* pFileName, DIV_MOTION div, int nNumMotion);
 	D3DXVECTOR3	m_pos;		// モデルの位置
 	D3DXVECTOR3	m_posOld;	// モデルの1フレーム前の位置
 	D3DXVECTOR3	m_move;		// モデルの移動量
@@ -130,6 +143,7 @@ private:
 	CMotion* m_apMotion[DIV_MOTION_MAX];		// モーション情報
 	CShadow* m_pShadow;		// 影情報
 	char m_aFileName[MODEL_MAX][MAX_STRING];	// ローカルで文字列を格納[コピー]
+	SPEED m_speed;	// 速度管理
 	float m_fSpeed;	// 移動速度
 	bool m_bJump;	// ジャンプ
 	bool m_bJumpOld;	// ジャンプ
