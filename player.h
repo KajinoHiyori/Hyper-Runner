@@ -17,7 +17,7 @@
 //=============================
 // マクロ定義
 //=============================
-
+#define MOTIONTYPE_MAX	(256)	// モーション情報
 //=============================
 // 前方宣言
 //=============================
@@ -62,10 +62,18 @@ public:
 	// モーションの種類
 	typedef enum
 	{
-		MOTIONTYPE_MOVE = 0,		// 移動
-		MOTIONTYPE_JUMP,			// ジャンプ
-		MOTIONTYPE_MAX
-	}MOTIONTYPE;
+		MOTIONUNDER_WALK = 0,		// 歩き
+		MOTIONUNDER_RUN,				// 走る
+		MOTIONUNDER_JUMP,			// ジャンプ
+		MOTIONUNDER_MAX
+	}MOTIONUNDER;
+
+	// モーションの種類
+	typedef enum
+	{
+		MOTIONUPPER_NUTORAL = 0,	// 待機
+		MOTIONUPPER_MAX
+	}MOTIONUPPER;
 
 	// 移動しているラインを選択
 	typedef enum
@@ -90,8 +98,8 @@ public:
 	void SetRotationDest(D3DXVECTOR3 rot) { m_rotDest = rot; }
 	void SetMove(D3DXVECTOR3 move) { m_move = move; }
 	D3DXVECTOR3 GetMove(void) { return m_move; }
-	MOTIONTYPE GetMotionType(int nIdx) { return static_cast<MOTIONTYPE>(m_apMotion[nIdx]->GetType()); }
-	void SetMotion(int nIdx, MOTIONTYPE motionType, bool bBrend, int nFrame) { m_apMotion[nIdx]->Set(motionType, bBrend, nFrame); }
+	MOTIONUNDER GetUnderMotionType(void) { return static_cast<MOTIONUNDER>(m_apMotion[DIV_MOTION_UNDER]->GetType()); }
+	MOTIONUPPER GetUpperMotionType(void) { return static_cast<MOTIONUPPER>(m_apMotion[DIV_MOTION_UPPER]->GetType()); }
 	D3DXMATRIX GetMatrix(void) { return m_mtxWorld; }
 	float GetRadius(void) { return m_fRadius; }
 	void ChangeSpeed(float fSpeed);
@@ -109,6 +117,7 @@ private:
 	bool LoadCharactor(void);
 	bool LoadModelFile(void);
 	bool LoadModelSetting(void);
+	bool LoadMotion(int nNumModel, int nStart, const char* pFileName);
 	bool LoadMotion(void);
 	D3DXVECTOR3	m_pos;		// モデルの位置
 	D3DXVECTOR3	m_posOld;	// モデルの1フレーム前の位置

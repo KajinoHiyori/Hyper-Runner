@@ -119,10 +119,13 @@ HRESULT CPlayer::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 	// モデル読み込み
 	LoadScripts();
 
-	for (int nCntDiv = 0; nCntDiv < DIV_MOTION_MAX; nCntDiv++)
+	if (m_apMotion[DIV_MOTION_UNDER] != NULL)
 	{
-		if (m_apMotion[nCntDiv] == NULL) continue;
-		m_apMotion[nCntDiv]->Set(MOTIONTYPE_MOVE, false, 0);
+		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_WALK, false, 0);
+	}
+	if (m_apMotion[DIV_MOTION_UPPER] != NULL)
+	{
+		m_apMotion[DIV_MOTION_UPPER]->Set(MOTIONUPPER_NUTORAL, false, 0);
 	}
 	return S_OK;
 }
@@ -325,7 +328,7 @@ void CPlayer::ChangeSpeed(float fSpeed)
 	// モーションの処理フレームも変更
 	for (int nCntMotion = 0; nCntMotion < DIV_MOTION_MAX; nCntMotion++)
 	{
-		m_apMotion[nCntMotion]->SetFrame((int)(MOTIONTYPE_MOVE), nFrame);
+		//m_apMotion[nCntMotion]->SetFrame((int)(MOTIONTYPE_MOVE), nFrame);
 	}
 }
 
@@ -398,7 +401,7 @@ void CPlayer::Move(bool bMove)
 		ChangeLine(nChangeDir);
 
 		// 下半身でジャンプモーションを設定
-		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONTYPE_JUMP, true, BLEND_FRAME);
+		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_JUMP, true, BLEND_FRAME);
 	}
 	else if ((pKeyboard->GetTrigger(DIK_A) == true
 		|| pKeyboard->GetTrigger(DIK_LEFTARROW) == true
@@ -420,7 +423,7 @@ void CPlayer::Move(bool bMove)
 		ChangeLine(nChangeDir);
 
 		// 下半身でジャンプモーションを設定
-		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONTYPE_JUMP, true, BLEND_FRAME);
+		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_JUMP, true, BLEND_FRAME);
 	}
 
 	// 重力
@@ -457,7 +460,7 @@ void CPlayer::CollisionField(CField* pField)
 
 	if (m_bJumpOld == true)
 	{ // 移動モーションに戻す
-		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONTYPE_MOVE, true, BLEND_FRAME);
+		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_WALK, true, BLEND_FRAME);
 	}
 }
 
@@ -494,7 +497,7 @@ bool CPlayer::CollisionBloack(void)
 					m_move.z = m_fSpeed;
 					if (m_bJumpOld == true)
 					{ // 移動モーションに戻す
-						m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONTYPE_MOVE, true, BLEND_FRAME);
+						m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_WALK, true, BLEND_FRAME);
 					}
 				}
 				else
