@@ -68,6 +68,7 @@ CPlayer::CPlayer(CObject::PRIORITY priority) : CObject(priority)
 	m_nLine = LINE_CENTER;		// 移動しているライン
 	m_bJump = false;	// ジャンプフラグ
 	m_bJumpOld = false;	// ジャンプフラグ
+	m_fRadius = 0.0f;	// 当たり判定半径
 }
 
 //=============================
@@ -114,7 +115,7 @@ HRESULT CPlayer::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 	m_move = D3DXVECTOR3(0.0f, 0.0f, m_fSpeed);
 	m_rot = rot;
 	m_rotDest = rot;
-
+	m_fRadius = RADIUS;
 	// モデル読み込み
 	LoadScripts();
 
@@ -194,12 +195,22 @@ void CPlayer::Update(void)
 		m_apMotion[nCntDiv]->Update();
 	}
 	
+	if (CManager::GetInputKeyboard()->GetTrigger(DIK_S) == true)
+	{
+		ChangeSpeed(1.0f);
+	}
+	if (CManager::GetInputKeyboard()->GetTrigger(DIK_W) == true)
+	{
+		ChangeSpeed(-1.0f);
+	}
+
 	// デバック表示=================================================================================
 	CDebugProc* pDebugProc = CManager::GetDebugProc();
 	pDebugProc->Print("Playerの位置 : (%.2f, %.2f, %.2f)\n", m_pos.x, m_pos.y, m_pos.z);
 	pDebugProc->Print("Player向き : (%.2f, %.2f, %.2f)\n", m_rot.x, m_rot.y, m_rot.z);
 	pDebugProc->Print("Player移動量 : (%.2f, %.2f, %.2f)\n", m_move.x, m_move.y, m_move.z);
 	pDebugProc->Print("Player存在ライン : %d\n", m_nLine);
+	pDebugProc->Print("Player速度 : %f\n", m_fSpeed);
 }
 
 //=============================
@@ -289,6 +300,33 @@ void CPlayer::Draw(void)
 	pDevice->SetTransform(D3DTS_PROJECTION, &mtxProjectionDef);	// プロジェクションマトリックス
 
 #endif
+}
+
+#define MAX_SPEED		(15.0f)	// 移動速度
+#define MIN_SPEED		(1.0f)	// 移動速度
+#define FRAME_SET		(100)	// フレーム設定
+#define FRAME_NORMALIZE	(0.25f)	// フレーム正規化
+//=============================
+// 速度設定処理
+//=============================
+void CPlayer::ChangeSpeed(float fSpeed)
+{
+	m_fSpeed += fSpeed;
+	if (m_fSpeed > MAX_SPEED)
+	{
+		m_fSpeed = MAX_SPEED;
+	}
+	else if (m_fSpeed < MIN_SPEED)
+	{
+		m_fSpeed = MIN_SPEED;
+	}
+	float frameSpeed = m_fSpeed / 2.0f;
+	int nFrame = (FRAME_SET / frameSpeed) * FRAME_NORMALIZE;
+	// モーションの処理フレームも変更
+	for (int nCntMotion = 0; nCntMotion < DIV_MOTION_MAX; nCntMotion++)
+	{
+		m_apMotion[nCntMotion]->SetFrame((int)(MOTIONTYPE_MOVE), nFrame);
+	}
 }
 
 //=============================
@@ -447,13 +485,13 @@ bool CPlayer::CollisionBloack(void)
 			CBlock* pBlock = static_cast<CBlock*>(pObject);
 
 			// 当たり判定処理を実行
-			if (pBlock->Collision(&m_pos, m_posOld, RADIUS, MARGINE))
+			if (pBlock->Collision(&m_pos, m_posOld, m_fRadius, MARGINE))
 			{
 				if (pBlock->CollisionHeight(m_pos, m_posOld, 0.0f, MARGINE, false) == true)
 				{
 					m_pos.y = pBlock->GetPosition().y + pBlock->GetVtxMax().y;
 					m_bJump = false;
-					m_move.z = SPEED;
+					m_move.z = m_fSpeed;
 					if (m_bJumpOld == true)
 					{ // 移動モーションに戻す
 						m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONTYPE_MOVE, true, BLEND_FRAME);
@@ -466,7 +504,7 @@ bool CPlayer::CollisionBloack(void)
 			}
 			else
 			{
-				m_move.z = SPEED;
+				m_move.z = m_fSpeed;
 			}
 			pObject = pObjectNext;	// NULL判定を行う
 		}

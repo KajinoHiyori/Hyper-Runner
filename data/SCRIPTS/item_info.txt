@@ -7,6 +7,6 @@
 #==================
 ITEMINFO
 	NUMITEM = 2	# ƒAƒCƒeƒ€‚ÌŽí—Þ
+	MODELNAME = data/MODEL/item/item000.x
 	MODELNAME = data/MODEL/item/item001.x
-	MODELNAME = data/MODEL/item/stem.x
 END_ITEMINFO

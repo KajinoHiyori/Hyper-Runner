@@ -228,6 +228,12 @@
     <ClCompile Include="item.cpp">
       <Filter>item\cpp</Filter>
     </ClCompile>
+    <ClCompile Include="item_speedup.cpp">
+      <Filter>item\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="item_speeddown.cpp">
+      <Filter>item\cpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="color.h">
@@ -369,6 +375,12 @@
       <Filter>event\h</Filter>
     </ClInclude>
     <ClInclude Include="item.h">
+      <Filter>item\h</Filter>
+    </ClInclude>
+    <ClInclude Include="item_speedup.h">
+      <Filter>item\h</Filter>
+    </ClInclude>
+    <ClInclude Include="item_speeddown.h">
       <Filter>item\h</Filter>
     </ClInclude>
   </ItemGroup>

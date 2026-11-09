@@ -172,7 +172,6 @@ void CGame::Update(void)
 	CInputKeyboard* pKeyboard = CManager::GetInputKeyboard();
 	CInputJoypad* pJoypad = CManager::GetInputJoypad();
 	
-	
 	if ((pKeyboard->GetTrigger(DIK_RETURN) == true || pJoypad->GetAnyButton() == true) /* && CManager::GetFadeState() == CFade::STATE_FADENONE && m_state == STATE_END*/)
 	{ // ƒŠƒUƒ‹ƒg‚É‘JˆÚ
 		CManager::GetFade()->SetFade(CFade::TYPE_ALPHA, SCREEN_CENTER, COLOR_WHITE, CScene::MODE_RESULT);

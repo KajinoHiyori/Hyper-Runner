@@ -93,6 +93,8 @@ public:
 	MOTIONTYPE GetMotionType(int nIdx) { return static_cast<MOTIONTYPE>(m_apMotion[nIdx]->GetType()); }
 	void SetMotion(int nIdx, MOTIONTYPE motionType, bool bBrend, int nFrame) { m_apMotion[nIdx]->Set(motionType, bBrend, nFrame); }
 	D3DXMATRIX GetMatrix(void) { return m_mtxWorld; }
+	float GetRadius(void) { return m_fRadius; }
+	void ChangeSpeed(float fSpeed);
 
 private:
 	void UpdateTitle(void);
@@ -122,6 +124,7 @@ private:
 	float m_fSpeed;	// 移動速度
 	bool m_bJump;	// ジャンプ
 	bool m_bJumpOld;	// ジャンプ
+	float m_fRadius;	// 当たり判定半径
 	int m_nLine;	// 移動しているラインを取得
 };
 

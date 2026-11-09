@@ -23,6 +23,10 @@
 #include "game.h"
 #include "ranking.h"
 #include "effect.h"
+#include "player.h"
+//アイテム情報=============================
+#include "item_speedup.h"
+#include "item_speeddown.h"
 
 //=============================
 // マクロ定義
@@ -42,7 +46,7 @@
 #define MARGINE				(0.1f)	// 余白
 #define STARCOLOR_CHANGE	(0.05f)	// 色変更
 #define DEFCOLOR			(2)			// デフォルト色の設定
-#define FRAME	(60)	// 移動フレーム
+#define FRAME				(60)	// 移動フレーム
 #define ITEMSET				("ITEMSET")		// ITEMSET
 #define END_ITEMSET			("END_ITEMSET")	// END_ITEMSET
 #define ITEMINFO			("ITEMINFO")		// ITEMINFO
@@ -55,7 +59,6 @@
 // 静的メンバ変数宣言
 //=============================
 int CItem::m_nNumAll = 0;
-char CItem::m_apModelName[MAX_ITEM][MAX_STRING] = {};
 
 //=============================
 // コンストラクタ
@@ -93,7 +96,7 @@ CItem* CItem::Create(D3DXVECTOR3 pos, int Type)
 		if (pItem != NULL)
 		{ // インスタンス生成に成功
 			// アイテムの初期化処理
-			pItem->Init(pos, Type);
+			pItem->Init();
 
 			return pItem;
 		}
@@ -106,10 +109,10 @@ CItem* CItem::Create(D3DXVECTOR3 pos, int Type)
 //=============================
 // 初期化処理
 //=============================
-HRESULT CItem::Init(D3DXVECTOR3 pos, int Type)
+HRESULT CItem::Init(D3DXVECTOR3 pos, TYPE type, const char* pFileName)
 {
 	// オブジェクトにタイプを指定
-	CObjectX::Init(pos, INIT_D3DVEC3, m_apModelName[Type], true, INIT_SCALE);
+	CObjectX::Init(pos, INIT_D3DVEC3, pFileName);
 	CObjectX::SetType(CObject::TYPE_ITEM);
 	
 	m_posOld = pos;	// モデルの1フレーム前の位置
@@ -168,6 +171,132 @@ void CItem::Draw(void)
 {
 	// Xオブジェクトの描画処理
 	CObjectX::Draw();
+}
+
+//=============================
+// アイテム情報読み取り
+//=============================
+void CItem::LoadInfo(void)
+{
+
+}
+
+//=============================
+// アイテム配置情報読み取り
+//=============================
+void CItem::LoadSetting(const char* pFileName)
+{
+	// スクリプト読み込み処理インスタンス生成
+	CLoadScripts* pLoadScripts = NULL;
+	pLoadScripts = new CLoadScripts;
+
+	bool bLoadEnd = false;		// 読み込み終了フラグ
+	char aString[MAX_STRING];		// ローカルで文字列を格納
+	char aStringCopy[MAX_STRING];	// ローカルで文字列を格納[コピー]
+	char aFileName[MAX_STRING];	// ローカルで文字列を格納[コピー]
+	memset(&aFileName[0], 0, sizeof aFileName);
+	D3DXVECTOR3 pos;	// 位置
+	D3DXVECTOR3 rot;	// 向き
+	int nType = 0;	// 種類
+
+	// ファイルを開く
+	FILE* pFile = fopen(pFileName, "r");
+
+	if (pFile == NULL)
+	{ // 読み込みに失敗
+		return;
+	}
+
+	do
+	{ // 文字列のクリア
+		memset(&aString[0], 0, sizeof aString);
+		memset(&aStringCopy[0], 0, sizeof aStringCopy);
+
+		// 読み込んだ行の文字列判定
+		fgets(&aString[0], MAX_STRING, pFile);	// 1行読み込む
+		pLoadScripts->Judgment(&aString[0], &aStringCopy[0]);	// 有効文字抜き取り
+
+		if (strstr(&aStringCopy[0], ITEMSET) != NULL)
+		{ // ITEMSETを読み込んだ
+			while (1)
+			{
+				// 文字列のクリア
+				memset(&aString[0], 0, sizeof aString);
+				memset(&aStringCopy[0], 0, sizeof aStringCopy);
+
+				// 読み込んだ行の文字列判定
+				fgets(&aString[0], MAX_STRING, pFile);	// 1行読み込む
+				pLoadScripts->Judgment(&aString[0], &aStringCopy[0]);	// 有効文字抜き取り
+
+				if (strstr(&aStringCopy[0], "TYPE") != NULL)
+				{ // TYPEを読み込んだ
+					nType = pLoadScripts->LoadInt(&aStringCopy[0]);
+				}
+				if (strstr(&aStringCopy[0], POS) != NULL)
+				{ // POSを読み込んだ
+					pos = pLoadScripts->LoadVector3(&aStringCopy[0]);
+				}
+				if (strstr(&aStringCopy[0], ROT) != NULL)
+				{ // ROTを読み込んだ
+					rot = pLoadScripts->LoadVector3(&aStringCopy[0]);
+					CItem::Setter(pos, nType);
+				}
+				if (strstr(&aStringCopy[0], END_ITEMSET) != NULL)
+				{ // END_PLAYERSETを読み込んだ
+					bLoadEnd = true;
+					break;
+				}
+			}
+		}
+	} while (bLoadEnd == false);
+
+	// ファイルを閉じる
+	fclose(pFile);
+
+	// スクリプト破棄
+	SAFE_DELETE_SINGULAR(pLoadScripts);
+}
+
+//=============================
+// プレイヤーとの判定処理
+//=============================
+CPlayer* CItem::CollisionPlayer(void)
+{
+	CPlayer* pPlayer = NULL;
+	bool bFind = false;
+
+	for (int nCntPriority = 0; nCntPriority < MAX_PRIORITYS; nCntPriority++)
+	{
+		CObject* pObject = GetTop(nCntPriority);	// 先頭アドレスを取得
+
+		while (pObject != NULL)
+		{ // 次のオブジェクトがある限りループ
+			CObject* pObjectNext = pObject->GetNext();	// 次のオブジェクトへのポインタを設定
+			bool bOneCollision = false;
+
+			// オブジェクトとの当たり判定
+			if (pObject->GetType() != CObject::TYPE_PLAYER)
+			{
+				pObject = pObjectNext;	// NULL判定を行う
+				continue;
+			}
+			// アイテムの場合
+			pPlayer = static_cast<CPlayer*>(pObject);
+			bFind = true;
+			break;
+		}
+		if (bFind == true) break;
+	}
+	if (pPlayer == NULL) return NULL;
+
+	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
+	D3DXVECTOR3 posItem = CObjectX::GetPosition();
+	float fDistance = sqrtf(((posItem.x - posPlayer.x) * (posItem.x - posPlayer.x)) + ((posItem.z - posPlayer.z) * (posItem.z - posPlayer.z)));
+	float fHeight = posPlayer.y - posItem.y;
+
+	if (fDistance > m_fSize + pPlayer->GetRadius() || fHeight > 0.0f)return NULL;	// 取得ナシ
+
+	return pPlayer;
 }
 
 //=============================
@@ -295,156 +424,18 @@ void CItem::Move(void)
 }
 
 //=============================
-// アイテム情報読み取り
+// アイテム生成処理
 //=============================
-void CItem::LoadInfo(void)
+void CItem::Setter(D3DXVECTOR3 pos, int type)
 {
-	// ファイル名のクリア
-	for (int nBlock = 0; nBlock < MAX_ITEM; nBlock++)
+	switch (type)
 	{
-		m_apModelName[nBlock][0] = {};
+	case TYPE_SPEEDUP:	// 加速アイテム
+		CSpeedUP::Create(pos);
+		break;
+
+	case TYPE_SPEEDDOWN:	// 減速アイテム
+		CSpeedDown::Create(pos);
+		break;
 	}
-
-	// ファイルを開く
-	FILE* pFile = fopen(ITEMINFO_PATH, "r");
-
-	if (pFile == NULL)
-	{ // 読み込みに失敗
-		return;
-	}
-
-	// スクリプト読み込み処理インスタンス生成
-	CLoadScripts* pLoadScripts = NULL;
-	pLoadScripts = new CLoadScripts;
-
-	bool bLoadEnd = false;		// 読み込み終了フラグ
-	char aString[MAX_STRING];		// ローカルで文字列を格納
-	char aStringCopy[MAX_STRING];	// ローカルで文字列を格納[コピー]
-	char aFileName[MAX_ITEM][MAX_STRING];	// ローカルで文字列を格納[コピー]
-	memset(&aFileName[0], 0, sizeof aFileName);
-	D3DXVECTOR3 pos;	// 位置
-	int nType = 0;	// 種類
-	int nNumType = 0;
-
-	do
-	{ // 文字列のクリア
-		memset(&aString[0], 0, sizeof aString);
-		memset(&aStringCopy[0], 0, sizeof aStringCopy);
-
-		// 読み込んだ行の文字列判定
-		fgets(&aString[0], MAX_STRING, pFile);	// 1行読み込む
-		pLoadScripts->Judgment(&aString[0], &aStringCopy[0]);	// 有効文字抜き取り
-
-		if (strstr(&aStringCopy[0], ITEMINFO) != NULL)
-		{ // ITEMINFOを読み込んだ
-			while (1)
-			{
-				// 文字列のクリア
-				memset(&aString[0], 0, sizeof aString);
-				memset(&aStringCopy[0], 0, sizeof aStringCopy);
-
-				// 読み込んだ行の文字列判定
-				fgets(&aString[0], MAX_STRING, pFile);	// 1行読み込む
-				pLoadScripts->Judgment(&aString[0], &aStringCopy[0]);	// 有効文字抜き取り
-
-				if (strstr(&aStringCopy[0], NUMITEM) != NULL)
-				{ // NUMITEMを読み込んだ
-					nNumType = pLoadScripts->LoadInt(&aStringCopy[0]);
-				}
-				if (strstr(&aStringCopy[0], MODELNAME) != NULL)
-				{ // MODELNAMEを読み込んだ
-					pLoadScripts->LoadFileName(&aStringCopy[0]);
-					memcpy(&m_apModelName[nType][0], &aStringCopy[0], sizeof aStringCopy);
-					nType++;
-				}
-				if (strstr(&aStringCopy[0], END_ITEMINFO) != NULL && nType == nNumType)
-				{ // END_ITEMINFOを読み込んだ
-					bLoadEnd = true;
-					break;
-				}
-			}
-		}
-	} while (bLoadEnd == false);
-
-	// ファイルを閉じる
-	fclose(pFile);
-
-	// スクリプト破棄
-	SAFE_DELETE_SINGULAR(pLoadScripts);
-}
-
-//=============================
-// アイテム配置情報読み取り
-//=============================
-void CItem::LoadSetting(const char* pFileName)
-{
-	// スクリプト読み込み処理インスタンス生成
-	CLoadScripts* pLoadScripts = NULL;
-	pLoadScripts = new CLoadScripts;
-
-	bool bLoadEnd = false;		// 読み込み終了フラグ
-	char aString[MAX_STRING];		// ローカルで文字列を格納
-	char aStringCopy[MAX_STRING];	// ローカルで文字列を格納[コピー]
-	char aFileName[MAX_STRING];	// ローカルで文字列を格納[コピー]
-	memset(&aFileName[0], 0, sizeof aFileName);
-	D3DXVECTOR3 pos;	// 位置
-	D3DXVECTOR3 rot;	// 向き
-	int nType = 0;	// 種類
-
-	// ファイルを開く
-	FILE* pFile = fopen(pFileName, "r");
-
-	if (pFile == NULL)
-	{ // 読み込みに失敗
-		return;
-	}
-
-	do
-	{ // 文字列のクリア
-		memset(&aString[0], 0, sizeof aString);
-		memset(&aStringCopy[0], 0, sizeof aStringCopy);
-
-		// 読み込んだ行の文字列判定
-		fgets(&aString[0], MAX_STRING, pFile);	// 1行読み込む
-		pLoadScripts->Judgment(&aString[0], &aStringCopy[0]);	// 有効文字抜き取り
-
-		if (strstr(&aStringCopy[0], ITEMSET) != NULL)
-		{ // ITEMSETを読み込んだ
-			while (1)
-			{
-				// 文字列のクリア
-				memset(&aString[0], 0, sizeof aString);
-				memset(&aStringCopy[0], 0, sizeof aStringCopy);
-
-				// 読み込んだ行の文字列判定
-				fgets(&aString[0], MAX_STRING, pFile);	// 1行読み込む
-				pLoadScripts->Judgment(&aString[0], &aStringCopy[0]);	// 有効文字抜き取り
-
-				if (strstr(&aStringCopy[0], "TYPE") != NULL)
-				{ // TYPEを読み込んだ
-					nType = pLoadScripts->LoadInt(&aStringCopy[0]);
-				}
-				if (strstr(&aStringCopy[0], POS) != NULL)
-				{ // POSを読み込んだ
-					pos = pLoadScripts->LoadVector3(&aStringCopy[0]);
-				}
-				if (strstr(&aStringCopy[0], ROT) != NULL)
-				{ // ROTを読み込んだ
-					rot = pLoadScripts->LoadVector3(&aStringCopy[0]);
-					CItem::Create(pos, nType);
-				}
-				if (strstr(&aStringCopy[0], END_ITEMSET) != NULL)
-				{ // END_PLAYERSETを読み込んだ
-					bLoadEnd = true;
-					break;
-				}
-			}
-		}
-	} while (bLoadEnd == false);
-
-	// ファイルを閉じる
-	fclose(pFile);
-
-	// スクリプト破棄
-	SAFE_DELETE_SINGULAR(pLoadScripts);
 }
