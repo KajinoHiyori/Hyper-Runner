@@ -58,6 +58,7 @@ public:
 	void Set(int nType, bool bBlendMotion, int nFrameBlend);
 	void Update(void);
 	int GetType(void) { return m_nType; }
+	int GetBlendType(void) { return m_nTypeBlend; }
 	bool IsFinish(void) { return m_bFinish; }
 
 private:

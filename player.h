@@ -34,14 +34,14 @@ public:
 	// モデルの種類
 	typedef enum
 	{
-		MODEL_00LOWERBACK,		// [00] 腰
+		MODEL_00LOWERBACK,		// [00] 腰		# 下半身モーション
 		MODEL_01LEFTFOOT,		// [01] 左腿
 		MODEL_02LEFTFOOT,		// [02] 左脛
 		MODEL_03LEFTFOOT,		// [03] 左足
 		MODEL_04RIGHTFOOT,		// [04] 右腿
 		MODEL_05RIGHTFOOT,		// [05] 右脛
 		MODEL_06RIGHTFOOT,		// [06] 右足
-		MODEL_07BODY,			// [07] 胴体
+		MODEL_07BODY,			// [07] 胴体		# 上半身モーション
 		MODEL_08HEAD,			// [08] 顎
 		MODEL_09HEAD,			// [09] 頭
 		MODEL_10LEFTARM,		// [10] 左上腕
@@ -51,11 +51,19 @@ public:
 		MODEL_MAX
 	}MODEL;
 
+	// モーションの分割数
+	typedef enum
+	{
+		DIV_MOTION_UNDER = 0,	// 下半身モーション
+		DIV_MOTION_UPPER,		// 上半身モーション
+		DIV_MOTION_MAX
+	}DIV_MOTION;
+
 	// モーションの種類
 	typedef enum
 	{
-		MOTIONTYPE_NUTORAL = 0,	// 待機
-		MOTIONTYPE_MOVE,		// 移動
+		MOTIONTYPE_MOVE = 0,		// 移動
+		MOTIONTYPE_JUMP,			// ジャンプ
 		MOTIONTYPE_MAX
 	}MOTIONTYPE;
 
@@ -82,8 +90,8 @@ public:
 	void SetRotationDest(D3DXVECTOR3 rot) { m_rotDest = rot; }
 	void SetMove(D3DXVECTOR3 move) { m_move = move; }
 	D3DXVECTOR3 GetMove(void) { return m_move; }
-	MOTIONTYPE GetMotionType(void) { return static_cast<MOTIONTYPE>(m_pMotion->GetType()); }
-	void SetMotion(MOTIONTYPE motionType, bool bBrend, int nFrame) { m_pMotion->Set(motionType, bBrend, nFrame); }
+	MOTIONTYPE GetMotionType(int nIdx) { return static_cast<MOTIONTYPE>(m_apMotion[nIdx]->GetType()); }
+	void SetMotion(int nIdx, MOTIONTYPE motionType, bool bBrend, int nFrame) { m_apMotion[nIdx]->Set(motionType, bBrend, nFrame); }
 	D3DXMATRIX GetMatrix(void) { return m_mtxWorld; }
 
 private:
@@ -94,11 +102,11 @@ private:
 	void Move(void);
 	void ChangeLine(int nChangeDir);
 	void CollisionField(CField* pField);
-	HRESULT LoadScripts(const char* pFilePath);
-	bool LoadCharactor(const char* pFilePath);
-	bool LoadModelFile(const char* pFilePath);
-	bool LoadModelSetting(const char* pFilePath);
-	bool LoadMotion(const char* pFilePath);
+	HRESULT LoadScripts(void);
+	bool LoadCharactor(void);
+	bool LoadModelFile(void);
+	bool LoadModelSetting(void);
+	bool LoadMotion(void);
 	D3DXVECTOR3	m_pos;		// モデルの位置
 	D3DXVECTOR3	m_posOld;	// モデルの1フレーム前の位置
 	D3DXVECTOR3	m_move;		// モデルの移動量
@@ -107,7 +115,7 @@ private:
 	D3DXMATRIX m_mtxWorld;	// ワールドマトリックス
 	CModel* m_apModel[MODEL_MAX];	// モデルのポインタ
 	int m_nNumModel;		// モデル総数
-	CMotion* m_pMotion;		// モーション情報
+	CMotion* m_apMotion[DIV_MOTION_MAX];		// モーション情報
 	CShadow* m_pShadow;		// 影情報
 	char m_aFileName[MODEL_MAX][MAX_STRING];	// ローカルで文字列を格納[コピー]
 	float m_fSpeed;	// 移動速度
