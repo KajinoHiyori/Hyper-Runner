@@ -60,6 +60,7 @@ public:
 	int GetType(void) { return m_nType; }
 	int GetBlendType(void) { return m_nTypeBlend; }
 	bool IsFinish(void) { return m_bFinish; }
+	void SetFrame(int nType, int nFrame);
 
 private:
 	INFO m_aInfo[MAX_MOTION];	// ƒ‚[ƒVƒ‡ƒ“î•ñ

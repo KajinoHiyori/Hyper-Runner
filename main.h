@@ -52,6 +52,7 @@
 #define HALF_D3DXPI						(D3DX_PI * 0.5f)	// 円周率の約半分
 #define DOUBLE_D3DXPI					(D3DX_PI * 2.0f)	// 円周率の約2倍
 #define INIT_D3DVEC3					(D3DXVECTOR3(0.0f, 0.0f, 0.0f))	// D3DXVECTOR3型の初期値
+#define INIT_SCALE						(D3DXVECTOR3(1.0f, 1.0f, 1.0f))	// スケールの初期値
 #define ROTATE_D3DXVEC3					(D3DXVECTOR3(0.0f, HALF_D3DXPI, 0.0f))	// D3DXVECTOR3型の90°回転
 #define SCREEN_CENTER					(D3DXVECTOR3(640.0f,360.0f, 0.0f))	// スクリーン中心位置
 #define RAND_POS						(D3DXVECTOR3(static_cast<float>(rand() % SCREEN_WIDTH), static_cast<float>(rand() % SCREEN_HEIGHT), 0.0f))	// ランダムな座標位置[2D]

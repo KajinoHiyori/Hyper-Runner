@@ -91,6 +91,9 @@ HRESULT CField::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fDept
 	// オブジェクトにタイプを指定
 	CObject3D::SetType(CObject::TYPE_FIELD);
 
+	// インデックスを指定
+	m_nIdx = m_nNumAll - 1;
+
 	return S_OK;
 }
 
@@ -129,4 +132,38 @@ void CField::Draw(void)
 float CField::GetHeight(D3DXVECTOR3 pos)
 {
 	return CObject3D::GetPosition().y;
+}
+
+//=============================
+// 判定面のインデックスを獲得
+//=============================
+int CField::GetIndex(D3DXVECTOR3 pos)
+{
+	for (int nCntPriority = 0; nCntPriority < MAX_PRIORITYS; nCntPriority++)
+	{
+		CObject* pObject = GetTop(nCntPriority);	// 先頭アドレスを取得
+
+		while (pObject != NULL)
+		{ // 次のオブジェクトがある限りループ
+			CObject* pObjectNext = pObject->GetNext();	// 次のオブジェクトへのポインタを設定
+			bool bOneCollision = false;
+
+			// オブジェクトとの当たり判定
+			if (pObject->GetType() != CObject::TYPE_FIELD)
+			{
+				pObject = pObjectNext;	// NULL判定を行う
+				continue;
+			}
+			// アイテムの場合
+			CField* pField = static_cast<CField*>(pObject);
+
+			// 当たり判定処理を実行
+			if (pField->GetPosition().x - pField->GetWidth() <= pos.x && pField->GetPosition().x + pField->GetWidth() >= pos.x)
+			{
+				return pField->m_nIdx;
+			}
+			pObject = pObjectNext;	// NULL判定を行う
+		}
+	}
+	return -1;
 }

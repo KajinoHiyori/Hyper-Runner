@@ -19,6 +19,7 @@
 #include "ranking_offline.h"
 #include "field.h"
 #include "block.h"
+#include "item.h"
 #include "fileX.h"
 
 //=============================
@@ -288,6 +289,9 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 
 	// ブロックモデルの読み込み
 	CBlock::LoadInfo();
+
+	// アイテムモデルの読み込み
+	CItem::LoadInfo();
 
 	// モード設定
 	SetMode(CScene::MODE_GAME);

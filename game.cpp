@@ -20,6 +20,7 @@
 #include "player.h"
 #include "field.h"
 #include "block.h"
+#include "item.h"
 
 //=============================
 // 静的メンバ変数宣言
@@ -42,6 +43,7 @@ CField* CGame::m_apField[MAX_FIELDLINE] = {};	// フィールドへのポインタ
 #define FIELD_POS(x)	(D3DXVECTOR3(FIELD_SPACE * 2.0f * (float)(x - 1), 0.0f, 0.0f))	// フィールド位置
 // ファイルパス
 #define BLOCK_SETTINGPATH	("data\\SCRIPTS\\block_game.txt")	// ゲーム内でのブロック設置情報
+#define ITEM_SETTINGPATH	("data\\SCRIPTS\\item_game.txt")	// ゲーム内でのアイテム設置情報
 
 //=============================
 // コンストラクタ
@@ -129,6 +131,9 @@ HRESULT CGame::Init(void)
 
 	// ブロックを生成
 	CBlock::LoadSetting(BLOCK_SETTINGPATH);
+
+	// アイテムを生成
+	CItem::LoadSetting(ITEM_SETTINGPATH);
 
 	return S_OK;
 }

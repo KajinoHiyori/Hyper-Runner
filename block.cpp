@@ -22,7 +22,6 @@
 #include "game.h"
 #include "ranking.h"
 #include "effect.h"
-#include "loadscripts.h"
 
 //=============================
 // マクロ定義
@@ -43,7 +42,7 @@
 // 静的メンバ変数宣言
 //=============================
 int CBlock::m_nNumAll = 0;
-const char* CBlock::m_apModelName[MAX_BLOCK] = {};
+char CBlock::m_apModelName[MAX_BLOCK][MAX_STRING] = {};
 
 //=============================
 // コンストラクタ
@@ -187,25 +186,21 @@ bool CBlock::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld, float fRadius, flo
 	posLeftBack.x = posObj.x - sinf(-rotObj.y + m_fAngle) * (m_fLength + fRadius);
 	posLeftBack.y = 0.0f;
 	posLeftBack.z = posObj.z + cosf(-rotObj.y + m_fAngle) * (m_fLength + fRadius);
-	CEffect::Create(posLeftBack, INIT_D3DVEC3, COLOR_RED, CEffect::TYPE_001, 2);
 	
 	D3DXVECTOR3 posRightBack = INIT_D3DVEC3;	// モデル右奥の座標
 	posRightBack.x = posObj.x + sinf(rotObj.y + m_fAngle) * (m_fLength + fRadius);
 	posRightBack.y = 0.0f;
 	posRightBack.z = posObj.z + cosf(rotObj.y + m_fAngle) * (m_fLength + fRadius);
-	CEffect::Create(posRightBack, INIT_D3DVEC3, COLOR_GREEN, CEffect::TYPE_001, 2);
 	
 	D3DXVECTOR3 posLeftFront = INIT_D3DVEC3;	// モデル左手前の座標
 	posLeftFront.x = posObj.x - sinf(rotObj.y + m_fAngle) * (m_fLength + fRadius);
 	posLeftFront.y = 0.0f;
 	posLeftFront.z = posObj.z - cosf(rotObj.y + m_fAngle) * (m_fLength + fRadius);
-	CEffect::Create(posLeftFront, INIT_D3DVEC3, COLOR_CYAN, CEffect::TYPE_001, 2);
 	
 	D3DXVECTOR3 posRightFront = INIT_D3DVEC3;	// モデル右手前の座標
 	posRightFront.x = posObj.x + sinf(-rotObj.y + m_fAngle) * (m_fLength + fRadius);
 	posRightFront.y = 0.0f;
 	posRightFront.z = posObj.z - cosf(-rotObj.y + m_fAngle) * (m_fLength + fRadius);
-	CEffect::Create(posRightFront, INIT_D3DVEC3, COLOR_MAGENTA, CEffect::TYPE_001, 2);
 
 	D3DXVECTOR3 vecLineLBRB = posRightBack - posLeftBack;	// 左奥→右奥
 	D3DXVec3Normalize(&vecLineLBRB, &vecLineLBRB);
@@ -373,6 +368,58 @@ bool CBlock::SetCollision(D3DXVECTOR3* pPos, float fRadius)
 }
 
 //=============================
+// 地面との判定処理処理
+//=============================
+void CBlock::CollisionField(CField* pField)
+{
+	D3DXVECTOR3 pos = CObjectX::GetPosition();
+
+	float fHeight = pField->GetHeight(D3DXVECTOR3(pos.x, pos.y, pos.z));
+	if (pos.y <= fHeight)
+	{ // 地面に埋まった場合
+		pos.y = fHeight;
+		m_move.y = 0.0f;
+		SetPosition(pos);
+	}
+}
+
+//=============================
+// ゲーム処理
+//=============================
+void CBlock::UpdateGame(void)
+{
+	if (m_nType == 0) return;	// 柵のみ早期リターン
+
+	// オブジェクトの情報を取得	
+	D3DXVECTOR3 pos = CObjectX::GetPosition();	// 現在地の取得
+	D3DXVECTOR3 rot = CObjectX::GetRotation();
+
+	// シーン情報を取得
+	CScene* pScene = CManager::GetScene();
+	CGame* pGame = static_cast<CGame*>(pScene);
+
+	// デバッグ情報を取得
+	CDebugProc* pDebug = CManager::GetDebugProc();
+
+	// 重力
+	m_move.y -= GRAVITY;
+
+	// 位置更新
+	pos += m_move;
+
+	// 移動量の更新
+	m_move.x += (0.0f - m_move.x) * CORRECTION_MOVE;
+	m_move.y += (0.0f - m_move.y) * CORRECTION_MOVE;
+	m_move.z += (0.0f - m_move.z) * CORRECTION_MOVE;
+
+	SetPosition(pos);
+	SetRotation(rot);
+
+	// 地面との当たり判定処理
+	CollisionField(pGame->GetField(0));
+}
+
+//=============================
 // ブロック情報読み取り
 //=============================
 void CBlock::LoadInfo(void)
@@ -380,7 +427,7 @@ void CBlock::LoadInfo(void)
 	// ファイル名のクリア
 	for (int nBlock = 0; nBlock < MAX_BLOCK; nBlock++)
 	{
-		m_apModelName[nBlock] = NULL;
+		m_apModelName[nBlock][0] = {};
 	}
 
 	// ファイルを開く
@@ -432,8 +479,7 @@ void CBlock::LoadInfo(void)
 				if (strstr(&aStringCopy[0], MODELNAME) != NULL)
 				{ // MODELNAMEを読み込んだ
 					pLoadScripts->LoadFileName(&aStringCopy[0]);
-					memcpy(&aFileName[nType][0], &aStringCopy[0], sizeof aStringCopy);
-					m_apModelName[nType] = &aFileName[nType][0];
+					memcpy(&m_apModelName[nType][0], &aStringCopy[0], sizeof aStringCopy);
 					nType++;
 				}
 				if (strstr(&aStringCopy[0], END_BLOCKINFO) != NULL && nType == nNumType)
@@ -526,56 +572,4 @@ void CBlock::LoadSetting(const char* pFileName)
 
 	// スクリプト破棄
 	SAFE_DELETE_SINGULAR(pLoadScripts);
-}
-
-//=============================
-// 地面との判定処理処理
-//=============================
-void CBlock::CollisionField(CField* pField)
-{
-	D3DXVECTOR3 pos = CObjectX::GetPosition();
-
-	float fHeight = pField->GetHeight(D3DXVECTOR3(pos.x, pos.y, pos.z));
-	if (pos.y <= fHeight)
-	{ // 地面に埋まった場合
-		pos.y = fHeight;
-		m_move.y = 0.0f;
-		SetPosition(pos);
-	}
-}
-
-//=============================
-// ゲーム処理
-//=============================
-void CBlock::UpdateGame(void)
-{
-	if (m_nType == 0) return;	// 柵のみ早期リターン
-
-	// オブジェクトの情報を取得	
-	D3DXVECTOR3 pos = CObjectX::GetPosition();	// 現在地の取得
-	D3DXVECTOR3 rot = CObjectX::GetRotation();
-
-	// シーン情報を取得
-	CScene* pScene = CManager::GetScene();
-	CGame* pGame = static_cast<CGame*>(pScene);
-
-	// デバッグ情報を取得
-	CDebugProc* pDebug = CManager::GetDebugProc();
-
-	// 重力
-	m_move.y -= GRAVITY;
-
-	// 位置更新
-	pos += m_move;
-
-	// 移動量の更新
-	m_move.x += (0.0f - m_move.x) * CORRECTION_MOVE;
-	m_move.y += (0.0f - m_move.y) * CORRECTION_MOVE;
-	m_move.z += (0.0f - m_move.z) * CORRECTION_MOVE;
-
-	SetPosition(pos);
-	SetRotation(rot);
-
-	// 地面との当たり判定処理
-	CollisionField(pGame->GetField(0));
 }

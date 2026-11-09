@@ -11,6 +11,7 @@
 //=============================
 #include "main.h"
 #include "objectX.h"
+#include "loadscripts.h"
 
 //=============================
 // マクロ定義
@@ -57,7 +58,7 @@ private:
 	bool m_bBump;			// 凸中
 	bool m_bDent;			// 凹中
 	D3DXVECTOR3 m_scl;	// 拡大率
-	static const char* m_apModelName[MAX_BLOCK];	// モデル名
+	static char m_apModelName[MAX_BLOCK][MAX_STRING];	// モデル名
 };
 
 #endif

@@ -79,6 +79,15 @@
     <Filter Include="event\h">
       <UniqueIdentifier>{c8d8b6ce-2709-47b0-9d1c-9745a04b38c7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="item">
+      <UniqueIdentifier>{94e8534e-4a46-4f41-a424-f47a4cfd100f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="item\cpp">
+      <UniqueIdentifier>{7cf8c778-b852-4010-8631-b490067235bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="item\h">
+      <UniqueIdentifier>{cf5999d8-a761-4b27-93a3-fb9f64140f4e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp">
@@ -215,6 +224,9 @@
     </ClCompile>
     <ClCompile Include="block.cpp">
       <Filter>event\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="item.cpp">
+      <Filter>item\cpp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -355,6 +367,9 @@
     </ClInclude>
     <ClInclude Include="block.h">
       <Filter>event\h</Filter>
+    </ClInclude>
+    <ClInclude Include="item.h">
+      <Filter>item\h</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

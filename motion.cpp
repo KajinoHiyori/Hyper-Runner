@@ -320,3 +320,14 @@ void CMotion::Update(void)
 		}
 	}
 }
+
+//=============================
+// モーションのフレーム一括変更
+//=============================
+void CMotion::SetFrame(int nType, int nFrame)
+{
+	for (int nCntKey = 0; nCntKey < m_aInfo[nType].nNumKey; nCntKey++)
+	{
+		m_aInfo[nType].aKeyInfo[nCntKey].nFrame = nFrame;
+	}
+}

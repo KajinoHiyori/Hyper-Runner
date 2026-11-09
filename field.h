@@ -41,9 +41,11 @@ public:
 	float GetWidth(void) { return CObject3D::GetWidth(); }
 	float GetDepth(void) { return CObject3D::GetDepth(); }
 	static int GetNumAll(void) { return m_nNumAll; }
+	static int GetIndex(D3DXVECTOR3 pos);
 	D3DXVECTOR3 GetPosition(void) { return CObject3D::GetPosition(); }
 
 private:
+	int m_nIdx;	// インデックス
 	static int m_nNumAll;	// フィールドの総数
 };
 #endif

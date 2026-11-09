@@ -413,7 +413,6 @@ void CPlayer::CollisionField(CField* pField)
 {
 	if (m_pos.y > pField->GetHeight(m_pos))return;
 	// Ý’uˆ—
-	m_move.x = 0.0f;
 	m_move.y = 0.0f;
 	m_bJump = false;
 	m_pos.y = pField->GetHeight(m_pos);
