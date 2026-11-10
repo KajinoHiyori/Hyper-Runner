@@ -39,6 +39,8 @@ CMotion::CMotion()
 	m_nFrameChange = 0;			// フレーム切り替え目的値
 	m_nFrameChangeType = 0;		// フレーム切り替えモーション種類
 	m_bMoveChanger = false;			// 移動時のモーション管理
+	m_nMoveType = 0;			// 移動時のモーション種類
+	m_nKeyMove = 0;				// 移動ブレンド
 }
 
 //=============================
@@ -119,6 +121,9 @@ void CMotion::Set(int nType, bool bBlendMotion, int nFrameBlend)
 //=============================
 void CMotion::Set(int nType, int nFrameBlend)
 {
+	if (m_bMoveChanger == true) return;
+	m_nMoveType = nType;
+	m_bMoveChanger = true;
 	//m_bFinish = false;
 	//m_bBlend = true;	// ブレンドの有無を管理
 	//m_nTypeBlend = nType;							// ブレンドモーションの種類
@@ -157,7 +162,8 @@ void CMotion::Set(int nType, int nFrameBlend)
 void CMotion::Update(void)
 {
 	if (m_bMoveChanger == true)
-	{
+	{ // 移動時の更新処理
+		MoveUpdate();
 	}
 	else
 	{ // 通常時のモーション更新
@@ -296,15 +302,7 @@ void CMotion::NormalUpdate(void)
 			m_nType = m_nTypeBlend;
 			m_bLoop = m_aInfo[m_nType].bLoop;
 			m_nNumKey = (int)m_aInfo[m_nType].nNumKey;
-			if (m_bMoveChanger == true)
-			{
-				m_nKey = (m_nKey + 1) % m_nNumKey;
-				m_bMoveChanger = false;
-			}
-			else
-			{
-				m_nKey = m_nKeyBlend;
-			}
+			m_nKey = m_nKeyBlend;
 			m_nCounter = m_nCounterMotionBlend;
 		}
 	}
@@ -327,6 +325,64 @@ void CMotion::NormalUpdate(void)
 			m_nKey = m_nKey % m_nNumKey;
 		}
 	}
+}
+
+//=============================
+// 移動時の更新処理
+//=============================
+void CMotion::MoveUpdate(void)
+{
+	// 全モデル(パーツ)ごとに位置、向きを更新
+	for (int nCntModel = 0; nCntModel < m_nNumModel; nCntModel++)
+	{
+		MOTIONKEY Key = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel];											// 現在のキー
+		MOTIONKEY KeyNext = m_aInfo[m_nType].aKeyInfo[(m_nKey + 1) % m_nNumKey].aKey[nCntModel];				// 次のフレームのキー
+
+		MOTIONKEY KeyMove = m_aInfo[m_nMoveType].aKeyInfo[m_nKey].aKey[nCntModel];								// ブレンドモーションの現在のキー
+		MOTIONKEY KeyNextMove = m_aInfo[m_nMoveType].aKeyInfo[(m_nKey + 1) % m_nNumKeyBlend].aKey[nCntModel];	// ブレンドモーションの次のキー
+		
+		float fRateKey = (float)m_nCounter / (float)m_aInfo[m_nType].aKeyInfo[m_nKey].nFrame;					// 現在のモーションカウンター / 現在の再生フレーム
+		float fRateMoveKey = (float)m_nCounter / (float)m_aInfo[m_nMoveType].aKeyInfo[m_nKey].nFrame;					// 現在のモーションカウンター / 現在の再生フレーム
+		float fPosX = 0.0f;	// 求める値[X座標の位置]
+		float fPosY = 0.0f; // 求める値[Y座標の位置]
+		float fPosZ = 0.0f; // 求める値[Z座標の位置]
+		float fRotX = 0.0f; // 求める値[X座標の角度]
+		float fRotY = 0.0f; // 求める値[Y座標の角度]
+		float fRotZ = 0.0f; // 求める値[Z座標の角度]
+
+		// 位置の更新
+		fPosX = SetBlendPos(fRateMoveKey, KeyNext.fPosX, Key.fPosX, fRateKey, KeyNextMove.fPosX, KeyMove.fPosX);
+		fPosY = SetBlendPos(fRateMoveKey, KeyNext.fPosY, Key.fPosY, fRateKey, KeyNextMove.fPosY, KeyMove.fPosY);
+		fPosZ = SetBlendPos(fRateMoveKey, KeyNext.fPosZ, Key.fPosZ, fRateKey, KeyNextMove.fPosZ, KeyMove.fPosZ);
+
+		// 角度の更新
+		fRotX = SetBlendRot(fRateMoveKey, KeyNext.fRotX, Key.fRotX, fRateKey, KeyNextMove.fRotX, KeyMove.fRotX);
+		fRotY = SetBlendRot(fRateMoveKey, KeyNext.fRotY, Key.fRotY, fRateKey, KeyNextMove.fRotY, KeyMove.fRotY);
+		fRotZ = SetBlendRot(fRateMoveKey, KeyNext.fRotZ, Key.fRotZ, fRateKey, KeyNextMove.fRotZ, KeyMove.fRotZ);
+
+		// モデルの位置を更新
+		D3DXVECTOR3 posOffset = m_ppModel[nCntModel]->GetPosOffset();
+		m_ppModel[nCntModel]->SetPosition(D3DXVECTOR3(fPosX + posOffset.x, fPosY + posOffset.y, fPosZ + posOffset.z));
+
+		// モデルの角度を更新
+		D3DXVECTOR3 rotOffset = m_ppModel[nCntModel]->GetRotOffset();
+		m_ppModel[nCntModel]->SetRotation(D3DXVECTOR3(fRotX + rotOffset.x, fRotY + rotOffset.y, fRotZ + rotOffset.z));
+	}
+
+	m_nCounter++;	// ブレンドモーションカウンターを加算
+	
+	if (m_nCounter >= m_aInfo[m_nType].aKeyInfo[m_nKey].nFrame)
+	{
+		m_nCounter = 0;
+		m_nKey++;
+		if (m_bFrameChanger == true)
+		{
+			ChangeFrame();
+		}
+		m_bMoveChanger = false;
+		m_nType = m_nMoveType;
+	}
+	m_nKey = m_nKey % m_nNumKey;
 }
 
 //=============================

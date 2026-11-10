@@ -67,6 +67,7 @@ public:
 private:
 	void ChangeFrame(void);
 	void NormalUpdate(void);
+	void MoveUpdate(void);
 	static float SetBlendPos(float fRate, float fNext, float fNow, float fRateBlend, float fNextBlend, float fNowBlend);
 	static float SetBlendRot(float fRate, float fNext, float fNow, float fRateBlend, float fNextBlend, float fNowBlend);
 	static float SetPos(float fRate, float fNext, float fNow);
@@ -93,6 +94,8 @@ private:
 	int		m_nFrameChange;			// フレーム切り替え目的値
 	int		m_nFrameChangeType;		// フレーム切り替えモーション種類
 	bool	m_bMoveChanger;			// 移動時のモーション管理
+	int		m_nMoveType;			// 移動時のモーション種類
+	int		m_nKeyMove;				// 移動ブレンド
 };
 
 #endif // !_MOTION_H_

@@ -550,7 +550,7 @@ bool CPlayer::CollisionBlock(void)
 #define FASTRUN_FRAME	(10)	// 早く走る際のフレーム数
 #define FASTEST_RUN		(5)		// 最速で走る際のフレーム数
 #define ENABLE_CHANGEFRAME	// フレーム切り替え
-#undef	ENABLE_CHANGEFRAME	// ENABLE_CHANGEFRAMEの無効化
+//#undef	ENABLE_CHANGEFRAME	// ENABLE_CHANGEFRAMEの無効化
 //=============================
 // 加速管理
 //=============================
