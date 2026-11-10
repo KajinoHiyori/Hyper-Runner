@@ -87,10 +87,11 @@ public:
 	// ë¨ìxä«óù
 	typedef enum
 	{
-		SPEED_SLOWWALK = 1,	// íxÇ≠ï‡Ç≠
-		SPEED_FASTWALK,		// ëÅÇ≠ï‡Ç≠
-		SPEED_SLOWRUN = 3,	// íxÇ≠ëñÇÈ
-		SPEED_FASTRUN,		// ëÅÇ≠ëñÇÈ
+		SPEED_SLOWWALK = 1,		// íxÇ≠ï‡Ç≠
+		SPEED_FASTWALK,			// ëÅÇ≠ï‡Ç≠
+		SPEED_SLOWRUN = 4,		// íxÇ≠ëñÇÈ
+		SPEED_FASTRUN = 7,		// ëÅÇ≠ëñÇÈ
+		SPEED_FASTESTRUN = 10,	// ç≈ë¨Ç≈ëñÇÈ
 	}SPEED;
 
 	CPlayer(CObject::PRIORITY priority = CObject::PRIORITY_CHARACTOR);

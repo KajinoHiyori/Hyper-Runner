@@ -200,8 +200,9 @@ void CPlayer::Update(void)
 	for (int nCntDiv = 0; nCntDiv < DIV_MOTION_MAX; nCntDiv++)
 	{
 		if (m_apMotion[nCntDiv] == NULL) continue;
-		m_apMotion[nCntDiv]->Update();
+	//	m_apMotion[nCntDiv]->Update();
 	}
+	m_apMotion[DIV_MOTION_UNDER]->Update();
 
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_W) == true)
 	{
@@ -480,7 +481,14 @@ void CPlayer::CollisionField(CField* pField)
 
 	if (m_bJumpOld == true)
 	{ // 移動モーションに戻す
-		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_WALK, true, BLEND_FRAME);
+		if (m_speed >= SPEED_SLOWRUN)
+		{
+			m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_RUN, true, BLEND_FRAME);
+		}
+		else
+		{
+			m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_WALK, true, BLEND_FRAME);
+		}
 	}
 }
 
@@ -540,29 +548,46 @@ bool CPlayer::CollisionBlock(void)
 #define FASTWALK_FRAME	(30)	// 早く歩く際のフレーム数
 #define SLOWRUN_FRAME	(20)	// 遅く走る際のフレーム数
 #define FASTRUN_FRAME	(10)	// 早く走る際のフレーム数
+#define FASTEST_RUN		(5)		// 最速で走る際のフレーム数
+#define ENABLE_CHANGEFRAME	// フレーム切り替え
+#undef	ENABLE_CHANGEFRAME	// ENABLE_CHANGEFRAMEの無効化
 //=============================
 // 加速管理
 //=============================
 void CPlayer::SpeedUp(void)
 {
-	if (m_speed == SPEED_FASTRUN) return;	// これ以上加速しない
+	if (m_speed == SPEED_FASTESTRUN) return;	// これ以上加速しない
 
 	switch (m_speed)
 	{
 	case SPEED_SLOWWALK:	// 遅く歩く
 		m_speed = SPEED_FASTWALK;
+#ifdef ENABLE_CHANGEFRAME
 		m_apMotion[DIV_MOTION_UNDER]->SetFrame(MOTIONUNDER_WALK, FASTWALK_FRAME);
+#endif // ENABLE_CHANGEFRAME
+
 		break;
 
 	case SPEED_FASTWALK:	// 早く歩く
 		m_speed = SPEED_SLOWRUN;
-		m_apMotion[DIV_MOTION_UNDER]->SetFrame(MOTIONUNDER_RUN, SLOWRUN_FRAME);
-		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_RUN, true, BLEND_FRAME);
+#ifdef ENABLE_CHANGEFRAME
+		m_apMotion[DIV_MOTION_UNDER]->ChangeFrame(MOTIONUNDER_RUN, SLOWRUN_FRAME);
+		#endif
+		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_RUN, SLOWWALK_FRAME);
 		break;
 
 	case SPEED_SLOWRUN:	// 遅く走る
 		m_speed = SPEED_FASTRUN;
+#ifdef ENABLE_CHANGEFRAME
 		m_apMotion[DIV_MOTION_UNDER]->SetFrame(MOTIONUNDER_RUN, FASTRUN_FRAME);
+#endif
+		break;
+
+	case SPEED_FASTRUN:	// 早く走る
+		m_speed = SPEED_FASTESTRUN;
+#ifdef ENABLE_CHANGEFRAME
+		m_apMotion[DIV_MOTION_UNDER]->SetFrame(MOTIONUNDER_RUN, FASTEST_RUN);
+#endif
 		break;
 	}
 }
@@ -578,18 +603,31 @@ void CPlayer::SpeedDown(void)
 	{
 	case SPEED_FASTWALK:	// 早く歩く
 		m_speed = SPEED_SLOWWALK;
+#ifdef ENABLE_CHANGEFRAME
 		m_apMotion[DIV_MOTION_UNDER]->SetFrame(MOTIONUNDER_WALK, SLOWWALK_FRAME);
+		#endif
 		break;
 
 	case SPEED_SLOWRUN:	// 遅く走る
 		m_speed = SPEED_FASTWALK;
-		m_apMotion[DIV_MOTION_UNDER]->SetFrame(MOTIONUNDER_WALK, FASTWALK_FRAME);
-		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_WALK, true, BLEND_FRAME);
+#ifdef ENABLE_CHANGEFRAME
+		m_apMotion[DIV_MOTION_UNDER]->ChangeFrame(MOTIONUNDER_WALK, FASTWALK_FRAME);
+#endif
+		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_WALK, SLOWWALK_FRAME);
 		break;
 
 	case SPEED_FASTRUN:	// 早く走る
 		m_speed = SPEED_SLOWRUN;
+#ifdef ENABLE_CHANGEFRAME
 		m_apMotion[DIV_MOTION_UNDER]->SetFrame(MOTIONUNDER_RUN, SLOWRUN_FRAME);
+#endif
+		break;
+
+	case SPEED_FASTESTRUN:	// 最速で走る
+		m_speed = SPEED_FASTRUN;
+#ifdef ENABLE_CHANGEFRAME
+		m_apMotion[DIV_MOTION_UNDER]->SetFrame(MOTIONUNDER_RUN, FASTRUN_FRAME);
+#endif
 		break;
 	}
 }

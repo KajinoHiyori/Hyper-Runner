@@ -35,6 +35,10 @@ CMotion::CMotion()
 	m_nCounterMotionBlend = 0;	// ブレンドモーションのカウンター
 	m_nFrameBlend = 0;			// ブレンドフレーム数(何フレームかけてブレンドをするか)
 	m_nCounterBlend = 0;		// ブレンドカウンター(ブレンドフレームが何フレーム処理されているか)
+	m_bFrameChanger = false;		// フレーム切り替えを管理
+	m_nFrameChange = 0;			// フレーム切り替え目的値
+	m_nFrameChangeType = 0;		// フレーム切り替えモーション種類
+	m_bMoveChanger = false;			// 移動時のモーション管理
 }
 
 //=============================
@@ -111,9 +115,110 @@ void CMotion::Set(int nType, bool bBlendMotion, int nFrameBlend)
 }
 
 //=============================
+// モーションの設定
+//=============================
+void CMotion::Set(int nType, int nFrameBlend)
+{
+	//m_bFinish = false;
+	//m_bBlend = true;	// ブレンドの有無を管理
+	//m_nTypeBlend = nType;							// ブレンドモーションの種類
+	//m_nFrameBlend = nFrameBlend;					// ブレンドモーションのフレーム
+	////m_nFrameBlend = m_aInfo[m_nTypeBlend].aKeyInfo[m_nKey].nFrame;					// ブレンドモーションのフレーム
+	//m_nNumKeyBlend = m_aInfo[m_nTypeBlend].nNumKey;	// ブレンドモーションのキー
+	//m_nKeyBlend = m_nKey;	// ブレンドモーションのキーを初期化
+	//m_bLoopBlend = m_aInfo[m_nTypeBlend].bLoop;		// ブレンド先のモーションのループ状態
+	//m_nCounterMotionBlend = m_nCounter;				// ブレンドモーションカウンターのクリア
+	//m_nCounterBlend = (int)(((float)m_nCounter / (float)m_aInfo[m_nType].aKeyInfo[m_nKey].nFrame) * (float)m_aInfo[m_nTypeBlend].aKeyInfo[m_nKey].nFrame);							// ブレンドカウンターのクリア
+	//m_bMoveChanger = true;			// 移動時のモーション管理
+
+	//// 全モデル(パーツ)ごとに位置、向きを更新
+	//for (int nCntModel = 0; nCntModel < m_nNumModel; nCntModel++)
+	//{
+	//	float fPosX = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel].fPosX;	// 位置X
+	//	float fPosY = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel].fPosY;	// 位置Y
+	//	float fPosZ = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel].fPosZ;	// 位置Z
+	//	float fRotX = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel].fRotX;	// 向きX
+	//	float fRotY = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel].fRotY;	// 向きY
+	//	float fRotZ = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel].fRotZ;	// 向きZ
+
+	//	// モデルの位置を更新
+	//	D3DXVECTOR3 posOffset = m_ppModel[nCntModel]->GetPosOffset();
+	//	m_ppModel[nCntModel]->SetPosition(D3DXVECTOR3(fPosX + posOffset.x, fPosY + posOffset.y, fPosZ + posOffset.z));
+
+	//	// モデルの角度を更新
+	//	D3DXVECTOR3 rotOffset = m_ppModel[nCntModel]->GetRotOffset();
+	//	m_ppModel[nCntModel]->SetRotation(D3DXVECTOR3(fRotX + rotOffset.x, fRotY + rotOffset.y, fRotZ + rotOffset.z));
+	//}
+}
+
+//=============================
 // モーションの更新処理
 //=============================
 void CMotion::Update(void)
+{
+	if (m_bMoveChanger == true)
+	{
+	}
+	else
+	{ // 通常時のモーション更新
+		NormalUpdate();
+	}
+
+	CDebugProc* pDebug = CManager::GetDebugProc();
+	pDebug->Print("m_nType %d\n", m_nType);
+	pDebug->Print("m_bLoop %d\n", m_bLoop);
+	pDebug->Print("m_nNumKey %d\n", m_nNumKey);
+	pDebug->Print("m_nKey %d\n", m_nKey);
+	pDebug->Print("m_nCounter %d\n", m_nCounter);
+	pDebug->Print("m_bFinish %d\n", m_bFinish);
+	pDebug->Print("m_bBlend %d\n", m_bBlend);
+	pDebug->Print("m_nTypeBlend %d\n", m_nTypeBlend);
+	pDebug->Print("m_bLoopBlend %d\n", m_bLoopBlend);
+	pDebug->Print("m_nNumKeyBlend %d\n", m_nNumKeyBlend);
+	pDebug->Print("m_nKeyBlend %d\n", m_nKeyBlend);
+	pDebug->Print("m_nCounterMotionBlend %d\n", m_nCounterMotionBlend);
+	pDebug->Print("m_nFrameBlend %d\n", m_nFrameBlend);
+	pDebug->Print("m_nCounterBlend %d\n", m_nCounterBlend);
+	pDebug->Print("m_aInfo[%d].aKeyInfo[%d].nFrame %d\n", m_nType, m_nKey, m_aInfo[m_nType].aKeyInfo[m_nKey].nFrame);
+}
+
+//=============================
+// モーションのフレーム設定
+//=============================
+void CMotion::SetFrame(int nType, int nFrame)
+{
+	m_bFrameChanger = true;
+	m_nFrameChange = nFrame;
+	m_nFrameChangeType = nType;
+}
+
+//=============================
+// モーションのフレーム一括変更
+//=============================
+void CMotion::ChangeFrame(int nType, int nFrame)
+{ 
+	for (int nCntKey = 0; nCntKey < m_aInfo[nType].nNumKey; nCntKey++)
+	{
+		m_aInfo[nType].aKeyInfo[nCntKey].nFrame = nFrame;
+	}
+}
+
+//=============================
+// モーションのフレーム一括変更
+//=============================
+void CMotion::ChangeFrame(void)
+{
+	for (int nCntKey = 0; nCntKey < m_aInfo[m_nFrameChangeType].nNumKey; nCntKey++)
+	{
+		m_aInfo[m_nFrameChangeType].aKeyInfo[nCntKey].nFrame = m_nFrameChange;
+	}
+	m_bFrameChanger = false;
+}
+
+//=============================
+// 通常時の更新処理
+//=============================
+void CMotion::NormalUpdate(void)
 {
 	// 全モデル(パーツ)ごとに位置、向きを更新
 	for (int nCntModel = 0; nCntModel < m_nNumModel; nCntModel++)
@@ -125,21 +230,6 @@ void CMotion::Update(void)
 		float fRateKey = (float)m_nCounter / (float)m_aInfo[m_nType].aKeyInfo[m_nKey].nFrame;					// 現在のモーションカウンター / 現在の再生フレーム
 		float fRateKeyBlend = (float)m_nCounterMotionBlend / (float)m_aInfo[m_nTypeBlend].aKeyInfo[m_nKeyBlend].nFrame;	// ブレンドモーションカウンター / ブレンドモーションフレーム
 		float fRateBlend = (float)m_nCounterBlend / (float)m_nFrameBlend;	// ブレンドフレームを処理している比率
-		float fDiffKey = 0.0f;	// 現在のモーションの次のキーと現在のキーの差分
-		float fDiffKeyBlend = 0.0f;	// ブレンドモーションの次のキーと現在のキーの差分
-		float fDiffBrend = 0.0f;	// 現在のモーションとブレンドモーションとの差分
-		float fPosXCurrent = 0.0f;	// 現在のX座標の位置を格納
-		float fPosYCurrent = 0.0f;	// 現在のY座標の位置を格納
-		float fPosZCurrent = 0.0f;	// 現在のZ座標の位置を格納
-		float fRotXCurrent = 0.0f;	// 現在のX座標の角度を格納
-		float fRotYCurrent = 0.0f;	// 現在のY座標の角度を格納
-		float fRotZCurrent = 0.0f;	// 現在のZ座標の角度を格納
-		float fPosXBlend = 0.0f;	// ブレンドモーションのX座標の位置を格納
-		float fPosYBlend = 0.0f;	// ブレンドモーションのY座標の位置を格納
-		float fPosZBlend = 0.0f;	// ブレンドモーションのZ座標の位置を格納
-		float fRotXBlend = 0.0f;	// ブレンドモーションのX座標の角度を格納
-		float fRotYBlend = 0.0f;	// ブレンドモーションのY座標の角度を格納
-		float fRotZBlend = 0.0f;	// ブレンドモーションのZ座標の角度を格納
 		float fPosX = 0.0f;	// 求める値[X座標の位置]
 		float fPosY = 0.0f; // 求める値[Y座標の位置]
 		float fPosZ = 0.0f; // 求める値[Z座標の位置]
@@ -149,127 +239,28 @@ void CMotion::Update(void)
 
 		if (m_bBlend == true)	// ブレンド有の場合
 		{
-			// 位置の更新 [Integer division by zero]に対処すること
-			// X
-			// 現在のモーション情報
-			fDiffKey = KeyNext.fPosX - Key.fPosX;
-			fPosXCurrent = Key.fPosX + (fDiffKey * fRateKey);
-			// ブレンドモーション情報
-			fDiffKeyBlend = KeyNextBlend.fPosX - KeyBlend.fPosX;
-			fPosXBlend = KeyBlend.fPosX + (fDiffKeyBlend * fRateKeyBlend);
-			// 差分を求め、位置を求める
-			fDiffBrend = fPosXBlend - fPosXCurrent;
-			fPosX = fPosXCurrent + (fDiffBrend * fRateBlend);
-
-			// Y
-			// 現在のモーション情報
-			fDiffKey = KeyNext.fPosY - Key.fPosY;
-			fPosYCurrent = Key.fPosY + (fDiffKey * fRateKey);
-			// ブレンドモーション情報
-			fDiffKeyBlend = KeyNextBlend.fPosY - KeyBlend.fPosY;
-			fPosYBlend = KeyBlend.fPosY + (fDiffKeyBlend * fRateKeyBlend);
-			// 差分を求め、位置を求める
-			fDiffBrend = fPosYBlend - fPosYCurrent;
-			fPosY = fPosYCurrent + (fDiffBrend * fRateBlend);
-
-			// Z
-			// 現在のモーション情報
-			fDiffKey = KeyNext.fPosZ - Key.fPosZ;
-			fPosZCurrent = Key.fPosZ + (fDiffKey * fRateKey);
-			// ブレンドモーション情報
-			fDiffKeyBlend = KeyNextBlend.fPosZ - KeyBlend.fPosZ;
-			fPosZBlend = KeyBlend.fPosZ + (fDiffKeyBlend * fRateKeyBlend);
-
-			// 差分を求め、位置を求める
-			fDiffBrend = fPosZBlend - fPosZCurrent;
-			fPosZ = fPosZCurrent + (fDiffBrend * fRateBlend);
+			// 位置の更新
+			fPosX = SetBlendPos(fRateKey, KeyNext.fPosX, Key.fPosX, fRateBlend, KeyNextBlend.fPosX, KeyBlend.fPosX);
+			fPosY = SetBlendPos(fRateKey, KeyNext.fPosY, Key.fPosY, fRateBlend, KeyNextBlend.fPosY, KeyBlend.fPosY);
+			fPosZ = SetBlendPos(fRateKey, KeyNext.fPosZ, Key.fPosZ, fRateBlend, KeyNextBlend.fPosZ, KeyBlend.fPosZ);
 
 			// 角度の更新
-			// X
-			// 現在のモーション情報
-			fDiffKey = KeyNext.fRotX - Key.fRotX;
-			fRotXCurrent = Key.fRotX + (fDiffKey * fRateKey);
-			// 角度補正
-			fRotXCurrent = AngleNormalize(fRotXCurrent);
-			// ブレンドモーション情報
-			fDiffKeyBlend = KeyNextBlend.fRotX - KeyBlend.fRotX;
-			// 角度補正
-			fDiffKeyBlend = AngleNormalize(fDiffKeyBlend);
-			fRotXBlend = KeyBlend.fRotX + (fDiffKeyBlend * fRateKeyBlend);
-			// 差分を求め、位置を求める
-			fDiffBrend = fRotXBlend - fRotXCurrent;
-			fRotX = fRotXCurrent + (fDiffBrend * fRateBlend);
-
-			// Y
-			// 現在のモーション情報
-			fDiffKey = KeyNext.fRotY - Key.fRotY;
-			fRotYCurrent = Key.fRotY + (fDiffKey * fRateKey);
-			// 角度補正
-			fRotYCurrent = AngleNormalize(fRotYCurrent);
-			// ブレンドモーション情報
-			fDiffKeyBlend = KeyNextBlend.fRotY - KeyBlend.fRotY;
-			// 角度補正
-			fDiffKeyBlend = AngleNormalize(fDiffKeyBlend);
-			fRotYBlend = KeyBlend.fRotY + (fDiffKeyBlend * fRateKeyBlend);
-			// 差分を求め、位置を求める
-			fDiffBrend = fRotYBlend - fRotYCurrent;
-			fRotY = fRotYCurrent + (fDiffBrend * fRateBlend);
-
-			// Z
-			// 現在のモーション情報
-			fDiffKey = KeyNext.fRotZ - Key.fRotZ;
-			fRotZCurrent = Key.fRotZ + (fDiffKey * fRateKey);
-			// 角度補正
-			fRotZCurrent = AngleNormalize(fRotZCurrent);
-			// ブレンドモーション情報
-			fDiffKeyBlend = KeyNextBlend.fRotZ - KeyBlend.fRotZ;
-			// 角度補正
-			fDiffKeyBlend = AngleNormalize(fDiffKeyBlend);
-			fRotZBlend = KeyBlend.fRotZ + (fDiffKeyBlend * fRateKeyBlend);
-			// 差分を求め、位置を求める
-			fDiffBrend = fRotZBlend - fRotZCurrent;
-			fRotZ = fRotZCurrent + (fDiffBrend * fRateBlend);
-
+			fRotX = SetBlendRot(fRateKey, KeyNext.fRotX, Key.fRotX, fRateBlend, KeyNextBlend.fRotX, KeyBlend.fRotX);
+			fRotY = SetBlendRot(fRateKey, KeyNext.fRotY, Key.fRotY, fRateBlend, KeyNextBlend.fRotY, KeyBlend.fRotY);
+			fRotZ = SetBlendRot(fRateKey, KeyNext.fRotZ, Key.fRotZ, fRateBlend, KeyNextBlend.fRotZ, KeyBlend.fRotZ);
 		}
 		else // ブレンド無の場合
 		{
-			// 位置の更新 [Integer division by zero]に対処すること
-			// X
-			fDiffKey = KeyNext.fPosX - Key.fPosX;
-			fPosX = Key.fPosX + fDiffKey * fRateKey;
-
-			// Y
-			fDiffKey = KeyNext.fPosY - Key.fPosY;
-			fPosY = Key.fPosY + fDiffKey * fRateKey;
-
-			// Z
-			fDiffKey = KeyNext.fPosZ - Key.fPosZ;
-			fPosZ = Key.fPosZ + fDiffKey * fRateKey;
+			// 位置の更新
+			fPosX = SetPos(fRateKey, KeyNext.fPosX, Key.fPosX);
+			fPosY = SetPos(fRateKey, KeyNext.fPosY, Key.fPosY);
+			fPosZ = SetPos(fRateKey, KeyNext.fPosZ, Key.fPosZ);
 
 			// 角度の更新
-			// X
-			fDiffKey = KeyNext.fRotX - Key.fRotX;
-			// 角度補正
-			fDiffKey = AngleNormalize(fDiffKey);
-			fRotX = Key.fRotX + fDiffKey * fRateKey;
-
-			// Y
-			fDiffKey = KeyNext.fRotY - Key.fRotY;
-			// 角度補正
-			fDiffKey = AngleNormalize(fDiffKey);
-			fRotY = Key.fRotY + fDiffKey * fRateKey;
-
-			// Z
-			fDiffKey = KeyNext.fRotZ - Key.fRotZ;
-			// 角度補正
-			fDiffKey = AngleNormalize(fDiffKey);
-			fRotZ = Key.fRotZ + fDiffKey * fRateKey;
+			fRotX = SetRot(fRateKey, KeyNext.fRotX, Key.fRotX);
+			fRotY = SetRot(fRateKey, KeyNext.fRotY, Key.fRotY);
+			fRotZ = SetRot(fRateKey, KeyNext.fRotZ, Key.fRotZ);
 		}
-
-		// 角度補正
-		fRotX = AngleNormalize(fRotX);
-		fRotY = AngleNormalize(fRotY);
-		fRotZ = AngleNormalize(fRotZ);
 
 		// モデルの位置を更新
 		D3DXVECTOR3 posOffset = m_ppModel[nCntModel]->GetPosOffset();
@@ -289,6 +280,11 @@ void CMotion::Update(void)
 			m_nKeyBlend++;
 			m_nCounterMotionBlend = 0;
 			m_nKeyBlend = m_nKeyBlend % m_nNumKeyBlend;
+			if (m_bFrameChanger == true)
+			{
+				ChangeFrame();
+				m_bFrameChanger = false;
+			}
 		}
 
 		m_nCounterBlend++;	// ブレンドカウンターを加算
@@ -300,18 +296,30 @@ void CMotion::Update(void)
 			m_nType = m_nTypeBlend;
 			m_bLoop = m_aInfo[m_nType].bLoop;
 			m_nNumKey = (int)m_aInfo[m_nType].nNumKey;
-			m_nKey = m_nKeyBlend;
+			if (m_bMoveChanger == true)
+			{
+				m_nKey = (m_nKey + 1) % m_nNumKey;
+				m_bMoveChanger = false;
+			}
+			else
+			{
+				m_nKey = m_nKeyBlend;
+			}
 			m_nCounter = m_nCounterMotionBlend;
 		}
 	}
 	else
 	{	// ブレンド無
 		m_nCounter++;	// ブレンドモーションカウンターを加算
-		
+
 		if (m_nCounter >= m_aInfo[m_nType].aKeyInfo[m_nKey].nFrame)
 		{
 			m_nCounter = 0;
 			m_nKey++;
+			if (m_bFrameChanger == true)
+			{
+				ChangeFrame();
+			}
 			if (m_bLoop == false && m_nKey + 1 >= m_nNumKey)
 			{
 				m_bFinish = true;
@@ -322,12 +330,64 @@ void CMotion::Update(void)
 }
 
 //=============================
-// モーションのフレーム一括変更
+// ブレンドモーション位置更新
 //=============================
-void CMotion::SetFrame(int nType, int nFrame)
+float CMotion::SetBlendPos(float fRate, float fNext, float fNow, float fRateBlend, float fNextBlend, float fNowBlend)
 {
-	for (int nCntKey = 0; nCntKey < m_aInfo[nType].nNumKey; nCntKey++)
-	{
-		m_aInfo[nType].aKeyInfo[nCntKey].nFrame = nFrame;
-	}
+	float fPos = 0.0f;
+	float fDiffKey = fNext - fNow;
+	float fPosCurrent = fNow + (fDiffKey * fRate);
+	// ブレンドモーション情報
+	float fDiffKeyBlend = fNextBlend - fNowBlend;
+	float fPosBlend = fNowBlend + (fDiffKeyBlend * fRateBlend);
+	// 差分を求め、位置を求める
+	float fDiffBrend = fPosBlend - fPosCurrent;
+	fPos = fPosCurrent + (fDiffBrend * fRateBlend);
+	return fPos;
+}
+
+//=============================
+// ブレンドモーション角度更新
+//=============================
+float CMotion::SetBlendRot(float fRate, float fNext, float fNow, float fRateBlend, float fNextBlend, float fNowBlend)
+{
+	float fRot = 0.0f;
+	float fDiffKey = fNext - fNow;
+	float fRotCurrent = fNow + (fDiffKey * fRate);
+	// 角度補正
+	fRotCurrent = AngleNormalize(fRotCurrent);
+	// ブレンドモーション情報
+	float fDiffKeyBlend = fNextBlend - fNowBlend;
+	// 角度補正
+	fDiffKeyBlend = AngleNormalize(fDiffKeyBlend);
+	float fRotBlend = fNowBlend + (fDiffKeyBlend * fRateBlend);
+	// 差分を求め、位置を求める
+	float fDiffBrend = fRotBlend - fRotCurrent;
+	fRot = fRotCurrent + (fDiffBrend * fRateBlend);
+
+	return fRot;
+}
+
+//=============================
+// モーション位置更新
+//=============================
+float CMotion::SetPos(float fRate, float fNext, float fNow)
+{
+	float fPos = 0.0f;
+	float fDiffKey = fNext - fNow;
+	fPos = fNow + fDiffKey * fRate;
+	return fPos;
+}
+
+//=============================
+// モーション角度更新
+//=============================
+float CMotion::SetRot(float fRate, float fNext, float fNow)
+{
+	float fRot = 0.0f;
+	float fDiffKey = fNext - fNow;
+	// 角度補正
+	fDiffKey = AngleNormalize(fDiffKey);
+	fRot = fNow + fDiffKey * fRate;
+	return AngleNormalize(fRot);
 }
