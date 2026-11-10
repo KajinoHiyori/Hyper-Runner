@@ -95,25 +95,6 @@ void CMotion::Set(int nType, bool bBlendMotion, int nFrameBlend)
 		m_nKey = 0;									// 現在のキーを初期化
 		m_nCounter = 0;								// モーションカウンターのクリア
 	}
-
-	// 全モデル(パーツ)ごとに位置、向きを更新
-	for (int nCntModel = 0; nCntModel < m_nNumModel; nCntModel++)
-	{
-		float fPosX = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel].fPosX;	// 位置X
-		float fPosY = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel].fPosY;	// 位置Y
-		float fPosZ = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel].fPosZ;	// 位置Z
-		float fRotX = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel].fRotX;	// 向きX
-		float fRotY = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel].fRotY;	// 向きY
-		float fRotZ = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel].fRotZ;	// 向きZ
-
-		// モデルの位置を更新
-		D3DXVECTOR3 posOffset = m_ppModel[nCntModel]->GetPosOffset();
-		m_ppModel[nCntModel]->SetPosition(D3DXVECTOR3(fPosX + posOffset.x, fPosY + posOffset.y, fPosZ + posOffset.z));
-
-		// モデルの角度を更新
-		D3DXVECTOR3 rotOffset = m_ppModel[nCntModel]->GetRotOffset();
-		m_ppModel[nCntModel]->SetRotation(D3DXVECTOR3(fRotX + rotOffset.x, fRotY + rotOffset.y, fRotZ + rotOffset.z));
-	}
 }
 
 //=============================
@@ -121,39 +102,8 @@ void CMotion::Set(int nType, bool bBlendMotion, int nFrameBlend)
 //=============================
 void CMotion::Set(int nType, int nFrameBlend)
 {
-	if (m_bMoveChanger == true) return;
 	m_nMoveType = nType;
 	m_bMoveChanger = true;
-	//m_bFinish = false;
-	//m_bBlend = true;	// ブレンドの有無を管理
-	//m_nTypeBlend = nType;							// ブレンドモーションの種類
-	//m_nFrameBlend = nFrameBlend;					// ブレンドモーションのフレーム
-	////m_nFrameBlend = m_aInfo[m_nTypeBlend].aKeyInfo[m_nKey].nFrame;					// ブレンドモーションのフレーム
-	//m_nNumKeyBlend = m_aInfo[m_nTypeBlend].nNumKey;	// ブレンドモーションのキー
-	//m_nKeyBlend = m_nKey;	// ブレンドモーションのキーを初期化
-	//m_bLoopBlend = m_aInfo[m_nTypeBlend].bLoop;		// ブレンド先のモーションのループ状態
-	//m_nCounterMotionBlend = m_nCounter;				// ブレンドモーションカウンターのクリア
-	//m_nCounterBlend = (int)(((float)m_nCounter / (float)m_aInfo[m_nType].aKeyInfo[m_nKey].nFrame) * (float)m_aInfo[m_nTypeBlend].aKeyInfo[m_nKey].nFrame);							// ブレンドカウンターのクリア
-	//m_bMoveChanger = true;			// 移動時のモーション管理
-
-	//// 全モデル(パーツ)ごとに位置、向きを更新
-	//for (int nCntModel = 0; nCntModel < m_nNumModel; nCntModel++)
-	//{
-	//	float fPosX = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel].fPosX;	// 位置X
-	//	float fPosY = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel].fPosY;	// 位置Y
-	//	float fPosZ = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel].fPosZ;	// 位置Z
-	//	float fRotX = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel].fRotX;	// 向きX
-	//	float fRotY = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel].fRotY;	// 向きY
-	//	float fRotZ = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel].fRotZ;	// 向きZ
-
-	//	// モデルの位置を更新
-	//	D3DXVECTOR3 posOffset = m_ppModel[nCntModel]->GetPosOffset();
-	//	m_ppModel[nCntModel]->SetPosition(D3DXVECTOR3(fPosX + posOffset.x, fPosY + posOffset.y, fPosZ + posOffset.z));
-
-	//	// モデルの角度を更新
-	//	D3DXVECTOR3 rotOffset = m_ppModel[nCntModel]->GetRotOffset();
-	//	m_ppModel[nCntModel]->SetRotation(D3DXVECTOR3(fRotX + rotOffset.x, fRotY + rotOffset.y, fRotZ + rotOffset.z));
-	//}
 }
 
 //=============================
@@ -161,16 +111,18 @@ void CMotion::Set(int nType, int nFrameBlend)
 //=============================
 void CMotion::Update(void)
 {
+	CDebugProc* pDebug = CManager::GetDebugProc();
 	if (m_bMoveChanger == true)
 	{ // 移動時の更新処理
 		MoveUpdate();
+		//pDebug->Print("MoveUpdate======================================================\n");
 	}
 	else
 	{ // 通常時のモーション更新
 		NormalUpdate();
+		//pDebug->Print("NormalUpdate\n");
 	}
-
-	CDebugProc* pDebug = CManager::GetDebugProc();
+	/*pDebug->Print("腰 : %f, %f, %f\n", m_ppModel[0]->GetPosition().x, m_ppModel[0]->GetPosition().y, m_ppModel[0]->GetPosition().z);
 	pDebug->Print("m_nType %d\n", m_nType);
 	pDebug->Print("m_bLoop %d\n", m_bLoop);
 	pDebug->Print("m_nNumKey %d\n", m_nNumKey);
@@ -185,7 +137,7 @@ void CMotion::Update(void)
 	pDebug->Print("m_nCounterMotionBlend %d\n", m_nCounterMotionBlend);
 	pDebug->Print("m_nFrameBlend %d\n", m_nFrameBlend);
 	pDebug->Print("m_nCounterBlend %d\n", m_nCounterBlend);
-	pDebug->Print("m_aInfo[%d].aKeyInfo[%d].nFrame %d\n", m_nType, m_nKey, m_aInfo[m_nType].aKeyInfo[m_nKey].nFrame);
+	pDebug->Print("m_aInfo[%d].aKeyInfo[%d].nFrame %d\n", m_nType, m_nKey, m_aInfo[m_nType].aKeyInfo[m_nKey].nFrame);*/
 }
 
 //=============================
@@ -349,6 +301,8 @@ void CMotion::MoveUpdate(void)
 		float fRotX = 0.0f; // 求める値[X座標の角度]
 		float fRotY = 0.0f; // 求める値[Y座標の角度]
 		float fRotZ = 0.0f; // 求める値[Z座標の角度]
+
+		// ここでの割合計算に失敗しており急に動いて見える===============================
 
 		// 位置の更新
 		fPosX = SetBlendPos(fRateMoveKey, KeyNext.fPosX, Key.fPosX, fRateKey, KeyNextMove.fPosX, KeyMove.fPosX);

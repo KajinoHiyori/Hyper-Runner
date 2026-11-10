@@ -43,6 +43,7 @@ public:
 	void SetParent(CModel* pModel) { m_pParent = pModel; }
 	void SetPosition(D3DXVECTOR3 pos) { m_pos = pos; }
 	void SetRotation(D3DXVECTOR3 rot) { m_rot = rot; }
+	D3DXVECTOR3 GetPosition(void) { return m_pos; }
 	D3DXVECTOR3 GetPosOffset(void) { return m_posOffset; }
 	D3DXVECTOR3 GetRotOffset(void) { return m_rotOffset; }
 	D3DXMATRIX GetMtxWorld(void) { return m_mtxWorld; }
