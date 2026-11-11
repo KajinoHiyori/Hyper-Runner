@@ -237,6 +237,9 @@
     <ClCompile Include="meshskin_flat.cpp">
       <Filter>mesh\cpp</Filter>
     </ClCompile>
+    <ClCompile Include="meshskin_cylinder.cpp">
+      <Filter>mesh</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="color.h">
@@ -388,6 +391,9 @@
     </ClInclude>
     <ClInclude Include="meshskin_flat.h">
       <Filter>mesh\h</Filter>
+    </ClInclude>
+    <ClInclude Include="meshskin_cylinder.h">
+      <Filter>mesh</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

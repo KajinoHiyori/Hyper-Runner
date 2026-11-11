@@ -168,6 +168,7 @@
     <ClCompile Include="meshcylinder.cpp" />
     <ClCompile Include="meshfield.cpp" />
     <ClCompile Include="meshring.cpp" />
+    <ClCompile Include="meshskin_cylinder.cpp" />
     <ClCompile Include="meshskin_flat.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="motion.cpp" />
@@ -220,6 +221,7 @@
     <ClInclude Include="meshcylinder.h" />
     <ClInclude Include="meshfield.h" />
     <ClInclude Include="meshring.h" />
+    <ClInclude Include="meshskin_cylinder.h" />
     <ClInclude Include="meshskin_flat.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="motion.h" />

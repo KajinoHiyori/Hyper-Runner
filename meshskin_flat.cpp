@@ -59,7 +59,7 @@ CMeshSkinFlat::CMeshSkinFlat(CObject::PRIORITY priority): CObject(priority)
 	for (int nCntBone = 0; nCntBone < MAX_FLATBONE; nCntBone++)
 	{
 		m_aBone[nCntBone] = {};
-		for (int nCntVtx = 0; nCntVtx < MAX_VERTEX; nCntVtx++)
+		for (int nCntVtx = 0; nCntVtx < MAX_FLATVERTEX; nCntVtx++)
 		{
 			m_aPosOffset[nCntBone][nCntVtx] = INIT_D3DVEC3;	// 頂点座標
 			m_aWeight[nCntBone][nCntVtx] = 0.0f;			// ボーンごとの影響力
@@ -131,7 +131,7 @@ HRESULT CMeshSkinFlat::Init(D3DXVECTOR3 pos)
 	m_rot = INIT_D3DVEC3;
 	m_pVtxBuff = NULL;
 	m_fLoadTexRange = 1.0f;
-	m_nNumVtx = MAX_VERTEX;
+	m_nNumVtx = MAX_FLATVERTEX;
 	m_nNumBone = MAX_FLATBONE;
 
 	// テクスチャの読み込み
@@ -347,7 +347,7 @@ void CMeshSkinFlat::SetVtxBuff(void)
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
-	D3DXCOLOR aCol[MAX_VERTEX];
+	D3DXCOLOR aCol[MAX_FLATVERTEX];
 	aCol[0] = COLOR_RED;
 	aCol[1] = COLOR_RED;
 	aCol[2] = COLOR_YELLOW;

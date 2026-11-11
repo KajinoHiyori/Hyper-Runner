@@ -23,7 +23,7 @@
 #define VERTEX			(WIDTH_SIZE * DEPTH_SIZE)	// 頂点数
 #define SKIN_SIZE		(500.0f)	// 大きさ
 #define SKIN_SIZE_HALF	(SKIN_SIZE * 0.5f)	// 半分の大きさ
-#define MAX_VERTEX		(10)	// 頂点の最大数
+#define MAX_FLATVERTEX		(10)	// 頂点の最大数
 
 //=============================
 // メッシュスキンクラス
@@ -65,13 +65,13 @@ private:
 	D3DXVECTOR3 m_rot;					// メッシュスキンの向き
 	D3DXVECTOR3 m_nor;					// メッシュスキンの法線方向
 	int m_nIdxTexture;		// テクスチャへのインデックス
+	float m_fLoadTexRange;	// テクスチャ読み込み幅
 	int m_nNumVtx;			// 頂点数
 	int m_nNumBone;			// ボーン数
-	float m_fLoadTexRange;	// テクスチャ読み込み幅
 	BONE m_aBone[MAX_FLATBONE];	// ボーン情報を格納
-	D3DXVECTOR3 m_aPosVtx[MAX_VERTEX];	// 頂点座標
-	D3DXVECTOR3 m_aPosOffset[MAX_FLATBONE][MAX_VERTEX];	// 頂点座標
-	float m_aWeight[MAX_FLATBONE][MAX_VERTEX];	// ボーンごとの影響力
+	D3DXVECTOR3 m_aPosVtx[MAX_FLATVERTEX];	// 頂点座標
+	D3DXVECTOR3 m_aPosOffset[MAX_FLATBONE][MAX_FLATVERTEX];	// 頂点座標
+	float m_aWeight[MAX_FLATBONE][MAX_FLATVERTEX];	// ボーンごとの影響力
 	const char* m_pFileName;			// ファイル名
 };
 

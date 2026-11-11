@@ -22,6 +22,7 @@
 #include "block.h"
 #include "item.h"
 #include "meshskin_flat.h"
+#include "meshskin_cylinder.h"
 
 //=============================
 // 静的メンバ変数宣言
@@ -138,10 +139,11 @@ HRESULT CGame::Init(void)
 	// アイテムを生成
 	CItem::LoadSetting(ITEM_SETTINGPATH);
 
-	// メッシュスキン生成
-	CMeshSkinFlat::Create(MESHSKIN_PATH);
-	//CMeshSkinFlat::Create(INIT_D3DVEC3);
+	// メッシュスキン生成[平面]
+	//CMeshSkinFlat::Create(MESHSKIN_PATH);
 
+	// メッシュスキン生成[円柱]
+	//CMeshSkinCylinder::Create(D3DXVECTOR3(0.0f, 0.0f, 300.0f), INIT_D3DVEC3, COLOR_WHITE, 100.0f, 100.0f);
 	return S_OK;
 }
 
