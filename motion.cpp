@@ -34,13 +34,18 @@ CMotion::CMotion()
 	m_nKeyBlend = 0;			// ブレンドモーションの実行されているキーの番号
 	m_nCounterMotionBlend = 0;	// ブレンドモーションのカウンター
 	m_nFrameBlend = 0;			// ブレンドフレーム数(何フレームかけてブレンドをするか)
-	m_nCounterBlend = 0;		// ブレンドカウンター(ブレンドフレームが何フレーム処理されているか)
-	m_bFrameChanger = false;		// フレーム切り替えを管理
+	m_nCounterBlend = 0;		// ブレンドカウンター(ブレンドフレームが何フレーム処理されているか)	
+	m_bMoveChanger = false;		// 移動時のモーション管理
+	m_nTypeMove = 0;			// 移動時のモーション種類
+	m_bLoopMove = false;		// 移動モーションのループを管理
+	m_nNumKeyMove = 0;			// 移動モーションのキーの総数
+	m_nKeyMove = 0;				// 移動モーションの実行されているキーの番号
+	m_nCounterMotionMove = 0;	// 移動モーションのカウンター
+	m_nFrameMove = 0;			// 移動フレーム数(何フレームかけてブレンドをするか)
+	m_nCounterMove = 0;			// 移動カウンター(ブレンドフレームが何フレーム処理されているか)
+	m_bFrameChanger = false;	// フレーム切り替えを管理
 	m_nFrameChange = 0;			// フレーム切り替え目的値
 	m_nFrameChangeType = 0;		// フレーム切り替えモーション種類
-	m_bMoveChanger = false;			// 移動時のモーション管理
-	m_nMoveType = 0;			// 移動時のモーション種類
-	m_nKeyMove = 0;				// 移動ブレンド
 }
 
 //=============================
@@ -102,8 +107,17 @@ void CMotion::Set(int nType, bool bBlendMotion, int nFrameBlend)
 //=============================
 void CMotion::Set(int nType, int nFrameBlend)
 {
-	m_nMoveType = nType;
+	m_nTypeMove = nType;
 	m_bMoveChanger = true;
+
+	//m_bMoveChanger = false;		// 移動時のモーション管理
+	//m_nTypeMove = 0;			// 移動時のモーション種類
+	//m_bLoopMove = false;		// 移動モーションのループを管理
+	//m_nNumKeyMove = 0;			// 移動モーションのキーの総数
+	//m_nKeyMove = 0;				// 移動モーションの実行されているキーの番号
+	//m_nCounterMotionMove = 0;	// 移動モーションのカウンター
+	//m_nFrameMove = 0;			// 移動フレーム数(何フレームかけてブレンドをするか)
+	//m_nCounterMove = 0;			// 移動カウンター(ブレンドフレームが何フレーム処理されているか)
 }
 
 //=============================
@@ -290,11 +304,11 @@ void CMotion::MoveUpdate(void)
 		MOTIONKEY Key = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel];											// 現在のキー
 		MOTIONKEY KeyNext = m_aInfo[m_nType].aKeyInfo[(m_nKey + 1) % m_nNumKey].aKey[nCntModel];				// 次のフレームのキー
 
-		MOTIONKEY KeyMove = m_aInfo[m_nMoveType].aKeyInfo[m_nKey].aKey[nCntModel];								// ブレンドモーションの現在のキー
-		MOTIONKEY KeyNextMove = m_aInfo[m_nMoveType].aKeyInfo[(m_nKey + 1) % m_nNumKeyBlend].aKey[nCntModel];	// ブレンドモーションの次のキー
+		MOTIONKEY KeyMove = m_aInfo[m_nTypeMove].aKeyInfo[m_nKey].aKey[nCntModel];								// ブレンドモーションの現在のキー
+		MOTIONKEY KeyNextMove = m_aInfo[m_nTypeMove].aKeyInfo[(m_nKey + 1) % m_nNumKeyBlend].aKey[nCntModel];	// ブレンドモーションの次のキー
 		
 		float fRateKey = (float)m_nCounter / (float)m_aInfo[m_nType].aKeyInfo[m_nKey].nFrame;					// 現在のモーションカウンター / 現在の再生フレーム
-		float fRateMoveKey = (float)m_nCounter / (float)m_aInfo[m_nMoveType].aKeyInfo[m_nKey].nFrame;					// 現在のモーションカウンター / 現在の再生フレーム
+		float fRateMoveKey = (float)m_nCounter / (float)m_aInfo[m_nTypeMove].aKeyInfo[m_nKey].nFrame;					// 現在のモーションカウンター / 現在の再生フレーム
 		float fPosX = 0.0f;	// 求める値[X座標の位置]
 		float fPosY = 0.0f; // 求める値[Y座標の位置]
 		float fPosZ = 0.0f; // 求める値[Z座標の位置]
@@ -334,7 +348,7 @@ void CMotion::MoveUpdate(void)
 			ChangeFrame();
 		}
 		m_bMoveChanger = false;
-		m_nType = m_nMoveType;
+		m_nType = m_nTypeMove;
 	}
 	m_nKey = m_nKey % m_nNumKey;
 }

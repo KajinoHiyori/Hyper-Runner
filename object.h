@@ -54,6 +54,7 @@ public:
 		PRIORITY_CHARACTOR,		// キャラクター
 		PRIORITY_SHADOW,		// 影
 		PRIORITY_CYLINDER,		// シリンダー
+		PRIORITY_MESH,			// メッシュ
 		PRIORITY_UI,			// UI
 		PRIORITY_TRIANGLE,		// 三角形
 		PRIORITY_COUNTDOWN,		// countdown

@@ -1,0 +1,84 @@
+#===================================
+# メッシュスキン[平面]情報
+# Author : Kajino Hiyori
+#===================================
+#===========================
+# メッシュの基本情報
+#===========================
+MESHSKIN_INFO
+	NUM_VERTEX = 10		# 頂点数
+	POS = 0.0 0.0 0.0	# 位置
+	ROT = 0.0 0.0 0.0	# 向き
+END_MESHSKIN_INFO
+
+#===========================
+# ボーンの基本情報
+#===========================
+BONE_INFO
+	NUM_BONE = 2	# ボーン数
+	BONESET
+		POS = 0.0 0.0 0.0	# 位置
+		ROT = 0.0 0.0 0.0	# 向き
+	END_BONESET
+	BONESET
+		POS = 0.0 30.0 0.0	# 位置
+		ROT = 0.0 0.0 0.0	# 向き
+	END_BONESET
+END_BONE_INFO
+
+#===========================
+# 各頂点情報
+# ボーン0を基準に設定
+#===========================
+VERTEX_INFO
+	SETVERTEX	#0 
+		POS = -10.0 0.0 0.0	# 位置
+		WEIGHT = 1.0		# 影響力
+	END_SETVERTEX
+	
+	SETVERTEX	#1
+		POS = 10.0 0.0 0.0	# 位置
+		WEIGHT = 1.0		# 影響力
+	END_SETVERTEX
+	
+	SETVERTEX	#2
+		POS = -10.0 30.0 0.0	# 位置
+		WEIGHT = 0.75		# 影響力
+	END_SETVERTEX
+	
+	SETVERTEX	#3
+		POS = 10.0 30.0 0.0	# 位置
+		WEIGHT = 0.75		# 影響力
+	END_SETVERTEX
+	
+	SETVERTEX	#4
+		POS = -10.0 60.0 0.0	# 位置
+		WEIGHT = 0.5		# 影響力
+	END_SETVERTEX
+	
+	SETVERTEX	#5
+		POS = 10.0 60.0 0.0	# 位置
+		WEIGHT = 0.5		# 影響力
+	END_SETVERTEX
+	
+	SETVERTEX	#6
+		POS = -10.0 90.0 0.0	# 位置
+		WEIGHT = 0.25		# 影響力
+	END_SETVERTEX
+	
+	SETVERTEX	#7
+		POS = 10.0 90.0 0.0	# 位置
+		WEIGHT = 0.25		# 影響力
+	END_SETVERTEX
+	
+	SETVERTEX	#8
+		POS = -10.0 120.0 0.0	# 位置
+		WEIGHT = 0.0		# 影響力
+	END_SETVERTEX
+	
+	SETVERTEX	#9
+		POS = 10.0 120.0 0.0	# 位置
+		WEIGHT = 0.0		# 影響力
+	END_SETVERTEX
+
+END_VERTEX_INFO

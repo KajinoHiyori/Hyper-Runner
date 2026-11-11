@@ -21,6 +21,7 @@
 #include "field.h"
 #include "block.h"
 #include "item.h"
+#include "meshskin_flat.h"
 
 //=============================
 // 静的メンバ変数宣言
@@ -44,6 +45,7 @@ CField* CGame::m_apField[MAX_FIELDLINE] = {};	// フィールドへのポインタ
 // ファイルパス
 #define BLOCK_SETTINGPATH	("data\\SCRIPTS\\block_game.txt")	// ゲーム内でのブロック設置情報
 #define ITEM_SETTINGPATH	("data\\SCRIPTS\\item_game.txt")	// ゲーム内でのアイテム設置情報
+#define MESHSKIN_PATH		("data\\SCRIPTS\\meshskin_flat.txt")	// メッシュスキンの設置情報
 
 //=============================
 // コンストラクタ
@@ -72,7 +74,8 @@ HRESULT CGame::Init(void)
 	// プレイヤー生成
 	if (m_pPlayer != NULL)return E_FAIL;
 	// 使用されていない場合
-	m_pPlayer = CPlayer::Create(INIT_D3DVEC3, D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));
+	//m_pPlayer = CPlayer::Create(INIT_D3DVEC3, D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));
+	m_pPlayer = CPlayer::Create(INIT_D3DVEC3, D3DXVECTOR3(0.0f, HALF_D3DXPI, 0.0f));
 
 	CManager::GetSound()->Play(CSound::BGM_GAME);
 
@@ -134,6 +137,10 @@ HRESULT CGame::Init(void)
 
 	// アイテムを生成
 	CItem::LoadSetting(ITEM_SETTINGPATH);
+
+	// メッシュスキン生成
+	CMeshSkinFlat::Create(MESHSKIN_PATH);
+	//CMeshSkinFlat::Create(INIT_D3DVEC3);
 
 	return S_OK;
 }

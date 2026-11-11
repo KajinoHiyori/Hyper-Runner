@@ -82,6 +82,7 @@ private:
 	int m_nKey;			// 現在のキー数
 	int m_nCounter;		// モーションカウンター
 	bool	m_bFinish;		// モーションの終了フラグ
+	// 通常時のブレンド=====================================
 	bool	m_bBlend;		// ブレンド状態の管理
 	int		m_nTypeBlend;	// ブレンドモーションの種類
 	bool	m_bLoopBlend;	// ブレンドモーションのループを管理
@@ -90,12 +91,19 @@ private:
 	int		m_nCounterMotionBlend;	// ブレンドモーションのカウンター
 	int		m_nFrameBlend;			// ブレンドフレーム数(何フレームかけてブレンドをするか)
 	int		m_nCounterBlend;		// ブレンドカウンター(ブレンドフレームが何フレーム処理されているか)
+	// 移動時のブレンド=====================================
+	bool	m_bMoveChanger;			// 移動時のモーション管理
+	int		m_nTypeMove;			// 移動時のモーション種類
+	bool	m_bLoopMove;			// 移動モーションのループを管理
+	int		m_nNumKeyMove;			// 移動モーションのキーの総数
+	int		m_nKeyMove;				// 移動モーションの実行されているキーの番号
+	int		m_nCounterMotionMove;	// 移動モーションのカウンター
+	int		m_nFrameMove;			// 移動フレーム数(何フレームかけてブレンドをするか)
+	int		m_nCounterMove;			// 移動カウンター(ブレンドフレームが何フレーム処理されているか)
+	// フレーム変更=========================================
 	bool	m_bFrameChanger;		// フレーム切り替えを管理
 	int		m_nFrameChange;			// フレーム切り替え目的値
 	int		m_nFrameChangeType;		// フレーム切り替えモーション種類
-	bool	m_bMoveChanger;			// 移動時のモーション管理
-	int		m_nMoveType;			// 移動時のモーション種類
-	int		m_nKeyMove;				// 移動ブレンド
 };
 
 #endif // !_MOTION_H_
