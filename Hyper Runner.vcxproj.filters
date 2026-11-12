@@ -238,7 +238,7 @@
       <Filter>mesh\cpp</Filter>
     </ClCompile>
     <ClCompile Include="meshskin_cylinder.cpp">
-      <Filter>mesh</Filter>
+      <Filter>mesh\cpp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -393,7 +393,7 @@
       <Filter>mesh\h</Filter>
     </ClInclude>
     <ClInclude Include="meshskin_cylinder.h">
-      <Filter>mesh</Filter>
+      <Filter>mesh\h</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

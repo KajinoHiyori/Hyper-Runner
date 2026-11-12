@@ -45,6 +45,7 @@ public:
 	void SetRotation(D3DXVECTOR3 rot) { m_rot = rot; }
 	D3DXVECTOR3 GetPosition(void) { return m_pos; }
 	D3DXVECTOR3 GetPosOffset(void) { return m_posOffset; }
+	D3DXVECTOR3 GetRotation(void) { return m_rot; }
 	D3DXVECTOR3 GetRotOffset(void) { return m_rotOffset; }
 	D3DXMATRIX GetMtxWorld(void) { return m_mtxWorld; }
 	void SetColor(COLORTYPE colType, D3DXCOLOR col = COLOR_WHITE) { m_colType = colType; m_col = col; }

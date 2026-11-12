@@ -75,8 +75,8 @@ HRESULT CGame::Init(void)
 	// プレイヤー生成
 	if (m_pPlayer != NULL)return E_FAIL;
 	// 使用されていない場合
-	//m_pPlayer = CPlayer::Create(INIT_D3DVEC3, D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));
-	m_pPlayer = CPlayer::Create(INIT_D3DVEC3, D3DXVECTOR3(0.0f, HALF_D3DXPI, 0.0f));
+	m_pPlayer = CPlayer::Create(INIT_D3DVEC3, D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));
+	//m_pPlayer = CPlayer::Create(INIT_D3DVEC3, D3DXVECTOR3(0.0f, HALF_D3DXPI, 0.0f));
 
 	CManager::GetSound()->Play(CSound::BGM_GAME);
 
@@ -143,7 +143,7 @@ HRESULT CGame::Init(void)
 	//CMeshSkinFlat::Create(MESHSKIN_PATH);
 
 	// メッシュスキン生成[円柱]
-	CMeshSkinCylinder::Create(D3DXVECTOR3(0.0f, 0.0f, 300.0f), INIT_D3DVEC3, COLOR_WHITE, 100.0f, 100.0f);
+	//CMeshSkinCylinder::Create(D3DXVECTOR3(0.0f, 0.0f, 300.0f), INIT_D3DVEC3, COLOR_WHITE, 100.0f, 100.0f);
 	return S_OK;
 }
 

@@ -200,9 +200,8 @@ void CPlayer::Update(void)
 	for (int nCntDiv = 0; nCntDiv < DIV_MOTION_MAX; nCntDiv++)
 	{
 		if (m_apMotion[nCntDiv] == NULL) continue;
-	//	m_apMotion[nCntDiv]->Update();
+		m_apMotion[nCntDiv]->Update();
 	}
-	m_apMotion[DIV_MOTION_UNDER]->Update();
 
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_W) == true)
 	{

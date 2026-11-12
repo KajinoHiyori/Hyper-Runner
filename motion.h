@@ -72,6 +72,8 @@ private:
 	static float SetBlendRot(float fRate, float fNext, float fNow, float fRateBlend, float fNextBlend, float fNowBlend);
 	static float SetPos(float fRate, float fNext, float fNow);
 	static float SetRot(float fRate, float fNext, float fNow);
+	static float SetMovePos(float fRate, float fDest, float fNow);
+	static float SetMoveRot(float fRate, float fNext, float fNow);
 	INFO m_aInfo[MAX_MOTION];	// モーション情報
 	int m_nNumAll;	// モーション総数
 	CModel** m_ppModel;	// モーションさせたいモデルへのポインタ
