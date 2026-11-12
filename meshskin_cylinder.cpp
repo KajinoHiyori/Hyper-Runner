@@ -111,6 +111,7 @@ HRESULT CMeshSkinCylinder::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXCOLOR col,
 	m_nNumVertex = m_nWidthSize * m_nHeightSize;		// 頂点数
 
 	// ボーン情報設定
+	m_nNumBone = MAX_CYLINDERBONE;
 	m_aBone[0].pos = INIT_D3DVEC3;
 	m_aBone[0].rot = INIT_D3DVEC3;
 	m_aBone[1].pos = D3DXVECTOR3(0.0f, 30.0f, 0.0f);
@@ -161,6 +162,15 @@ void CMeshSkinCylinder::Uninit(void)
 //=============================
 void CMeshSkinCylinder::Update(void)
 {
+	if (CManager::GetInputKeyboard()->GetPress(DIK_LSHIFT) == true)
+	{
+		m_aBone[1].rot.z += 0.02f;
+		m_aBone[1].rot.z = AngleNormalize(m_aBone[1].rot.z);
+	}
+	if (CManager::GetInputKeyboard()->GetPress(DIK_RSHIFT) == true)
+	{
+		m_aBone[1].rot.z = 0.0f;
+	}
 }
 
 //=============================
@@ -174,7 +184,7 @@ void CMeshSkinCylinder::Draw(void)
 	// テクスチャ取得
 	CTexture* pTexture = CManager::GetTexture();
 
-	D3DXMATRIX mtxRot, mtxTrans;	// 計算用マトリックス
+	D3DXMATRIX mtxRot, mtxTrans, mtxParent;	// 計算用マトリックス
 
 	// ワールドマトリックスの初期化(デフォルトの値にする)
 	D3DXMatrixIdentity(&m_mtxWorld);
@@ -186,6 +196,44 @@ void CMeshSkinCylinder::Draw(void)
 	// 位置を反映
 	D3DXMatrixTranslation(&mtxTrans, m_pos.x, m_pos.y, m_pos.z);
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
+
+	// 親マトリックスを指定
+	mtxParent = m_mtxWorld;
+
+	for (int nCntVtx = 0; nCntVtx < m_nNumVertex; nCntVtx++)
+	{
+		m_aPosVtx[nCntVtx] = INIT_D3DVEC3;
+	}
+
+	for (int nCntBone = 0; nCntBone < m_nNumBone; nCntBone++)
+	{
+		// ポリゴンの形状を設定
+		D3DXMATRIX mtxBone;
+
+		// ワールドマトリックスの初期化(デフォルトの値にする)
+		D3DXMatrixIdentity(&mtxBone);
+
+		// 向きを反映
+		D3DXMatrixRotationYawPitchRoll(&mtxRot, m_aBone[nCntBone].rot.y, m_aBone[nCntBone].rot.x, m_aBone[nCntBone].rot.z);
+		D3DXMatrixMultiply(&mtxBone, &mtxBone, &mtxRot);
+
+		// 位置を反映
+		D3DXMatrixTranslation(&mtxTrans, m_aBone[nCntBone].pos.x, m_aBone[nCntBone].pos.y, m_aBone[nCntBone].pos.z);
+		D3DXMatrixMultiply(&mtxBone, &mtxBone, &mtxTrans);
+
+		// 親マトリックスと掛け合わせる
+		D3DXMatrixMultiply(&mtxParent, &mtxParent, &mtxBone);
+
+		for (int nCntVtx = 0; nCntVtx < m_nNumVertex; nCntVtx++)
+		{// 全頂点データの算出
+			D3DXVECTOR3 posVtx = INIT_D3DVEC3;
+			D3DXVec3TransformCoord(&posVtx, &m_aPosOffset[nCntBone][nCntVtx], &mtxBone);
+			m_aPosVtx[nCntVtx] += posVtx * m_aWeight[nCntBone][nCntVtx];
+		}
+	}
+
+	// 描画用頂点情報の設定
+	SetDrawVtxBuff();
 
 	// ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
@@ -217,7 +265,6 @@ void CMeshSkinCylinder::Draw(void)
 void CMeshSkinCylinder::SetOffset(void)
 {
 	int nWidth = 0;
-	int n = 0;
 	for (int nCntHeight = 0; nCntHeight < m_nHeightSize; nCntHeight++, nWidth += m_nWidthSize)
 	{
 		for (int nCntWidth = 0; nCntWidth < m_nWidthSize; nCntWidth++)
@@ -226,14 +273,21 @@ void CMeshSkinCylinder::SetOffset(void)
 			m_aPosOffset[0][nCntWidth + nWidth].x = sinf(D3DX_PI / (m_nDivisionW / 2) * (nCntWidth)) * m_fRadius;
 			m_aPosOffset[0][nCntWidth + nWidth].y = nCntHeight * m_fHeight;
 			m_aPosOffset[0][nCntWidth + nWidth].z = cosf(D3DX_PI / (m_nDivisionW / 2) * (nCntWidth)) * m_fRadius;
-			n++;
+			m_aWeight[0][nCntWidth + nWidth] = 1.0f - (float)nCntHeight / (float)m_nDivisionH;
 		}
 	}
 	
-	if (n != m_nNumVertex) return;
+	for (int nCntBone = 1; nCntBone < m_nNumBone; nCntBone++)
+	{ // ボーンごとのオフセットを指定
+		for (int nCntVtx = 0; nCntVtx < m_nNumVertex; nCntVtx++)
+		{
+			m_aPosOffset[nCntBone][nCntVtx] = m_aPosOffset[nCntBone - 1][nCntVtx] - m_aBone[nCntBone].pos;
+			m_aWeight[nCntBone][nCntVtx] = 1.0f - m_aWeight[nCntBone-1][nCntVtx];
+		}
+	}
 
 	for (int nCntVtx = 0; nCntVtx < m_nNumVertex; nCntVtx++)
-	{
+	{ // 現在座標を格納
 		m_aPosVtx[nCntVtx] = m_aPosOffset[0][nCntVtx];
 	}
 }
@@ -265,10 +319,27 @@ void CMeshSkinCylinder::SetVtx(void)
 
 	// 頂点バッファをアンロック
 	m_pVtxBuff->Unlock();
+
+	// 頂点バッファ設定処理
+	SetDrawVtxBuff();
 }
 
-void SetDrawVtxBuff(void);
-
+//=============================
+// 頂点バッファ設定処理
+//=============================
+void CMeshSkinCylinder::SetDrawVtxBuff(void)
+{
+	VERTEX_3D* pVtx;
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
+	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+	for (int nCntVtx = 0; nCntVtx < m_nNumVertex; nCntVtx++)
+	{
+		// 頂点座標の設定
+		pVtx[nCntVtx].pos = m_aPosVtx[nCntVtx];
+	}
+	// 頂点バッファをアンロック
+	m_pVtxBuff->Unlock();
+}
 
 //=============================
 // インデックスバッファ設定処理

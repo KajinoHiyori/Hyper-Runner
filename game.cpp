@@ -143,7 +143,7 @@ HRESULT CGame::Init(void)
 	//CMeshSkinFlat::Create(MESHSKIN_PATH);
 
 	// メッシュスキン生成[円柱]
-	//CMeshSkinCylinder::Create(D3DXVECTOR3(0.0f, 0.0f, 300.0f), INIT_D3DVEC3, COLOR_WHITE, 100.0f, 100.0f);
+	CMeshSkinCylinder::Create(D3DXVECTOR3(0.0f, 0.0f, 300.0f), INIT_D3DVEC3, COLOR_WHITE, 100.0f, 100.0f);
 	return S_OK;
 }
 
