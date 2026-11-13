@@ -39,6 +39,7 @@
 // 静的メンバ変数宣言
 //=============================
 int CField::m_nNumAll = 0;
+const char* CField::m_pFilePath = "data\\TEXTURE\\field\\field.jpg";
 
 //=============================
 // コンストラクタ
@@ -86,7 +87,11 @@ CField* CField::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fDe
 HRESULT CField::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot, float fWidth, float fDepth)
 {
 	// オブジェクト初期化
-	CObject3D::Init(pos, rot, COLOR_LIGHTBLUE, fWidth, fDepth, CObject3D::CENTER_BUTTON);
+	CObject3D::Init(pos, rot, COLOR_WHITE, fWidth, fDepth, CObject3D::CENTER_BUTTON);
+
+	// テクスチャ指定
+	CObject3D::SetTextureIdx(CManager::GetTexture()->Register(m_pFilePath));
+	CObject3D::SetTextureRange(0.5f, fDepth / fWidth * 0.5f);
 	
 	// オブジェクトにタイプを指定
 	CObject3D::SetType(CObject::TYPE_FIELD);

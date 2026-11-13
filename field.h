@@ -47,5 +47,6 @@ public:
 private:
 	int m_nIdx;	// インデックス
 	static int m_nNumAll;	// フィールドの総数
+	static const char* m_pFilePath;	// テクスチャパス
 };
 #endif

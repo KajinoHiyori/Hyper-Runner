@@ -44,6 +44,7 @@ public:
 	HRESULT Init(void) { return E_FAIL; }
 	HRESULT Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXCOLOR col, float fWidth, float fDepth, TYPE type = CENTER_MIDDLE);
 	void SetTextureIdx(int nIdx) { m_nIdxTexture = nIdx; }
+	void SetTextureRange(float fWidth, float fDepth) { m_fTexWidth = fWidth; m_fTexDepth = fDepth; SetVtx(); }
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
@@ -66,6 +67,8 @@ private:
 	float m_fDepth;		// 奥行き
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;		// 頂点バッファ
 	int m_nIdxTexture;		// テクスチャのインデックスを格納
+	float m_fTexWidth;		// テクスチャ読み込み幅
+	float m_fTexDepth;		// テクスチャ読み込み奥行き
 	D3DXMATRIX m_mtxWorld;	// ワールドマトリックス
 	TYPE m_type;		// アンカーポイントのタイプ
 };

@@ -35,7 +35,9 @@ CObject3D::CObject3D(CObject3D::PRIORITY priority) : CObject(priority)
 	m_fWidth = 0.0f;		// 横幅
 	m_fDepth = 0.0f;		// 奥行き
 	m_pVtxBuff = NULL;		// 頂点バッファ	
-	m_nIdxTexture = 0;		// テクスチャのインデックス
+	m_nIdxTexture = -1;		// テクスチャのインデックス
+	m_fTexWidth = 0.0f;		// テクスチャ読み込み幅
+	m_fTexDepth = 0.0f;		// テクスチャ読み込み奥行き
 }
 
 //=============================
@@ -89,6 +91,8 @@ HRESULT CObject3D::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXCOLOR col, float f
 	m_fDepth = fDepth;		// 奥行き
 	m_col = col;		// 色
 	m_type = type;
+	m_fTexWidth = 1.0f;
+	m_fTexDepth = 1.0f;
 
 	// 頂点バッファの生成
 	pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * NUM_VTX3D,	// 確保するバッファのサイズ
@@ -235,9 +239,9 @@ void CObject3D::SetVtx(void)
 
 	// テクスチャ座標の設定
 	pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-	pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
-	pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-	pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
+	pVtx[1].tex = D3DXVECTOR2(m_fTexWidth, 0.0f);
+	pVtx[2].tex = D3DXVECTOR2(0.0f, m_fTexDepth);
+	pVtx[3].tex = D3DXVECTOR2(m_fTexWidth, m_fTexDepth);
 
 	// 頂点バッファをアンロック
 	m_pVtxBuff->Unlock();
