@@ -202,3 +202,44 @@ void CModel::Draw(void)
 	// 保存していたマテリアルに戻す
 	pDevice->SetMaterial(&matDef);
 }
+
+//=============================
+// 描画処理
+//=============================
+D3DXMATRIX CModel::GetMtxToPos(void)
+{
+	// デバイスの取得
+	CRenderer* pRenderer = CManager::GetRenderer();
+	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
+	D3DXMATRIX mtxRot, mtxTrans;	// 計算用マトリックス
+
+	// ワールドマトリックスの初期化(デフォルトの値にする)
+	D3DXMatrixIdentity(&m_mtxWorld);
+
+	// 向きを反映
+	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_rot.y, m_rot.x, m_rot.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
+
+	// 位置を反映
+	D3DXMatrixTranslation(&mtxTrans, m_pos.x, m_pos.y, m_pos.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
+
+	// 親のマトリックスと掛け合わせる
+	D3DXMATRIX mtxParent;	// 親マトリックスの格納
+	if (m_pParent != NULL)
+	{ // 親モデルがある場合
+		// 親モデルのマトリックスを取得
+		mtxParent = m_pParent->GetMtxWorld();
+	}
+	else
+	{ // 親モデルがない場合
+		// 直前のマトリックス = 管理元のマトリックスを取得
+		pDevice->GetTransform(D3DTS_WORLD, &mtxParent);
+	}
+
+	// 算出したパーツのワールドマトリックスと親モデルのマトリックスを掛け合わせる
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxParent);
+
+	// ワールドマトリックスの設定
+	return m_mtxWorld;
+}

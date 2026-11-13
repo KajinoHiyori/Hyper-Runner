@@ -88,6 +88,15 @@
     <Filter Include="item\h">
       <UniqueIdentifier>{cf5999d8-a761-4b27-93a3-fb9f64140f4e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="action">
+      <UniqueIdentifier>{b6ca7f74-a3a9-4ec1-97cd-289282424a72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="action\cpp">
+      <UniqueIdentifier>{3e46b6df-1641-401d-b749-576ca89b40ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="action\h">
+      <UniqueIdentifier>{e7749233-f600-41ee-9b01-c913eca5413c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp">
@@ -239,6 +248,12 @@
     </ClCompile>
     <ClCompile Include="meshskin_cylinder.cpp">
       <Filter>mesh\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="action.cpp">
+      <Filter>action\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="action_box.cpp">
+      <Filter>action\cpp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -394,6 +409,12 @@
     </ClInclude>
     <ClInclude Include="meshskin_cylinder.h">
       <Filter>mesh\h</Filter>
+    </ClInclude>
+    <ClInclude Include="action.h">
+      <Filter>action\h</Filter>
+    </ClInclude>
+    <ClInclude Include="action_box.h">
+      <Filter>action\h</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

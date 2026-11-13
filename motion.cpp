@@ -122,33 +122,14 @@ void CMotion::Set(int nType, int nFrameBlend)
 //=============================
 void CMotion::Update(void)
 {
-	CDebugProc* pDebug = CManager::GetDebugProc();
 	if (m_bMoveChanger == true)
 	{ // 移動時の更新処理
 		MoveUpdate();
-		//pDebug->Print("MoveUpdate======================================================\n");
 	}
 	else
 	{ // 通常時のモーション更新
 		NormalUpdate();
-		//pDebug->Print("NormalUpdate\n");
 	}
-	pDebug->Print("腰 : %f, %f, %f\n", m_ppModel[0]->GetPosition().x, m_ppModel[0]->GetPosition().y, m_ppModel[0]->GetPosition().z);
-	pDebug->Print("m_nType %d\n", m_nType);
-	pDebug->Print("m_bLoop %d\n", m_bLoop);
-	pDebug->Print("m_nNumKey %d\n", m_nNumKey);
-	pDebug->Print("m_nKey %d\n", m_nKey);
-	pDebug->Print("m_nCounter %d\n", m_nCounter);
-	pDebug->Print("m_bFinish %d\n", m_bFinish);
-	pDebug->Print("m_bBlend %d\n", m_bBlend);
-	pDebug->Print("m_nTypeBlend %d\n", m_nTypeBlend);
-	pDebug->Print("m_bLoopBlend %d\n", m_bLoopBlend);
-	pDebug->Print("m_nNumKeyBlend %d\n", m_nNumKeyBlend);
-	pDebug->Print("m_nKeyBlend %d\n", m_nKeyBlend);
-	pDebug->Print("m_nCounterMotionBlend %d\n", m_nCounterMotionBlend);
-	pDebug->Print("m_nFrameBlend %d\n", m_nFrameBlend);
-	pDebug->Print("m_nCounterBlend %d\n", m_nCounterBlend);
-	pDebug->Print("m_aInfo[%d].aKeyInfo[%d].nFrame %d\n", m_nType, m_nKey, m_aInfo[m_nType].aKeyInfo[m_nKey].nFrame);
 }
 
 //=============================

@@ -23,12 +23,14 @@
 #include "item.h"
 #include "meshskin_flat.h"
 #include "meshskin_cylinder.h"
+#include "action.h"
 
 //=============================
 // 静的メンバ変数宣言
 //=============================
 CPlayer* CGame::m_pPlayer = NULL;	// プレイヤーへのポインタ
 CField* CGame::m_apField[MAX_FIELDLINE] = {};	// フィールドへのポインタ
+
 //CWall* CGame::m_apWall[MAX_GAMEWALL] = {};	// 壁のポインタ
 //CMachine* CGame::m_pMachine = NULL;	// マシンへのポインタ
 //CTimer* CGame::m_pTimer = NULL;		// タイマーへのポインタ
@@ -88,6 +90,8 @@ HRESULT CGame::Init(void)
 		m_apField[nCntLine] = CField::Create(FIELD_POS(nCntLine), INIT_D3DVEC3, FIELD_WIDTH, FIELD_DEPTH);
 	}
 
+	CAction::Setter(D3DXVECTOR3(-400.0f, 30.0f, 300.0f), 0);
+	
 	//// 壁の総数を読み取り
 	//int nNumWall = CWall::LoadNumAll(GAMESCRIPTS_PATH);
 

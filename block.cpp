@@ -56,6 +56,7 @@ CBlock::CBlock(CObject::PRIORITY priority) : CObjectX(priority)
 	m_fWidth = 0.0f;	// 横幅
 	m_fDepth = 0.0f;	// 奥行き
 	m_nType = 0;		// 種類
+	m_fSize = 0.0f;		// サイズ
 	m_nNumAll++;
 }
 
@@ -102,6 +103,7 @@ HRESULT CBlock::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int type)
 	D3DXVECTOR3 vtxMax = CObjectX::GetVtxMax();	// 最大値
 	m_fWidth = vtxMax.x - vtxMin.x;	// 横幅
 	m_fDepth = vtxMax.z - vtxMin.z;	// 奥行き
+	m_fSize = m_fWidth;
 	m_fLength = sqrtf(m_fWidth * m_fWidth + m_fDepth * m_fDepth) * 0.5f;	// 対角線の長さ
 	m_fAngle = atan2f(m_fWidth, m_fDepth);				// 対角線の長さ
 	return S_OK;

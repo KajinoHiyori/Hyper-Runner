@@ -247,9 +247,6 @@ void CPlayer::Draw(void)
 	// ワールドマトリックスの設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
 
-	// ゲージ用のマトリックスを格納
-	mtxGauge = m_mtxWorld;
-
 	// モデルごとに描画
 	for (int nCntModel = 0; nCntModel < m_nNumModel; nCntModel++)
 	{
@@ -330,27 +327,47 @@ void CPlayer::ChangeSpeed(bool bChangeUP)
 	SpeedManager();
 }
 
-#if 0
-#define MAX_SPEED		(15.0f)	// 移動速度
-#define MIN_SPEED		(1.0f)	// 移動速度
-#define FRAME_SET		(100)	// フレーム設定
-#define FRAME_NORMALIZE	(0.25f)	// フレーム正規化
 //=============================
-// 速度設定処理
+// アクション保持マトリックス処理
 //=============================
-void CPlayer::ChangeSpeed(float fSpeed)
+D3DXMATRIX CPlayer::GetRightarmMtx(void)
 {
-	m_fSpeed = fSpeed;
-	
-	//float frameSpeed = m_fSpeed / 2.0f;
-	//int nFrame = (FRAME_SET / frameSpeed) * FRAME_NORMALIZE;
-	//// モーションの処理フレームも変更
-	//for (int nCntMotion = 0; nCntMotion < DIV_MOTION_MAX; nCntMotion++)
-	//{
-	//	//m_apMotion[nCntMotion]->SetFrame((int)(MOTIONTYPE_MOVE), nFrame);
-	//}
+	// デバイスの取得
+	CRenderer* pRenderer = CManager::GetRenderer();
+	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
+
+	D3DXMATRIX matrix;
+	D3DXMATRIX mtxRot, mtxTrans;	// 計算用マトリックス
+
+	// ワールドマトリックスの初期化(デフォルトの値にする)
+	D3DXMatrixIdentity(&matrix);
+	D3DXMatrixIdentity(&m_mtxWorld);
+
+	// 向きを反映
+	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_rot.y, m_rot.x, m_rot.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
+
+	// 位置を反映
+	D3DXMatrixTranslation(&mtxTrans, m_pos.x, m_pos.y, m_pos.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
+
+	// ワールドマトリックスの設定
+	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
+
+	// モデルごとに描画
+	for (int nCntModel = 0; nCntModel < m_nNumModel; nCntModel++)
+	{
+		if (m_apModel[nCntModel] == NULL)continue;
+	   // モデルのマトリックス取得
+		matrix = m_apModel[nCntModel]->GetMtxToPos();
+
+		if (nCntModel == MODEL_13RIGHTARM)
+		{ // 右腕のマトリックス取得
+			return matrix;
+		}
+	}
+	return matrix;
 }
-#endif
 
 //=============================
 // タイトル処理
@@ -374,10 +391,10 @@ void CPlayer::UpdateTutorial(void)
 void CPlayer::UpdateGame(void)
 {
 	// ブロックとの判定
-	bool bMove = CollisionBlock();
+	CollisionBlock();
 
 	// 移動処理
-	Move(bMove);
+	Move();
 
 	// 地面との判定
 	CollisionField(static_cast<CGame*>(CManager::GetScene())->GetField(m_nLine));
@@ -394,7 +411,7 @@ void CPlayer::UpdateResult(void)
 //=============================
 // 移動処理
 //=============================
-void CPlayer::Move(bool bMove)
+void CPlayer::Move(void)
 {
 	// 入力情報取得
 	CInputKeyboard* pKeyboard = CManager::GetInputKeyboard();
@@ -407,7 +424,7 @@ void CPlayer::Move(bool bMove)
 		|| pJoypad->GetLeftStickTrigger(CInputJoypad::JOYKEY_LSTICK_RIGHT) == true)
 		&& m_bJump == false)
 	{ // 右のラインに移動
-		if (m_nLine == LINE_RIGHT && bMove == false)
+		if (m_nLine == LINE_RIGHT)
 		{
 			nChangeDir = 0;
 		}
@@ -429,7 +446,7 @@ void CPlayer::Move(bool bMove)
 		|| pJoypad->GetLeftStickTrigger(CInputJoypad::JOYKEY_LSTICK_LEFT) == true)
 		&& m_bJump == false)
 	{ // 左のラインに移動
-		if (m_nLine == LINE_LEFT && bMove == false)
+		if (m_nLine == LINE_LEFT)
 		{
 			nChangeDir = 0;
 		}
@@ -478,17 +495,8 @@ void CPlayer::CollisionField(CField* pField)
 	m_bJump = false;
 	m_pos.y = pField->GetHeight(m_pos);
 
-	if (m_bJumpOld == true)
-	{ // 移動モーションに戻す
-		if (m_speed >= SPEED_SLOWRUN)
-		{
-			m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_RUN, true, BLEND_FRAME);
-		}
-		else
-		{
-			m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_WALK, true, BLEND_FRAME);
-		}
-	}
+	// 設置時のモーション管理
+	SetMoveMotion();
 }
 
 //=============================
@@ -496,6 +504,8 @@ void CPlayer::CollisionField(CField* pField)
 //=============================
 bool CPlayer::CollisionBlock(void)
 {
+	bool bColl = false;
+	bool bHeight = false;
 	for (int nCntPriority = 0; nCntPriority < MAX_PRIORITYS; nCntPriority++)
 	{
 		CObject* pObject = GetTop(nCntPriority);	// 先頭アドレスを取得
@@ -517,29 +527,37 @@ bool CPlayer::CollisionBlock(void)
 			// 当たり判定処理を実行
 			if (pBlock->Collision(&m_pos, m_posOld, m_fRadius, MARGINE))
 			{
-				if (pBlock->CollisionHeight(m_pos, m_posOld, 0.0f, MARGINE, false) == true)
+				bool bHeight = pBlock->CollisionHeight(m_pos, m_posOld, 0.0f, MARGINE, false);
+				if (bHeight == true)
 				{
 					m_pos.y = pBlock->GetPosition().y + pBlock->GetVtxMax().y;
 					m_bJump = false;
-					m_move.z = m_fSpeed;
-					if (m_bJumpOld == true)
-					{ // 移動モーションに戻す
-						m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_WALK, true, BLEND_FRAME);
-					}
+					bHeight = true;
+					// 設置時のモーション管理
+					SetMoveMotion();
 				}
 				else
 				{
-					m_move.z = 0.0f;
+					bColl = true;
 				}
 			}
-			else
-			{
-				m_move.z = m_fSpeed;
-			}
+			
 			pObject = pObjectNext;	// NULL判定を行う
 		}
 	}
 
+	if (bColl == true)
+	{ // 側面で接触
+		m_move.z = 0.0f;
+		return true;
+	}
+	if (bHeight == true)
+	{ // 上面で接触
+		m_move.z = m_fSpeed;
+		return true;
+	}
+	
+	m_move.z = m_fSpeed;
 	return false;
 }
 
@@ -637,6 +655,24 @@ void CPlayer::SpeedDown(void)
 void CPlayer::SpeedManager(void)
 {
 	m_fSpeed = (float)m_speed;
+}
+
+//=============================
+// 設置時のモーション管理
+//=============================
+void CPlayer::SetMoveMotion(void)
+{
+	if (m_bJumpOld == true)
+	{ // 移動モーションに戻す
+		if (m_speed >= SPEED_SLOWRUN)
+		{
+			m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_RUN, true, BLEND_FRAME);
+		}
+		else
+		{
+			m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_WALK, true, BLEND_FRAME);
+		}
+	}
 }
 
 //=============================

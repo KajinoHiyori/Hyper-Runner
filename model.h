@@ -48,6 +48,7 @@ public:
 	D3DXVECTOR3 GetRotation(void) { return m_rot; }
 	D3DXVECTOR3 GetRotOffset(void) { return m_rotOffset; }
 	D3DXMATRIX GetMtxWorld(void) { return m_mtxWorld; }
+	D3DXMATRIX GetMtxToPos(void);
 	void SetColor(COLORTYPE colType, D3DXCOLOR col = COLOR_WHITE) { m_colType = colType; m_col = col; }
 
 private:

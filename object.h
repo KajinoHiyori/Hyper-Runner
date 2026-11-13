@@ -29,7 +29,7 @@ public:
 	{
 		TYPE_NONE = 0,	// 初期化
 		TYPE_PLAYER,	// プレイヤー
-		TYPE_MACHINE,	// 機械
+		TYPE_ACTION,	// アクション
 		TYPE_FIELD,		// 地面
 		TYPE_BLOCK,		// ブロック
 		TYPE_WALL,		// 壁

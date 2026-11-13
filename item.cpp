@@ -315,7 +315,10 @@ void CItem::UpdateGame(void)
 	Move();
 
 	// 地面との判定処理
-	CollisionField(pField);
+	if (CField::GetIndex(CObjectX::GetPosition()) != -1)
+	{
+		CollisionField(pField);
+	}
 
 	// ブロックとの判定処理
 	CollisionBlock();

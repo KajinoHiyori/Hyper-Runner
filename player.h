@@ -114,19 +114,21 @@ public:
 	float GetRadius(void) { return m_fRadius; }
 	SPEED GetSpeed(void) { return m_speed; }
 	void ChangeSpeed(bool bChangeUP);
+	D3DXMATRIX GetRightarmMtx(void);
 
 private:
 	void UpdateTitle(void);
 	void UpdateTutorial(void);
 	void UpdateGame(void);
 	void UpdateResult(void);
-	void Move(bool bMove);
+	void Move(void);
 	void ChangeLine(int nChangeDir);
 	void CollisionField(CField* pField);
 	bool CollisionBlock(void);
 	void SpeedUp(void);
 	void SpeedDown(void);
 	void SpeedManager(void);
+	void SetMoveMotion(void);
 	HRESULT LoadScripts(void);
 	bool LoadCharactor(void);
 	bool LoadModelFile(void);

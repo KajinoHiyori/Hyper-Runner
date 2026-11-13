@@ -40,6 +40,7 @@ public:
 	bool Collision(D3DXVECTOR3* pos, D3DXVECTOR3 posOld, float fRadius, float fMargin);
 	bool CollisionHeight(D3DXVECTOR3 pos, D3DXVECTOR3 posOld, float fHeight, float fMargin, bool bCollision);
 	bool SetCollision(D3DXVECTOR3* pPos, float fRadius);
+	float GetSize(void) { return m_fSize; }
 	static int GetNumAll(void) { return m_nNumAll; }
 	static void LoadInfo(void);
 	static void LoadSetting(const char* pFileName);
@@ -54,9 +55,7 @@ private:
 	float m_fDepth;		// 奥行き
 	float m_fLength;	// 対角線の長さ
 	float m_fAngle;		// 対角線の角度
-	int m_nCntFrame;		// 凹凸管理カウンター
-	bool m_bBump;			// 凸中
-	bool m_bDent;			// 凹中
+	float m_fSize;		// 当たり判定サイズ
 	D3DXVECTOR3 m_scl;	// 拡大率
 	static char m_apModelName[MAX_BLOCK][MAX_STRING];	// モデル名
 };
