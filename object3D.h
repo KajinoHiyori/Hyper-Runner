@@ -56,6 +56,7 @@ public:
 	D3DXCOLOR GetColor(void) { return m_col; }
 	float GetWidth(void) { return m_fWidth; }
 	float GetDepth(void) { return m_fDepth; }
+	void SetDepth(float fDepth) { m_fDepth = fDepth; SetVtx();}
 
 private:
 	void SetVtx(void);

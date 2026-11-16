@@ -234,38 +234,29 @@ void CCamera::UpdateResult(void)
 //=============================
 void CCamera::SetSceneCamera(CScene::MODE mode, CScene* pScene)
 {
-	/*D3DXVECTOR3 posPlayer = INIT_D3DVEC3;
+	D3DXVECTOR3 posPlayer = INIT_D3DVEC3;
 	CPlayer* pPlayer = NULL;
-	float fSizePlayer = 0.0f;
 	switch (mode)
 	{
 	case CScene::MODE_GAME:
 		pPlayer = static_cast<CGame*>(pScene)->GetPlayer();
 		posPlayer = pPlayer->GetPosition();
 		m_posR.x = posPlayer.x;
-		m_posR.y = posPlayer.y + fSizePlayer;
-		m_posR.z = posPlayer.z;
+		m_posR.y = posPlayer.y;
+		m_posR.z = posPlayer.z + FORWARD;
 		m_posV.y = GAME_HEIGHT;
 		m_posV.x = m_posR.x - sinf(m_rot.y) * (DISTANCE + (10.0f * 5.0f));
 		m_posV.z = m_posR.z - cosf(m_rot.y) * (DISTANCE + (10.0f * 5.0f)); 
-		break;
-
-	case CScene::MODE_TUTORIAL:
-		pPlayer = static_cast<CTutorial*>(pScene)->GetPlayer();
-		posPlayer = pPlayer->GetPosition();
-		m_posR.x = posPlayer.x;
-		m_posR.y = posPlayer.y + fSizePlayer;
-		m_posR.z = posPlayer.z;
-		m_posV.y = GAME_HEIGHT;
-		m_posV.x = m_posR.x - sinf(m_rot.y) * (DISTANCE + (10.0f * 5.0f));
-		m_posV.z = m_posR.z - cosf(m_rot.y) * (DISTANCE + (10.0f * 5.0f));
+		m_posRDest.x = posPlayer.x;
+		m_posRDest.y = posPlayer.y;
+		m_posRDest.z = posPlayer.z + FORWARD;
 		break;
 
 	default:
 		m_posV = D3DXVECTOR3(0.0f, 240.0f, -740.0f);
 		m_posR = D3DXVECTOR3(0.0f, 200.0f, -535.0f);
 		break;
-	}*/
+	}
 }
 
 //=============================

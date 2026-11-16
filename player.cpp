@@ -257,7 +257,7 @@ void CPlayer::Draw(void)
 		
 	}
 
-#ifndef ENABLE_MULTITARGETRENDERING
+#ifdef ENABLE_MULTITARGETRENDERING
 	CCamera* pCamera = CManager::GetCamera();
 	LPDIRECT3DSURFACE9 pRenderDef, pZBuffDef;
 	D3DVIEWPORT9 viewportDef;
@@ -272,6 +272,7 @@ void CPlayer::Draw(void)
 
 	// レンダリングターゲットの変更
 	pRenderer->ChangeTarget(pCamera->GetPosV(), pCamera->GetPosR(), pCamera->GetVecU());
+	pRenderer->SetClear(true);
 	
 	// ワールドマトリックスの初期化(デフォルトの値にする)
 	D3DXMatrixIdentity(&m_mtxWorld);
@@ -489,6 +490,12 @@ void CPlayer::ChangeLine(int nChangeDir)
 //=============================
 void CPlayer::CollisionField(CField* pField)
 {
+	if (CField::GetIndex(m_pos) == -1)
+	{
+		m_bJump = true;
+		return;
+	}
+
 	if (m_pos.y > pField->GetHeight(m_pos))return;
 	// 設置処理
 	m_move.y = 0.0f;

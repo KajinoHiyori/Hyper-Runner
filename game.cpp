@@ -91,6 +91,7 @@ HRESULT CGame::Init(void)
 	}
 
 	CAction::Setter(D3DXVECTOR3(-400.0f, 30.0f, 300.0f), 0);
+	CAction::Setter(D3DXVECTOR3(-200.0f, 30.0f, 300.0f), 0);
 	
 	//// ï«ÇÃëçêîÇì«Ç›éÊÇË
 	//int nNumWall = CWall::LoadNumAll(GAMESCRIPTS_PATH);

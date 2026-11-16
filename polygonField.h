@@ -52,7 +52,7 @@ public:
 	void SetWidth(float fWidth) { m_fWidth = fWidth; SetVtx(); }
 	void SetHeight(float fDepth) { m_fDepth = fDepth; SetVtx(); }
 	float GetWidth(void) { return m_fWidth; }
-	float GetHeight(void) { return m_fDepth; }
+	float GetDepth(void) { return m_fDepth; }
 	void SetTexMinX(float fTexMinX) { m_fTexMinX = fTexMinX; SetVtx();}
 	void SetTexMinY(float fTexMinY) { m_fTexMinY = fTexMinY; SetVtx();}
 	void SetTexMaxX(float fTexMaxX) { m_fTexMaxX = fTexMaxX; SetVtx();}

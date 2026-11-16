@@ -390,8 +390,6 @@ void CBlock::CollisionField(CField* pField)
 //=============================
 void CBlock::UpdateGame(void)
 {
-	if (m_nType == 0) return;	// 柵のみ早期リターン
-
 	// オブジェクトの情報を取得	
 	D3DXVECTOR3 pos = CObjectX::GetPosition();	// 現在地の取得
 	D3DXVECTOR3 rot = CObjectX::GetRotation();
@@ -418,7 +416,9 @@ void CBlock::UpdateGame(void)
 	SetRotation(rot);
 
 	// 地面との当たり判定処理
-	CollisionField(pGame->GetField(0));
+	if (CField::GetIndex(pos) == -1)return;
+
+	CollisionField(pGame->GetField(CField::GetIndex(pos)));
 }
 
 //=============================

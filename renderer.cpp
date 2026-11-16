@@ -16,9 +16,14 @@
 //========================================================================
 // マクロ定義
 //========================================================================
-#define FEEDBACK	(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f))
-#define BLAR		(15.0f)
-#define CLEAR_COLOR	(D3DCOLOR_RGBA(0, 0, 0, 0))
+#define FEEDBACK		(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))	// フィードバックエフェクト用ポリゴンの色
+#define CLEAR_COLOR		(D3DCOLOR_RGBA(255, 255, 255, 0))	// 画面クリアの色
+#define RATE			((float)SCREEN_HEIGHT / (float)SCREEN_WIDTH)	// 画面比率
+#define ZOOM_RATE		(0.6f)	// テクスチャ拡大率
+#define DEFAULT_RATE	(5.0f)	// 描画時のテクスチャサイズ
+#define SHAKE_COUNTER	(20.0f)	// 振動管理
+#define SHAKE_DIR		(0.2f)	// 振動方向
+#define SHAKE_CONTROL	(0.1f)	// 振動時間管理
 
 //========================================================================
 // コンストラクタ
@@ -36,6 +41,7 @@ CRenderer::CRenderer()
 	m_bFeedBack = false;	// フィードバック有無を管理
 	m_bFeedBackDest = false;
 #endif
+	m_state = STATE_NONE;	// 通常状態
 }
 
 //========================================================================
@@ -155,6 +161,12 @@ HRESULT CRenderer::Init(const HWND hWnd, const BOOL bWindow)
 	m_viewportMT.MinZ = 0.0f;
 	m_viewportMT.MaxZ = 1.0f;
 
+	// テクスチャサイズを指定
+	m_fShakeVertically = DEFAULT_RATE;
+	m_fShakehorizontal = DEFAULT_RATE * RATE;
+	m_fShake = 0.0f;
+	m_nShakeCounter = 0;
+
 	// フィードバック用ポリゴンの生成
 	// 頂点バッファの生成
 	m_pD3DDevice->CreateVertexBuffer(sizeof(VERTEX_2D) * 4, D3DUSAGE_WRITEONLY, FVF_VERTEX_2D, D3DPOOL_MANAGED, &m_pVtxBuffMT, NULL);
@@ -163,17 +175,17 @@ HRESULT CRenderer::Init(const HWND hWnd, const BOOL bWindow)
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	m_pVtxBuffMT->Lock(0, 0, (void**)&pVtx, 0);
 
-	pVtx[0].pos.x = SCREEN_CENTER.x - SCREEN_WIDTH * 0.5f - BLAR;
-	pVtx[0].pos.y = SCREEN_CENTER.y - SCREEN_HEIGHT * 0.5f - BLAR;
+	pVtx[0].pos.x = SCREEN_CENTER.x - SCREEN_WIDTH * ZOOM_RATE + m_fShakehorizontal;
+	pVtx[0].pos.y = SCREEN_CENTER.y - SCREEN_HEIGHT * ZOOM_RATE + m_fShakeVertically;
 	pVtx[0].pos.z = SCREEN_CENTER.z;
-	pVtx[1].pos.x = SCREEN_CENTER.x + SCREEN_WIDTH * 0.5f + BLAR;
-	pVtx[1].pos.y = SCREEN_CENTER.y - SCREEN_HEIGHT * 0.5f - BLAR;
+	pVtx[1].pos.x = SCREEN_CENTER.x + SCREEN_WIDTH * ZOOM_RATE + m_fShakehorizontal;
+	pVtx[1].pos.y = SCREEN_CENTER.y - SCREEN_HEIGHT * ZOOM_RATE + m_fShakeVertically;
 	pVtx[1].pos.z = SCREEN_CENTER.z;
-	pVtx[2].pos.x = SCREEN_CENTER.x - SCREEN_WIDTH * 0.5f - BLAR;
-	pVtx[2].pos.y = SCREEN_CENTER.y + SCREEN_HEIGHT * 0.5f + BLAR;
+	pVtx[2].pos.x = SCREEN_CENTER.x - SCREEN_WIDTH * ZOOM_RATE + m_fShakehorizontal;
+	pVtx[2].pos.y = SCREEN_CENTER.y + SCREEN_HEIGHT * ZOOM_RATE + m_fShakeVertically;
 	pVtx[2].pos.z = SCREEN_CENTER.z;
-	pVtx[3].pos.x = SCREEN_CENTER.x + SCREEN_WIDTH * 0.5f + BLAR;
-	pVtx[3].pos.y = SCREEN_CENTER.y + SCREEN_HEIGHT * 0.5f + BLAR;
+	pVtx[3].pos.x = SCREEN_CENTER.x + SCREEN_WIDTH * ZOOM_RATE + m_fShakehorizontal;
+	pVtx[3].pos.y = SCREEN_CENTER.y + SCREEN_HEIGHT * ZOOM_RATE + m_fShakeVertically;
 	pVtx[3].pos.z = SCREEN_CENTER.z;
 
 	// rhwの設定
@@ -258,14 +270,21 @@ void CRenderer::Update(void)
 	CObject::UpdateAll();
 
 #ifdef _DEBUG
-	CInputKeyboard* pKeyboard = CManager::GetInputKeyboard();
-	if (pKeyboard->GetTrigger(DIK_F) == true)
-	{
-		m_bFeedBackDest = m_bFeedBack ^ 1;
-		m_bFeedBack = m_bFeedBack ^ 1;
-		m_bClearTexture = true;
-	}
 #endif // _DEBUG
+	m_bFeedBack = true;
+	switch (m_state)
+	{
+	case STATE_SHAKE:	// 振動
+		UpdateShake();
+		break;
+	}
+
+	// 頂点情報更新
+	SetVtxPos();
+
+	CManager::GetDebugProc()->Print("m_fShake = %f\n", m_fShake);
+	CManager::GetDebugProc()->Print("m_fShakehorizontal = %f\n", m_fShakehorizontal);
+	CManager::GetDebugProc()->Print("m_fShakeVertically = %f\n", m_fShakeVertically);
 }
 
 //========================================================================
@@ -314,10 +333,7 @@ void CRenderer::Draw(void)
 	m_pD3DDevice->GetTransform(D3DTS_PROJECTION, &mtxProjectionDef);	// プロジェクションマトリックス
 
 	// レンダリングターゲットを0に指定
-	if (m_bFeedBack == true)
-	{
-		ChangeTarget(pCamera->GetPosV(), pCamera->GetPosR(), pCamera->GetVecU());
-	}
+	ChangeTarget(pCamera->GetPosV(), pCamera->GetPosR(), pCamera->GetVecU());
 #endif // ENABLE_MULTITARGETRENDERING
 
 	// 描画開始
@@ -330,11 +346,6 @@ void CRenderer::Draw(void)
 		CObject::DrawAll();
 
 #ifdef ENABLE_MULTITARGETRENDERING
-		// フィードバック用ポリゴンにテクスチャ1を貼り付ける
-		if (m_bFeedBack == true)
-		{
-			DrawPastImages();
-		}
 		//========================================================================================
 		// レンダリングターゲットを元に戻す
 		m_pD3DDevice->SetRenderTarget(0, pRenderDef);		// レンダリングターゲット
@@ -344,10 +355,7 @@ void CRenderer::Draw(void)
 		m_pD3DDevice->SetTransform(D3DTS_PROJECTION, &mtxProjectionDef);	// プロジェクションマトリックス
 
 		// フィードバック用ポリゴンにテクスチャ0を貼り付ける
-		if (m_bFeedBack == true)
-		{
-			DrawCurrentImages();
-		}
+		DrawCurrentImages();
 
 		// テクスチャ0とテクスチャ1を入れ替える
 		SwapTexture();
@@ -371,6 +379,59 @@ void CRenderer::Draw(void)
 
 	// バックバッファとフロントバッファの入れ替え
 	m_pD3DDevice->Present(NULL, NULL, NULL, NULL);
+}
+
+//========================================================================
+// 振動開始処理
+//========================================================================
+void CRenderer::SetShake(float fRange, int nTime)
+{
+	m_state = STATE_SHAKE;
+	m_nShakeCounter = nTime;
+	m_fShake = fRange;
+}
+
+//========================================================================
+// 画面全体の振動管理
+//========================================================================
+void CRenderer::UpdateShake(void)
+{
+	m_fShake += SHAKE_DIR;
+	m_fShake = AngleNormalize(m_fShake);
+	m_nShakeCounter--;
+	if (m_nShakeCounter <= 0)
+	{
+		m_state = STATE_NONE;
+	}
+	float fRate = (float)m_nShakeCounter * SHAKE_CONTROL;
+	m_fShakeVertically = sinf(m_fShake) * fRate;
+	m_fShakehorizontal = cosf(m_fShake) * fRate * RATE;
+}
+
+//========================================================================
+// 頂点情報更新
+//========================================================================
+void CRenderer::SetVtxPos(void)
+{
+	VERTEX_2D* pVtx;
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
+	m_pVtxBuffMT->Lock(0, 0, (void**)&pVtx, 0);
+
+	pVtx[0].pos.x = SCREEN_CENTER.x - SCREEN_WIDTH * ZOOM_RATE + m_fShakehorizontal;
+	pVtx[0].pos.y = SCREEN_CENTER.y - SCREEN_HEIGHT * ZOOM_RATE + m_fShakeVertically;
+	pVtx[0].pos.z = SCREEN_CENTER.z;
+	pVtx[1].pos.x = SCREEN_CENTER.x + SCREEN_WIDTH * ZOOM_RATE + m_fShakehorizontal;
+	pVtx[1].pos.y = SCREEN_CENTER.y - SCREEN_HEIGHT * ZOOM_RATE + m_fShakeVertically;
+	pVtx[1].pos.z = SCREEN_CENTER.z;
+	pVtx[2].pos.x = SCREEN_CENTER.x - SCREEN_WIDTH * ZOOM_RATE + m_fShakehorizontal;
+	pVtx[2].pos.y = SCREEN_CENTER.y + SCREEN_HEIGHT * ZOOM_RATE + m_fShakeVertically;
+	pVtx[2].pos.z = SCREEN_CENTER.z;
+	pVtx[3].pos.x = SCREEN_CENTER.x + SCREEN_WIDTH * ZOOM_RATE + m_fShakehorizontal;
+	pVtx[3].pos.y = SCREEN_CENTER.y + SCREEN_HEIGHT * ZOOM_RATE + m_fShakeVertically;
+	pVtx[3].pos.z = SCREEN_CENTER.z;
+	
+	// 頂点バッファをアンロック
+	m_pVtxBuffMT->Unlock();
 }
 
 #ifdef ENABLE_MULTITARGETRENDERING
@@ -533,5 +594,4 @@ void CRenderer::ClearTextures(void)
 	// 次回の描画で古い画像が使われないようにする
 	m_bClearMT = true;
 }
-
 #endif

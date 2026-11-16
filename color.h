@@ -15,6 +15,7 @@
 #define COLOR_WHITE			(D3DXCOLOR(1.000f,	1.000f,	1.000f,	1.000f))	// 白
 #define COLOR_WHITE_ALPHA	(D3DXCOLOR(1.000f,	1.000f,	1.000f,	0.500f))	// アルファ値半減白
 #define COLOR_WHITE_ALPHA75	(D3DXCOLOR(1.000f,	1.000f,	1.000f,	0.750f))	// アルファ値75白
+#define COLOR_WHITE_ZERO	(D3DXCOLOR(1.000f,	1.000f,	1.000f,	0.000f))	// 透明白
 #define COLOR_BLACK			(D3DXCOLOR(0.000f,	0.000f,	0.000f,	1.000f))	// 黒
 #define COLOR_RED			(D3DXCOLOR(1.000f,	0.000f,	0.000f,	1.000f))	// 赤
 #define COLOR_GREEN			(D3DXCOLOR(0.000f,	1.000f,	0.000f,	1.000f))	// 緑
