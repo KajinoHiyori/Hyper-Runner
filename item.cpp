@@ -19,6 +19,7 @@
 #include "texture.h"
 #include "ObjectX.h"
 #include "field.h"
+#include "magma.h"
 #include "scene.h"
 #include "game.h"
 #include "ranking.h"
@@ -322,6 +323,9 @@ void CItem::UpdateGame(void)
 
 	// ブロックとの判定処理
 	CollisionBlock();
+
+	// マグマとの判定処理
+	CollisionMagma(pGame->GetMagma());
 }
 
 //=============================
@@ -347,27 +351,17 @@ void CItem::CollisionField(CField* pField)
 		}
 	}
 
-	// フィールド上で行動範囲を制限[X]
-	if (pField->GetPosition().x - pField->GetWidth() >= pos.x - m_fSize)
-	{
-		pos.x = pField->GetPosition().x - pField->GetWidth() + m_fSize;
-	}
-	else if (pField->GetPosition().x + pField->GetWidth() <= pos.x + m_fSize)
-	{
-		pos.x = pField->GetPosition().x + pField->GetWidth() - m_fSize;
-	}
-	// フィールド上で行動範囲を制限[Z]
-	if (pField->GetPosition().z - pField->GetDepth() >= pos.z - m_fSize)
-	{
-		pos.z = pField->GetPosition().z - pField->GetDepth() + m_fSize;
-	}
-	else if (pField->GetPosition().z + pField->GetDepth() <= pos.z + m_fSize)
-	{
-		pos.z = pField->GetPosition().z + pField->GetDepth() - m_fSize;
-	}
-
 	// 位置更新
 	CObjectX::SetPosition(pos);
+}
+
+//=============================
+// マグマとの判定
+//=============================
+void CItem::CollisionMagma(CMagma* pMagma)
+{
+	if (pMagma->GetHeight(CObjectX::GetPosition()) < CObjectX::GetPosition().y) return;
+	Release();	// 自身を破棄
 }
 
 //=============================

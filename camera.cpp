@@ -200,6 +200,8 @@ void CCamera::UpdateGame(void)
 	}
 
 	CPlayer* pPlayer = static_cast<CGame*>(CManager::GetScene())->GetPlayer();
+	if (pPlayer == NULL) return;
+	
 	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
 	
 	m_posRDest.x = posPlayer.x;

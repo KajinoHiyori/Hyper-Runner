@@ -22,6 +22,7 @@
 // 前方宣言
 //=============================
 class CField;	// フィールドクラス
+class CMagma;	// マグマクラス
 class CPlayer;	// プレイヤークラス
 
 //=============================
@@ -79,7 +80,8 @@ public:
 
 private:
 	void UpdateGame(void);
-	void CollisionField(CField* pField);
+	void CollisionField(CField* pMagma);
+	void CollisionMagma(CMagma* ｐMagma);
 	void CollisionBlock(void);
 	void Move(void);
 	static void Setter(D3DXVECTOR3 pos, int type);

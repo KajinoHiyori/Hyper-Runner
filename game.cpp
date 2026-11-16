@@ -13,6 +13,7 @@
 #include "input.h"
 #include "sound.h"
 #include "field.h"
+#include "magma.h"
 #include "loadscripts.h"
 #include "particle.h"
 #include "meshcylinder.h"
@@ -30,7 +31,7 @@
 //=============================
 CPlayer* CGame::m_pPlayer = NULL;	// プレイヤーへのポインタ
 CField* CGame::m_apField[MAX_FIELDLINE] = {};	// フィールドへのポインタ
-
+CMagma* CGame::m_pMagma = NULL;		// マグマへのポインタ
 //CWall* CGame::m_apWall[MAX_GAMEWALL] = {};	// 壁のポインタ
 //CMachine* CGame::m_pMachine = NULL;	// マシンへのポインタ
 //CTimer* CGame::m_pTimer = NULL;		// タイマーへのポインタ
@@ -45,6 +46,7 @@ CField* CGame::m_apField[MAX_FIELDLINE] = {};	// フィールドへのポインタ
 #define FIELD_DEPTH		(5000.0f)	// フィールド奥行き
 #define FIELD_SPACE		(200.0f)		// フィールド間の隙間
 #define FIELD_POS(x)	(D3DXVECTOR3(FIELD_SPACE * 2.0f * (float)(x - 1), 0.0f, 0.0f))	// フィールド位置
+#define MAGMA_POS		(D3DXVECTOR3(0.0f, -400.0f, 0.0f))	// マグマ生成位置
 // ファイルパス
 #define BLOCK_SETTINGPATH	("data\\SCRIPTS\\block_game.txt")	// ゲーム内でのブロック設置情報
 #define ITEM_SETTINGPATH	("data\\SCRIPTS\\item_game.txt")	// ゲーム内でのアイテム設置情報
@@ -89,6 +91,10 @@ HRESULT CGame::Init(void)
 		// 使用されていない場合
 		m_apField[nCntLine] = CField::Create(FIELD_POS(nCntLine), INIT_D3DVEC3, FIELD_WIDTH, FIELD_DEPTH);
 	}
+
+	// マグマ生成
+	if (m_pMagma != NULL) return E_FAIL;
+	m_pMagma = CMagma::Create(MAGMA_POS);
 
 	CAction::Setter(D3DXVECTOR3(-400.0f, 30.0f, 300.0f), 0);
 	CAction::Setter(D3DXVECTOR3(-200.0f, 30.0f, 300.0f), 0);
@@ -163,6 +169,8 @@ void CGame::Uninit(void)
 	{
 		m_apField[nCntLine] = NULL;
 	}
+	m_pMagma = NULL;	// マグマへのポインタ
+
 	//m_pField = NULL;		// フィールドへのポインタ
 	//m_pMachine = NULL;		// マシンへのポインタ
 	//m_pTimer = NULL;		// タイマーのクリア

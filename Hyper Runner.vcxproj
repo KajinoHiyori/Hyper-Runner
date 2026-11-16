@@ -165,6 +165,7 @@
     <ClCompile Include="item_speedup.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="loadscripts.cpp" />
+    <ClCompile Include="magma.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="manager.cpp" />
     <ClCompile Include="meshcylinder.cpp" />
@@ -182,6 +183,7 @@
     <ClCompile Include="object3D.cpp" />
     <ClCompile Include="objectBillboard.cpp" />
     <ClCompile Include="objectBillboardAnim.cpp" />
+    <ClCompile Include="objectField.cpp" />
     <ClCompile Include="objectWall.cpp" />
     <ClCompile Include="objectX.cpp" />
     <ClCompile Include="orbit3D.cpp" />
@@ -220,6 +222,7 @@
     <ClInclude Include="item_speedup.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="loadscripts.h" />
+    <ClInclude Include="magma.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="manager.h" />
     <ClInclude Include="meshcylinder.h" />
@@ -237,6 +240,7 @@
     <ClInclude Include="object3D.h" />
     <ClInclude Include="objectBillboard.h" />
     <ClInclude Include="objectBillboardAnim.h" />
+    <ClInclude Include="objectField.h" />
     <ClInclude Include="objectWall.h" />
     <ClInclude Include="objectX.h" />
     <ClInclude Include="orbit3D.h" />

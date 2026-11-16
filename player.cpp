@@ -27,19 +27,27 @@
 #include "particle.h"
 #include "sound.h"
 #include "field.h"
+#include "magma.h"
 #include "block.h"
 
 //=============================
 // マクロ定義
 //=============================
-#define NUM_DIVMOTION		(7)		// 分割時のモデル数
-#define BLEND_FRAME			(10)	// ブレンドモーションのフレーム数
-#define SPEED				(3.0f)	// 移動速度
-#define JUMP		(40.0f)	// ジャンプ
-#define CHANGE_X	(40.0f)	// X方向切り替え
-#define RADIUS		(45.0f)		// 半径
-#define HEIGHT		(117.0f)	// 身長
-#define MARGINE		(0.1f)		// 余白
+#define NUM_DIVMOTION	(7)		// 分割時のモデル数
+#define BLEND_FRAME		(10)	// ブレンドモーションのフレーム数
+#define SPEED			(3.0f)	// 移動速度
+#define JUMP			(40.0f)	// ジャンプ
+#define CHANGE_X		(40.0f)	// X方向切り替え
+#define RADIUS			(45.0f)		// 半径
+#define HEIGHT			(117.0f)	// 身長
+#define MARGINE			(0.1f)		// 余白
+#define SLOWWALK_FRAME	(40)	// 遅く歩く際のフレーム数
+#define FASTWALK_FRAME	(30)	// 早く歩く際のフレーム数
+#define SLOWRUN_FRAME	(20)	// 遅く走る際のフレーム数
+#define FASTRUN_FRAME	(10)	// 早く走る際のフレーム数
+#define FASTEST_RUN		(5)		// 最速で走る際のフレーム数
+#define ENABLE_CHANGEFRAME	// フレーム切り替え
+//#undef	ENABLE_CHANGEFRAME	// ENABLE_CHANGEFRAMEの無効化
 // ファイルパス
 #define SETTING_PATH		("data\\SCRIPTS\\player_setting.txt")	// プレイヤー設定情報
 #define UPPERMOTION_PATH	("data\\SCRIPTS\\player_uppermotion.txt")	// 上半身モーション
@@ -399,6 +407,9 @@ void CPlayer::UpdateGame(void)
 
 	// 地面との判定
 	CollisionField(static_cast<CGame*>(CManager::GetScene())->GetField(m_nLine));
+
+	// マグマとの判定
+	CollisionMagma(static_cast<CGame*>(CManager::GetScene())->GetMagma());
 }
 
 //=============================
@@ -507,6 +518,22 @@ void CPlayer::CollisionField(CField* pField)
 }
 
 //=============================
+// フィールド判定処理
+//=============================
+void CPlayer::CollisionMagma(CMagma* pMagma)
+{
+	if (pMagma->GetHeight(m_pos) < m_pos.y) return;
+	Release();
+	// 死亡情報を渡す
+	switch (CManager::GetMode())
+	{
+	case CScene::MODE_GAME:	// ゲーム中
+		static_cast<CGame*>(CManager::GetScene())->DeletePlayer();
+		break;
+	}
+}
+
+//=============================
 // ブロック判定処理
 //=============================
 bool CPlayer::CollisionBlock(void)
@@ -568,13 +595,6 @@ bool CPlayer::CollisionBlock(void)
 	return false;
 }
 
-#define SLOWWALK_FRAME	(40)	// 遅く歩く際のフレーム数
-#define FASTWALK_FRAME	(30)	// 早く歩く際のフレーム数
-#define SLOWRUN_FRAME	(20)	// 遅く走る際のフレーム数
-#define FASTRUN_FRAME	(10)	// 早く走る際のフレーム数
-#define FASTEST_RUN		(5)		// 最速で走る際のフレーム数
-#define ENABLE_CHANGEFRAME	// フレーム切り替え
-//#undef	ENABLE_CHANGEFRAME	// ENABLE_CHANGEFRAMEの無効化
 //=============================
 // 加速管理
 //=============================

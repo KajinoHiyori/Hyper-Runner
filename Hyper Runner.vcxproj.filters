@@ -264,6 +264,12 @@
     <ClCompile Include="field.cpp">
       <Filter>field\cpp</Filter>
     </ClCompile>
+    <ClCompile Include="objectField.cpp">
+      <Filter>object\inheritance\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="magma.cpp">
+      <Filter>field\cpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="color.h">
@@ -423,6 +429,12 @@
       <Filter>action\h</Filter>
     </ClInclude>
     <ClInclude Include="field.h">
+      <Filter>field\h</Filter>
+    </ClInclude>
+    <ClInclude Include="objectField.h">
+      <Filter>object\inheritance\h</Filter>
+    </ClInclude>
+    <ClInclude Include="magma.h">
       <Filter>field\h</Filter>
     </ClInclude>
   </ItemGroup>

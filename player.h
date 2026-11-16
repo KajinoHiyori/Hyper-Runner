@@ -24,6 +24,7 @@
 class CModel;	// モデルクラス
 class CShadow;	// 影クラス
 class CField;	// フィールドクラス
+class CMagma;	// マグマクラス
 
 //=============================
 // プレイヤークラス
@@ -124,6 +125,7 @@ private:
 	void Move(void);
 	void ChangeLine(int nChangeDir);
 	void CollisionField(CField* pField);
+	void CollisionMagma(CMagma* pMagma);
 	bool CollisionBlock(void);
 	void SpeedUp(void);
 	void SpeedDown(void);

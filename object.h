@@ -33,12 +33,10 @@ public:
 		TYPE_FIELD,		// 地面
 		TYPE_BLOCK,		// ブロック
 		TYPE_WALL,		// 壁
-		TYPE_ITEM,	// アイテム
-		TYPE_STEM,	// 茎
-		TYPE_CORN,	// トウモロコシ
-		TYPE_POPCORN,	// ポップコーン
-		TYPE_TIMER,	// タイマー
-		TYPE_PAUSE,	// ポーズ
+		TYPE_ITEM,		// アイテム
+		TYPE_MAGMA,		// マグマ
+		TYPE_TIMER,		// タイマー
+		TYPE_PAUSE,		// ポーズ
 		TYPE_SHADOW,	// 影
 		TYPE_EFFECT,	// エフェクト
 		TYPE_PARTICLE,	// パーティクル
@@ -49,6 +47,7 @@ public:
 	typedef enum
 	{
 		PRIORITY_SCENE = 0,		// シーンクラス
+		PRIORITY_MAGMA,			// マグマ
 		PRIORITY_FIELD,			// 地面
 		PRIORITY_EVENTS,		// イベント[item / obsculate]
 		PRIORITY_CHARACTOR,		// キャラクター
