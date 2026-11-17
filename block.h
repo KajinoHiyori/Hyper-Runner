@@ -22,6 +22,7 @@
 // 前方宣言
 //=============================
 class CField;	// フィールドクラス
+class CMagma;	// マグマクラス
 
 //=============================
 // ブロッククラス
@@ -47,6 +48,7 @@ public:
 
 private:
 	void CollisionField(CField* pField);
+	void CollisionMagma(CMagma* pMagma);
 	void UpdateGame(void);
 	static int m_nNumAll;	// 総数
 	int m_nType;		// 種類

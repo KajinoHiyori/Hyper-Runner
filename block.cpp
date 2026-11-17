@@ -18,6 +18,7 @@
 #include "texture.h"
 #include "ObjectX.h"
 #include "field.h"
+#include "magma.h"
 #include "scene.h"
 #include "game.h"
 #include "ranking.h"
@@ -386,6 +387,18 @@ void CBlock::CollisionField(CField* pField)
 }
 
 //=============================
+// マグマとの判定処理処理
+//=============================
+void CBlock::CollisionMagma(CMagma* pMagma)
+{
+	D3DXVECTOR3 pos = CObjectX::GetPosition();
+	float fHeight = pMagma->GetHeight(D3DXVECTOR3(pos.x, pos.y + CObjectX::GetVtxMin().y * CObjectX::GetScale().y, pos.z));
+
+	if (pos.y + CObjectX::GetVtxMin().y * CObjectX::GetScale().y > fHeight)return;
+	Release();	// 自身を破棄
+}
+
+//=============================
 // ゲーム処理
 //=============================
 void CBlock::UpdateGame(void)
@@ -414,6 +427,9 @@ void CBlock::UpdateGame(void)
 
 	SetPosition(pos);
 	SetRotation(rot);
+
+	// マグマとの判定処理
+	CollisionMagma(pGame->GetMagma());
 
 	// 地面との当たり判定処理
 	if (CField::GetIndex(pos) == -1)return;

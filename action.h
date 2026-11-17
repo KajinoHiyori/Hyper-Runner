@@ -22,6 +22,7 @@
 // 前方宣言
 //=============================
 class CField;	// フィールドクラス
+class CMagma;	// マグマクラス
 class CPlayer;	// プレイヤークラス
 
 //=============================
@@ -76,6 +77,7 @@ private:
 	void UpdateStateNone(CPlayer* pPlayer);
 	void UpdateStatePlayer(CPlayer* pPlayer);
 	void CollisionField(CField* pField);
+	void CollisionMagma(CMagma* pMagma);
 	void CollisionBlock(void);
 	void Move(void);
 	TYPE m_type;					// 種類

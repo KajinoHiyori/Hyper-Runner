@@ -516,13 +516,13 @@ void CPlayer::CollisionField(CField* pField)
 	// 設置時のモーション管理
 	SetMoveMotion();
 }
-
+#define PLAYER_HEIGHT	(120.0f)	// プレイヤーの身長
 //=============================
 // フィールド判定処理
 //=============================
 void CPlayer::CollisionMagma(CMagma* pMagma)
 {
-	if (pMagma->GetHeight(m_pos) < m_pos.y) return;
+	if (pMagma->GetHeight(m_pos) < m_pos.y + PLAYER_HEIGHT) return;
 	Release();
 	// 死亡情報を渡す
 	switch (CManager::GetMode())

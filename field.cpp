@@ -240,7 +240,11 @@ void CField::UpdateWarning(void)
 		fDepth -= m_pWarning->GetDepth();
 		CObject3D::SetDepth(fDepth);
 
+		// 通常状態に変更
 		m_state = STATE_NONE;
+
+		// テクスチャ読み込み幅を変更
+		CObject3D::SetTextureRange(0.25f, fDepth / CObject3D::GetWidth() * 0.25f);
 
 		CManager::GetRenderer()->SetShake(SHAKE_TIME, SHAKE_TIME);
 	}
