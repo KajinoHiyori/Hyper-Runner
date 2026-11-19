@@ -61,6 +61,7 @@ public:
 		PRIOTITY_DISALPHA,		// 減算合成専専用
 		PRIORITY_SMOKE,			// 煙
 		PRIORITY_VISUALEFEFCT,	// 視覚効果
+		PRIORITY_STENCIL,		// ステンシル管理
 		PRIORITY_MANAGER,		// 管理[描画無し]
 		PRIORITY_PAUSE,			// PAUSE
 		PRIORITY_MAX

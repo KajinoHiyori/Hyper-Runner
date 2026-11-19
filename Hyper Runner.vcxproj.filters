@@ -106,6 +106,15 @@
     <Filter Include="field\h">
       <UniqueIdentifier>{9a763e16-3d43-4363-923e-9df78f4741a4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="shadow">
+      <UniqueIdentifier>{5df43536-a06a-4ad1-b3f1-22b04c8b1588}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shadow\cpp">
+      <UniqueIdentifier>{39ab56c2-669c-47ec-a546-f984f150427b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shadow\h">
+      <UniqueIdentifier>{55b7ec7d-5888-4750-82a8-dae631e64ef3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp">
@@ -195,9 +204,6 @@
     <ClCompile Include="particleX.cpp">
       <Filter>visual effect\cpp</Filter>
     </ClCompile>
-    <ClCompile Include="shadow.cpp">
-      <Filter>visual effect\cpp</Filter>
-    </ClCompile>
     <ClCompile Include="smoke.cpp">
       <Filter>visual effect\cpp</Filter>
     </ClCompile>
@@ -269,6 +275,12 @@
     </ClCompile>
     <ClCompile Include="magma.cpp">
       <Filter>field\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="shadow.cpp">
+      <Filter>shadow\cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="shadowST.cpp">
+      <Filter>shadow\cpp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -362,9 +374,6 @@
     <ClInclude Include="particleX.h">
       <Filter>visual effect\h</Filter>
     </ClInclude>
-    <ClInclude Include="shadow.h">
-      <Filter>visual effect\h</Filter>
-    </ClInclude>
     <ClInclude Include="smoke.h">
       <Filter>visual effect\h</Filter>
     </ClInclude>
@@ -436,6 +445,12 @@
     </ClInclude>
     <ClInclude Include="magma.h">
       <Filter>field\h</Filter>
+    </ClInclude>
+    <ClInclude Include="shadow.h">
+      <Filter>shadow\h</Filter>
+    </ClInclude>
+    <ClInclude Include="shadowST.h">
+      <Filter>shadow\h</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

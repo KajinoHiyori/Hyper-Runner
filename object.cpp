@@ -183,36 +183,37 @@ void CObject::DrawAll(void)
 
 		if (nCntPriority == PRIORITY_MANAGER) continue;	// 描画を行わないクラス
 		
-		// レンダーステートを一括管理
-		if (nCntPriority == PRIOTITY_ADDALPHA)
-		{ // 加算合成
+		// レンダーステートを一括変更
+		switch (nCntPriority)
+		{
+		case PRIOTITY_ADDALPHA:	// 加算合成
 			// アルファテストを有効にする
 			pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);	// アルファテストを有効にする
 			pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);	// 比較方法を設定(基準値より大きい場合描画)
 			pDevice->SetRenderState(D3DRS_ALPHAREF, 0);	// アルファテストの参照値を設定(この場合、0より大きい場合は描画)
-		
+
 			// アルファブレンディングを加算合成に設定
 			pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
 			pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 			pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
-		
+
 			// ライトをオフにする
 			pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
-		}
-		else if (nCntPriority == PRIOTITY_DISALPHA)
-		{ // 減算合成
+			break;
+
+		case PRIOTITY_DISALPHA:	// 減算合成
 			// アルファテストを有効にする
 			pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
 			pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
 			pDevice->SetRenderState(D3DRS_ALPHAREF, 0);
-		
+
 			// 減算合成の設定
 			pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_REVSUBTRACT);
 			pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 			pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
-		}
-		else if (nCntPriority == PRIORITY_SMOKE)
-		{ // 
+			break;
+
+		case PRIORITY_SMOKE:	// 半透明部分を持つビルボード
 			// アルファテストを有効にする
 			pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);	// アルファテストを有効にする
 			pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);	// 比較方法を設定(基準値より大きい場合描画)
@@ -220,6 +221,7 @@ void CObject::DrawAll(void)
 
 			// ライトをオフにする
 			pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+			break;
 		}
 
 		CObject* pObject = m_apTop[nCntPriority];	// 先頭アドレスを取得
@@ -232,34 +234,36 @@ void CObject::DrawAll(void)
 			pObject = pObjectNext;	// NULL判定を行う
 		}
 
-		if (nCntPriority == PRIOTITY_ADDALPHA)
-		{ // 加算合成
+		// レンダーステートを元に戻す
+		switch (nCntPriority)
+		{
+		case PRIOTITY_ADDALPHA: // 加算合成
 			// ライトをオンにする
 			pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
-		
+
 			// アルファブレンディングを元に戻す
 			pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
 			pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 			pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-		
+
 			// アルファテストを無効にする
 			pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);	// アルファテストを無効にする
 			pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_ALWAYS);	// 比較方法を設定(条件に関わらず描画)
 			pDevice->SetRenderState(D3DRS_ALPHAREF, 0);	// アルファテストの参照値を設定(この場合、0より大きい場合は描画)
-		}
-		else if (nCntPriority == PRIOTITY_DISALPHA)
-		{ // 減算合成
+			break;
+
+		case PRIOTITY_DISALPHA:	// 減算合成
 			pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
 			pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 			pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-		
+
 			// アルファテストを無効にする
 			pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 			pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_ALWAYS);
 			pDevice->SetRenderState(D3DRS_ALPHAREF, 0);
-		}
-		else if (nCntPriority == PRIORITY_SMOKE)
-		{
+			break;
+
+		case PRIORITY_SMOKE:// 半透明部分を持つビルボード
 			// ライトをオンにする
 			pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
 
@@ -267,6 +271,7 @@ void CObject::DrawAll(void)
 			pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);	// アルファテストを無効にする
 			pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_ALWAYS);	// 比較方法を設定(条件に関わらず描画)
 			pDevice->SetRenderState(D3DRS_ALPHAREF, 0);	// アルファテストの参照値を設定(この場合、0より大きい場合は描画)
+			break;
 		}
 	}
 }

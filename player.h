@@ -23,6 +23,7 @@
 //=============================
 class CModel;	// モデルクラス
 class CShadow;	// 影クラス
+class CShadowST;	// 影クラス
 class CField;	// フィールドクラス
 class CMagma;	// マグマクラス
 
@@ -147,6 +148,7 @@ private:
 	int m_nNumModel;		// モデル総数
 	CMotion* m_apMotion[DIV_MOTION_MAX];		// モーション情報
 	CShadow* m_pShadow;		// 影情報
+	CShadowST* m_pShadowST;		// 影情報
 	char m_aFileName[MODEL_MAX][MAX_STRING];	// ローカルで文字列を格納[コピー]
 	SPEED m_speed;	// 速度管理
 	float m_fSpeed;	// 移動速度

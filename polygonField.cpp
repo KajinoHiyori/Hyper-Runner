@@ -152,6 +152,10 @@ void CPolygonField::Draw(D3DXMATRIX mtxParent)
 	// ビューマトリックスを取得する
 	pDevice->GetTransform(D3DTS_VIEW, &mtxView);
 
+	// 向きを反映
+	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_rot.y, m_rot.x, m_rot.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
+
 	// パーツの位置を反映
 	D3DXMatrixTranslation(&mtxTrans, m_pos.x, m_pos.y, m_pos.z);
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);

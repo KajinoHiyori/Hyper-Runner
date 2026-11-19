@@ -18,6 +18,7 @@
 #include "texture.h"
 #include "model.h"
 #include "shadow.h"
+#include "shadowST.h"
 #include "meshfield.h"
 #include "scene.h"
 #include "title.h"
@@ -35,6 +36,7 @@
 //=============================
 #define NUM_DIVMOTION	(7)		// 分割時のモデル数
 #define BLEND_FRAME		(10)	// ブレンドモーションのフレーム数
+#define SHADOW_RADIUS	(2.0f)	// 影の拡大率
 #define SPEED			(3.0f)	// 移動速度
 #define JUMP			(40.0f)	// ジャンプ
 #define CHANGE_X		(40.0f)	// X方向切り替え
@@ -68,6 +70,7 @@ CPlayer::CPlayer(CObject::PRIORITY priority) : CObject(priority)
 	m_nNumModel = 0;			// モデル総数
 	m_apMotion[DIV_MOTION_MAX] = {};			// モーション情報
 	m_pShadow = NULL;			// 影情報
+	m_pShadowST = NULL;		// 影情報
 	for (int nCntModel = 0; nCntModel < MODEL_MAX; nCntModel++)
 	{
 		memset(&m_aFileName[nCntModel][0], 0, sizeof m_aFileName[nCntModel]);
@@ -125,12 +128,13 @@ HRESULT CPlayer::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 	m_rot = rot;
 	m_rotDest = rot;
 	m_fRadius = RADIUS;
+	m_speed = SPEED_SLOWRUN;
 	// モデル読み込み
 	LoadScripts();
 
 	if (m_apMotion[DIV_MOTION_UNDER] != NULL)
 	{
-		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_WALK, false, 0);
+		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_RUN, false, 0);
 	}
 	if (m_apMotion[DIV_MOTION_UPPER] != NULL)
 	{
@@ -139,6 +143,10 @@ HRESULT CPlayer::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 
 	// 基本速度管理
 	SpeedManager();
+
+	// ステンシルシャドウの生成
+	if (m_pShadow != NULL) return E_FAIL;
+	m_pShadowST = CShadowST::Create(m_pos, SHADOW_RADIUS);
 
 	return S_OK;
 }
@@ -164,6 +172,7 @@ void CPlayer::Uninit(void)
 	}
 	// 影の破棄
 	m_pShadow = NULL;
+	m_pShadowST = NULL;
 }
 
 //=============================
@@ -209,6 +218,12 @@ void CPlayer::Update(void)
 	{
 		if (m_apMotion[nCntDiv] == NULL) continue;
 		m_apMotion[nCntDiv]->Update();
+	}
+
+	// 影の更新
+	if (m_pShadowST != NULL)
+	{
+		m_pShadowST->SetPosition(m_pos);
 	}
 
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_W) == true)
@@ -406,7 +421,7 @@ void CPlayer::UpdateGame(void)
 	Move();
 
 	// 地面との判定
-	CollisionField(static_cast<CGame*>(CManager::GetScene())->GetField(m_nLine));
+	//CollisionField(static_cast<CGame*>(CManager::GetScene())->GetField(m_nLine));
 
 	// マグマとの判定
 	CollisionMagma(static_cast<CGame*>(CManager::GetScene())->GetMagma());
@@ -430,6 +445,7 @@ void CPlayer::Move(void)
 	CInputJoypad* pJoypad = CManager::GetInputJoypad();
 	int nChangeDir = 0;	// 移動方向設定
 
+#if 0
 	if ((pKeyboard->GetTrigger(DIK_D) == true
 		|| pKeyboard->GetTrigger(DIK_RIGHTARROW) == true
 		|| pJoypad->GetTrigger(CInputJoypad::JOYKEY_RIGHT) == true
@@ -474,12 +490,39 @@ void CPlayer::Move(void)
 		// 下半身でジャンプモーションを設定
 		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_JUMP, true, BLEND_FRAME);
 	}
+#endif
 
 	// 重力
 	m_move.y -= GRAVITY;
 
 	// 移動量更新
-	m_pos += m_move;
+	//m_pos += m_move;
+
+	float fMove = 0.5f;
+	if (pKeyboard->GetPress(DIK_W) == true)
+	{
+		m_pos.z -= fMove;
+	}
+	if (pKeyboard->GetPress(DIK_S) == true)
+	{
+		m_pos.z += fMove;
+	}
+	if (pKeyboard->GetPress(DIK_A) == true)
+	{
+		m_pos.x -= fMove;
+	}
+	if (pKeyboard->GetPress(DIK_D) == true)
+	{
+		m_pos.x += fMove;
+	}
+	if (pKeyboard->GetPress(DIK_LSHIFT) == true)
+	{
+		m_pos.y -= fMove;
+	}
+	if (pKeyboard->GetPress(DIK_RSHIFT) == true)
+	{
+		m_pos.y += fMove;
+	}
 
 	// 移動量の更新
 	m_move.x += (0.0f - m_move.x) * CORRECTION_MOVE;
@@ -523,7 +566,12 @@ void CPlayer::CollisionField(CField* pField)
 void CPlayer::CollisionMagma(CMagma* pMagma)
 {
 	if (pMagma->GetHeight(m_pos) < m_pos.y + PLAYER_HEIGHT) return;
+	// 自身を破棄
 	Release();
+	if (m_pShadowST != NULL)
+	{ // ステンシルシャドウを破棄
+		m_pShadowST->Release();
+	}
 	// 死亡情報を渡す
 	switch (CManager::GetMode())
 	{

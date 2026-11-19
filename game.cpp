@@ -30,7 +30,6 @@
 // 静的メンバ変数宣言
 //=============================
 CPlayer* CGame::m_pPlayer = NULL;	// プレイヤーへのポインタ
-CField* CGame::m_apField[MAX_FIELDLINE] = {};	// フィールドへのポインタ
 CMagma* CGame::m_pMagma = NULL;		// マグマへのポインタ
 //CWall* CGame::m_apWall[MAX_GAMEWALL] = {};	// 壁のポインタ
 //CMachine* CGame::m_pMachine = NULL;	// マシンへのポインタ
@@ -85,12 +84,7 @@ HRESULT CGame::Init(void)
 	CManager::GetSound()->Play(CSound::BGM_GAME);
 
 	// フィールド生成
-	for (int nCntLine = 0; nCntLine < MAX_FIELDLINE; nCntLine++)
-	{
-		if (m_apField[nCntLine] != NULL) return E_FAIL;
-		// 使用されていない場合
-		m_apField[nCntLine] = CField::Create(FIELD_POS(nCntLine), INIT_D3DVEC3, FIELD_WIDTH, FIELD_DEPTH);
-	}
+	CField::Create(D3DXVECTOR3(0.0f, -150.0f, 0.0f), INIT_D3DVEC3, FIELD_WIDTH, 500.0f);
 
 	// マグマ生成
 	if (m_pMagma != NULL) return E_FAIL;
@@ -165,10 +159,6 @@ void CGame::Uninit(void)
 {
 	// 各ポインタのクリア
 	m_pPlayer = NULL;	// プレイヤーへのポインタ
-	for (int nCntLine = 0; nCntLine < MAX_FIELDLINE; nCntLine++)
-	{
-		m_apField[nCntLine] = NULL;
-	}
 	m_pMagma = NULL;	// マグマへのポインタ
 
 	//m_pField = NULL;		// フィールドへのポインタ

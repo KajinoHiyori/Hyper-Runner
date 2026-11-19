@@ -310,7 +310,7 @@ void CItem::UpdateGame(void)
 
 	//if (static_cast<CGame*>(CManager::GetScene())->GetEnablePause() == true) return;
 
-	CField* pField = pGame->GetField(CField::GetIndex(CObjectX::GetPosition()));
+	//CField* pField = pGame->GetField(CField::GetIndex(CObjectX::GetPosition()));
 
 	// 移動処理
 	Move();
@@ -318,7 +318,7 @@ void CItem::UpdateGame(void)
 	// 地面との判定処理
 	if (CField::GetIndex(CObjectX::GetPosition()) != -1)
 	{
-		CollisionField(pField);
+		//CollisionField(pField);
 	}
 
 	// ブロックとの判定処理

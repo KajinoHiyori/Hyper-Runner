@@ -434,7 +434,7 @@ void CBlock::UpdateGame(void)
 	// ’n–Ê‚Æ‚Ì“–‚½‚è”»’èˆ—
 	if (CField::GetIndex(pos) == -1)return;
 
-	CollisionField(pGame->GetField(CField::GetIndex(pos)));
+	//CollisionField(pGame->GetField(CField::GetIndex(pos)));
 }
 
 //=============================

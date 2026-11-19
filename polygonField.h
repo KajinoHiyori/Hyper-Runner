@@ -50,7 +50,7 @@ public:
 	void SetPosition(D3DXVECTOR3 pos) { m_pos = pos; SetVtx(); }
 	void SetRotation(D3DXVECTOR3 rot) { m_rot = rot; SetVtx(); }
 	void SetWidth(float fWidth) { m_fWidth = fWidth; SetVtx(); }
-	void SetHeight(float fDepth) { m_fDepth = fDepth; SetVtx(); }
+	void SetDepth(float fDepth) { m_fDepth = fDepth; SetVtx(); }
 	float GetWidth(void) { return m_fWidth; }
 	float GetDepth(void) { return m_fDepth; }
 	void SetTexMinX(float fTexMinX) { m_fTexMinX = fTexMinX; SetVtx();}

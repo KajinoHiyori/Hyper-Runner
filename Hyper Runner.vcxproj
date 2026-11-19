@@ -199,6 +199,7 @@
     <ClCompile Include="result.cpp" />
     <ClCompile Include="scene.cpp" />
     <ClCompile Include="shadow.cpp" />
+    <ClCompile Include="shadowST.cpp" />
     <ClCompile Include="smoke.cpp" />
     <ClCompile Include="sound.cpp" />
     <ClCompile Include="texture.cpp" />
@@ -256,6 +257,7 @@
     <ClInclude Include="result.h" />
     <ClInclude Include="scene.h" />
     <ClInclude Include="shadow.h" />
+    <ClInclude Include="shadowST.h" />
     <ClInclude Include="smoke.h" />
     <ClInclude Include="sound.h" />
     <ClInclude Include="texture.h" />

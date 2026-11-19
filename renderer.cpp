@@ -81,7 +81,8 @@ HRESULT CRenderer::Init(const HWND hWnd, const BOOL bWindow)
 	d3dpp.BackBufferCount = 1;									// バックバッファの数
 	d3dpp.SwapEffect = D3DSWAPEFFECT_DISCARD;					// ダブルバッファの切り替え
 	d3dpp.EnableAutoDepthStencil = TRUE;						// デプスバッファのとステンシルバッファを作成
-	d3dpp.AutoDepthStencilFormat = D3DFMT_D16;					// デプスバッファとして16bitを使う
+	//d3dpp.AutoDepthStencilFormat = D3DFMT_D16;				// デプスバッファとして16bitを使う
+	d3dpp.AutoDepthStencilFormat = D3DFMT_D24S8;				// ステンシルバッファを使用[Zバッファに24bit、ステンシルバッファに8bitを設定]
 	d3dpp.Windowed = bWindow;									// ウィンドウモード
 	d3dpp.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;	// リフレッシュレート
 	d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_DEFAULT;	// インターバル
@@ -117,7 +118,8 @@ HRESULT CRenderer::Init(const HWND hWnd, const BOOL bWindow)
 	// テクスチャレンダリング用Zバッファの生成
 	m_pD3DDevice->CreateDepthStencilSurface(SCREEN_WIDTH,
 		SCREEN_HEIGHT,
-		D3DFMT_D16,
+		//D3DFMT_D16,
+		D3DFMT_D24S8,
 		D3DMULTISAMPLE_NONE,
 		0,
 		TRUE,
@@ -147,7 +149,7 @@ HRESULT CRenderer::Init(const HWND hWnd, const BOOL bWindow)
 		m_pD3DDevice->SetDepthStencilSurface(m_pZBuffMT);	// Zバッファを生成したZバッファに設定
 
 		// レンダリングターゲット用テクスチャのクリア
-		m_pD3DDevice->Clear(0, NULL, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER), D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
+		m_pD3DDevice->Clear(0, NULL, (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL), D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
 
 		m_pD3DDevice->SetRenderTarget(0, pRenderDef);	// レンダリングターゲットを元に戻す
 		m_pD3DDevice->SetDepthStencilSurface(pZBuffDef);	// Zバッファを元に戻す
@@ -309,9 +311,14 @@ void CRenderer::Draw(void)
 	}
 	else
 	{
-		// 画面のクリア(バックバッファとZバッファのクリア)
+		//// 画面のクリア(バックバッファとZバッファのクリア)
+		//m_pD3DDevice->Clear(0, NULL,
+		//	(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER),
+		//	CLEAR_COLOR, 1.0f, 0);
+
+		// 画面のクリア(バックバッファとZバッファとステンシルバッファのクリア)
 		m_pD3DDevice->Clear(0, NULL,
-			(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER),
+			(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL),
 			CLEAR_COLOR, 1.0f, 0);
 	}
 #else
@@ -482,7 +489,7 @@ void CRenderer::ChangeTarget(D3DXVECTOR3 posV, D3DXVECTOR3 posR, D3DXVECTOR3 vec
 	{
 		// 画面のクリア(バックバッファとZバッファのクリア)
 		m_pD3DDevice->Clear(0, NULL,
-			(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER),
+			(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL),
 			CLEAR_COLOR, 1.0f, 0);
 		m_bClearMT = false;
 	}
@@ -572,11 +579,17 @@ void CRenderer::ClearTextures(void)
 		m_pD3DDevice->SetDepthStencilSurface(m_pZBuffMT);
 		m_pD3DDevice->SetViewport(&m_viewportMT);
 
-		// 過去の画像を消去
+		//// 過去の画像を消去
+		//m_pD3DDevice->Clear(0, NULL,
+		//	D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,
+		//	CLEAR_COLOR,
+		//	1.0f,0);
+
+		// 過去の画像を消去[ステンシル使用]
 		m_pD3DDevice->Clear(0, NULL,
-			D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER,
+			D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL,
 			CLEAR_COLOR,
-			1.0f,0);
+			1.0f, 0);
 	}
 
 	// 描画先を下に戻す

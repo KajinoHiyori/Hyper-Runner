@@ -286,7 +286,7 @@ void CAction::UpdateGame(void)
 
 	//if (static_cast<CGame*>(CManager::GetScene())->GetEnablePause() == true) return;
 
-	CField* pField = pGame->GetField(CField::GetIndex(CObjectX::GetPosition()));
+	//CField* pField = pGame->GetField(CField::GetIndex(CObjectX::GetPosition()));
 	CPlayer* pPlayer = pGame->GetPlayer();
 
 	// 移動処理
@@ -298,7 +298,7 @@ void CAction::UpdateGame(void)
 	// 地面との判定処理
 	if (CField::GetIndex(CObjectX::GetPosition()) != -1)
 	{
-		CollisionField(pField);
+		//CollisionField(pField);
 	}
 
 	// ブロックとの判定処理
@@ -339,6 +339,12 @@ void CAction::UpdateStateNone(CPlayer* pPlayer)
 //=============================
 void CAction::UpdateStatePlayer(CPlayer* pPlayer)
 {
+	if (pPlayer == NULL)
+	{
+		m_state = STATE_NONE;
+		return;
+	}
+
 	// 頂点データの算出
 	D3DXVECTOR3 pos = INIT_D3DVEC3;
 	D3DXMATRIX mtxRightarm = pPlayer->GetRightarmMtx();
@@ -391,7 +397,7 @@ void CAction::CollisionMagma(CMagma* pMagma)
 	D3DXVECTOR3 pos = CObjectX::GetPosition();
 	float fHeight = pMagma->GetHeight(D3DXVECTOR3(pos.x, pos.y + CObjectX::GetVtxMin().y * CObjectX::GetScale().y, pos.z));
 
-	if (pos.y + CObjectX::GetVtxMin().y * CObjectX::GetScale().y > fHeight)return;
+	if (pos.y + CObjectX::GetVtxMax().y * CObjectX::GetScale().y > fHeight)return;
 	Release();	// 自身を破棄
 }
 

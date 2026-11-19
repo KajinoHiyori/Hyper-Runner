@@ -24,7 +24,6 @@
 // 前方宣言
 //=============================
 class CPlayer;		// プレイヤークラス
-class CField;		// フィールドクラス
 class CMagma;		// マグマクラス
 //class CWall;		// 壁クラス
 //class CMachine;		// マシンクラス
@@ -59,7 +58,6 @@ public:
 	STATE GetState(void) { return m_state; }
 	static CPlayer* GetPlayer(void) { return m_pPlayer; }
 	static void DeletePlayer(void) { m_pPlayer = NULL; }
-	static CField* GetField(int nIdx) { return m_apField[nIdx]; }
 	static CMagma* GetMagma(void) { return m_pMagma; }
 	//static CWall* GetWall(int nIdx){ return m_apWall[nIdx]; }
 	//static CMachine* GetMachine(void) { return m_pMachine; }
@@ -70,7 +68,6 @@ public:
 
 private:
 	static CPlayer* m_pPlayer;		// プレイヤークラスへのポインタ
-	static CField* m_apField[MAX_FIELDLINE];		// フィールドへのポインタ
 	static CMagma* m_pMagma;	// マグマへのポインタ
 	//static CWall* m_apWall[MAX_GAMEWALL];		// 壁へのポインタ
 	//static CMachine* m_pMachine;	// マシンクラスへのポインタ
