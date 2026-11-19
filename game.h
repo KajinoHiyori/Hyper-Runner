@@ -25,9 +25,9 @@
 //=============================
 class CPlayer;		// プレイヤークラス
 class CMagma;		// マグマクラス
+class CTimer;		// タイマークラス
 //class CWall;		// 壁クラス
 //class CMachine;		// マシンクラス
-//class CTimer;		// タイマークラス
 //class CGameUI;		// UIクラス
 
 //=============================
@@ -61,7 +61,7 @@ public:
 	static CMagma* GetMagma(void) { return m_pMagma; }
 	//static CWall* GetWall(int nIdx){ return m_apWall[nIdx]; }
 	//static CMachine* GetMachine(void) { return m_pMachine; }
-	//static CTimer* GetTimer(void) { return m_pTimer; }
+	static CTimer* GetTimer(void) { return m_pTimer; }
 	//static CPause* GetPause(void) { return m_pPause; }
 	//static CGameUI* GetGameUI(void) { return m_pGameUI; }
 	//static bool GetEnablePause(void) { return m_pPause->GetPauseState(); }
@@ -71,7 +71,7 @@ private:
 	static CMagma* m_pMagma;	// マグマへのポインタ
 	//static CWall* m_apWall[MAX_GAMEWALL];		// 壁へのポインタ
 	//static CMachine* m_pMachine;	// マシンクラスへのポインタ
-	//static CTimer* m_pTimer;		// タイマーへのポインタ
+	static CTimer* m_pTimer;		// タイマーへのポインタ
 	//static CPause* m_pPause;		// ポーズへのポインタ
 	//static CGameUI* m_pGameUI;		// UIへのポインタ
 	STATE m_state;					// 状態管理

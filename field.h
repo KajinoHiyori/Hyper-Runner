@@ -85,7 +85,7 @@ public:
 	bool OnField(D3DXVECTOR3 pos, float fRadius);
 	void SetState(STATE state);
 	STATE GetState(void) { return m_state; }
-	static void SetStage(const char* pFilePath);
+	static bool SetStage(const char* pFilePath);
 	static int GetNumAll(void) { return m_nNumAll; }
 
 private:
@@ -94,6 +94,7 @@ private:
 	void UpdateDisScaling(void);
 	void UpdateAddScaling(void);
 	void SetResize(void);
+	void DeleteLine(void);
 	CPolygonField* m_apLid[LID_MAX];	// è„â∫ñ 
 	CPolygon3D* m_apSide[SIDE_MAX];	// ë§ñ 
 	CPolygonField* m_pWarning;	// íçà”ópÉ|ÉäÉSÉì

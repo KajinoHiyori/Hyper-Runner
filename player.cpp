@@ -129,7 +129,7 @@ HRESULT CPlayer::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 	m_rot = rot;
 	m_rotDest = rot;
 	m_fRadius = RADIUS;
-	m_speed = SPEED_SLOWRUN;
+	m_speed = SPEED_FASTRUN;
 	// モデル読み込み
 	LoadScripts();
 
@@ -141,6 +141,7 @@ HRESULT CPlayer::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 	{
 		m_apMotion[DIV_MOTION_UPPER]->Set(MOTIONUPPER_NUTORAL, false, 0);
 	}
+	m_apMotion[DIV_MOTION_UNDER]->SetFrame(MOTIONUNDER_RUN, FASTRUN_FRAME);
 
 	// 基本速度管理
 	SpeedManager();
@@ -564,7 +565,7 @@ void CPlayer::CollisionField(void)
 			pField = static_cast<CField*>(pObject);
 
 			// 当たり判定処理を実行
-			if (pField->OnField(m_pos, RADIUS) == false)
+			if (pField->OnField(m_pos, RADIUS) == false || pField->GetIndex() == -1)
 			{
 				pObject = pObjectNext;	// NULL判定を行う
 				pField = NULL;
@@ -581,10 +582,11 @@ void CPlayer::CollisionField(void)
 		if (bOnField == true)break;
 	}
 
-	if (pField == NULL || bOnField == false) return;
-	CManager::GetDebugProc()->Print("pField->GetHeight() %f\n", pField->GetHeight(m_pos));
+	if (bOnField == false) return;
+	float fHeight = pField->GetHeight(m_pos);
+	CManager::GetDebugProc()->Print("pField->GetHeight() %f\n", fHeight);
 
-	if (m_pos.y > pField->GetHeight(m_pos))return;
+	if (m_pos.y > fHeight)return;
 	// 設置処理
 	m_move.y = 0.0f;
 	m_bJump = false;

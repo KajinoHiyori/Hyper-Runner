@@ -272,7 +272,7 @@ void CAction::CollisionPlayer(CPlayer* pPlayer)
 	float fDistance = sqrtf(((posAction.x - posPlayer.x) * (posAction.x - posPlayer.x)) + ((posAction.z - posPlayer.z) * (posAction.z - posPlayer.z)));
 	float fHeight = posPlayer.y - posAction.y;
 
-	if ((fDistance > m_fSize + pPlayer->GetRadius() || fHeight > 0.0f))return;	// 取得ナシ
+	if ((fDistance > m_fSize + pPlayer->GetRadius() || fHeight > 1.0f))return;	// 取得ナシ
 	m_state = STATE_PLAYER;
 }
 
@@ -407,9 +407,14 @@ void CAction::CollisionField(void)
 	// 設置処理
 	m_move.y = 0.0f;
 	pos.y = pField->GetHeight(pos) + CObjectX::GetVtxMin().y;
-
+	
 	// 設置
 	CObjectX::SetPosition(pos);
+
+	if (m_state != STATE_PLAYER)
+	{
+		m_state = STATE_NONE;
+	}
 }
 
 //=============================

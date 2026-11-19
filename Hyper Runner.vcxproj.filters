@@ -282,6 +282,9 @@
     <ClCompile Include="shadowST.cpp">
       <Filter>shadow\cpp</Filter>
     </ClCompile>
+    <ClCompile Include="timer.cpp">
+      <Filter>event\cpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="color.h">
@@ -451,6 +454,9 @@
     </ClInclude>
     <ClInclude Include="shadowST.h">
       <Filter>shadow\h</Filter>
+    </ClInclude>
+    <ClInclude Include="timer.h">
+      <Filter>event\h</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

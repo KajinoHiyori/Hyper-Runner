@@ -25,6 +25,7 @@
 #include "meshskin_flat.h"
 #include "meshskin_cylinder.h"
 #include "action.h"
+#include "timer.h"
 
 //=============================
 // 静的メンバ変数宣言
@@ -33,19 +34,21 @@ CPlayer* CGame::m_pPlayer = NULL;	// プレイヤーへのポインタ
 CMagma* CGame::m_pMagma = NULL;		// マグマへのポインタ
 //CWall* CGame::m_apWall[MAX_GAMEWALL] = {};	// 壁のポインタ
 //CMachine* CGame::m_pMachine = NULL;	// マシンへのポインタ
-//CTimer* CGame::m_pTimer = NULL;		// タイマーへのポインタ
+CTimer* CGame::m_pTimer = NULL;		// タイマーへのポインタ
 //CPause* CGame::m_pPause = NULL;		// ポーズへのポインタ
 //CGameUI* CGame::m_pGameUI = NULL;	// UIへのポインタ
 
 //=============================
 // マクロ定義
 //=============================
+#define STAGE_LENGTH	(10000.0f)	// ステージ幅
 #define GAME_TIME		(60)	// ゲーム時間
 #define FIELD_WIDTH		(100.0f)	// フィールド幅
-#define FIELD_DEPTH		(5000.0f)	// フィールド奥行き
 #define FIELD_SPACE		(200.0f)		// フィールド間の隙間
 #define FIELD_POS(x)	(D3DXVECTOR3(FIELD_SPACE * 2.0f * (float)(x - 1), 0.0f, 0.0f))	// フィールド位置
 #define MAGMA_POS		(D3DXVECTOR3(0.0f, -400.0f, 0.0f))	// マグマ生成位置
+#define PLAYER_START	(D3DXVECTOR3(0.0f, 0.0f, -STAGE_LENGTH))	// プレイヤー生成位置
+#define TIMER_POS		(D3DXVECTOR3(640.0f, 100.0f, 0.0f))	// タイマー生成位置
 // ファイルパス
 #define BLOCK_SETTINGPATH	("data\\SCRIPTS\\block_game.txt")	// ゲーム内でのブロック設置情報
 #define ITEM_SETTINGPATH	("data\\SCRIPTS\\item_game.txt")	// ゲーム内でのアイテム設置情報
@@ -79,15 +82,12 @@ HRESULT CGame::Init(void)
 	// プレイヤー生成
 	if (m_pPlayer != NULL)return E_FAIL;
 	// 使用されていない場合
-	m_pPlayer = CPlayer::Create(INIT_D3DVEC3, D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));
-	//m_pPlayer = CPlayer::Create(INIT_D3DVEC3, D3DXVECTOR3(0.0f, HALF_D3DXPI, 0.0f));
+	m_pPlayer = CPlayer::Create(PLAYER_START, D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));
 
 	CManager::GetSound()->Play(CSound::BGM_GAME);
 
 	// フィールド生成
 	CField::SetStage(STAGE_PATH);
-
-	CField::Create(D3DXVECTOR3(0.0f, 0.0f, -30.0f),INIT_D3DVEC3, FIELD_SIZE, FIELD_SIZE);
 
 	// マグマ生成
 	if (m_pMagma != NULL) return E_FAIL;
@@ -105,9 +105,9 @@ HRESULT CGame::Init(void)
 	//	m_apWall[nCntWall] = CWall::Create(GAMESCRIPTS_PATH, nCntWall);
 	//}
 
-	//// タイマーを生成
-	//if (m_pTimer != NULL) return E_FAIL;
-	//m_pTimer = CTimer::Create(TIMER_POS, GAME_TIME);
+	// タイマーを生成
+	if (m_pTimer != NULL) return E_FAIL;
+	m_pTimer = CTimer::Create(TIMER_POS, GAME_TIME);
 
 	//// 回収マシンを生成
 	//if (m_pMachine != NULL) return E_FAIL;
@@ -142,10 +142,10 @@ HRESULT CGame::Init(void)
 	//CManager::GetPopcornManager()->Reset();
 
 	// ブロックを生成
-	CBlock::LoadSetting(BLOCK_SETTINGPATH);
+	//CBlock::LoadSetting(BLOCK_SETTINGPATH);
 
 	// アイテムを生成
-	CItem::LoadSetting(ITEM_SETTINGPATH);
+	//CItem::LoadSetting(ITEM_SETTINGPATH);
 
 	// メッシュスキン生成[平面]
 	//CMeshSkinFlat::Create(MESHSKIN_PATH);
@@ -163,10 +163,10 @@ void CGame::Uninit(void)
 	// 各ポインタのクリア
 	m_pPlayer = NULL;	// プレイヤーへのポインタ
 	m_pMagma = NULL;	// マグマへのポインタ
+	m_pTimer = NULL;		// タイマーのクリア
 
 	//m_pField = NULL;		// フィールドへのポインタ
 	//m_pMachine = NULL;		// マシンへのポインタ
-	//m_pTimer = NULL;		// タイマーのクリア
 	//m_pPause = NULL;		// ポーズへのポインタ
 	//m_pGameUI = NULL;		// UIへのポインタ
 	//for (int nCntWall = 0; nCntWall < MAX_GAMEWALL; nCntWall++)
@@ -190,6 +190,11 @@ void CGame::Update(void)
 	if ((pKeyboard->GetTrigger(DIK_RETURN) == true || pJoypad->GetAnyButton() == true) /* && CManager::GetFadeState() == CFade::STATE_FADENONE && m_state == STATE_END*/)
 	{ // リザルトに遷移
 		CManager::GetFade()->SetFade(CFade::TYPE_ALPHA, SCREEN_CENTER, COLOR_WHITE, CScene::MODE_RESULT);
+	}
+
+	if ((pKeyboard->GetTrigger(DIK_R) == true) /* && CManager::GetFadeState() == CFade::STATE_FADENONE && m_state == STATE_END*/)
+	{ // リザルトに遷移
+		CManager::GetFade()->SetFade(CFade::TYPE_ALPHA, SCREEN_CENTER, COLOR_WHITE, CScene::MODE_GAME);
 	}
 }
 

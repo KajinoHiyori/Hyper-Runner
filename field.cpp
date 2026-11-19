@@ -25,12 +25,14 @@
 //=============================
 // マクロ定義
 //=============================
-#define CHANGE_COLOR	(0.05f)	// 注意喚起の色変更
-#define BREAK_TIME		(300)	// 注意喚起が出てから壊れるまでの時間
-#define SHAKE_TIME		(1.0f)	// 画面振動幅
-#define SHAKE_TIME		(120)	// 振動時間
-#define WARNING_Y		(1.0f)	// 注意表示UIの高度
-#define HEIGHT_DEFAULT	(10.0f)	// ブロックの高さ
+#define CHANGE_COLOR	(0.05f)		// 注意喚起の色変更
+#define BREAK_TIME		(300)		// 注意喚起が出てから壊れるまでの時間
+#define SHAKE_TIME		(1.0f)		// 画面振動幅
+#define SHAKE_TIME		(120)		// 振動時間
+#define WARNING_Y		(1.0f)		// 注意表示UIの高度
+#define HEIGHT_DEFAULT	(10.0f)		// ブロックの高さ
+#define FIELD_WIDTH		(100.0f)	// フィールド幅
+#define FIELD_SPACE		(FIELD_WIDTH * 4.0f)	// フィールド同士の間隔
 
 //=============================
 // 静的メンバ変数宣言
@@ -170,7 +172,7 @@ void CField::Uninit(void)
 //=============================
 void CField::Update(void)
 {
-	if (CManager::GetInputKeyboard()->GetTrigger(DIK_0) == true)
+	if (CManager::GetInputKeyboard()->GetTrigger(DIK_0) == true && m_state == STATE_NONE)
 	{
 		SetState(STATE_WARNING);
 	}
@@ -189,7 +191,8 @@ void CField::Update(void)
 		break;
 	}
 
-	CManager::GetDebugProc()->Print("m_fWidth %f, m_fDepth %f, m_fHeight %f", m_fWidth, m_fDepth, m_fHeight);
+	// カメラ位置に応じて削除
+	DeleteLine();
 }
 
 //=============================
@@ -298,12 +301,102 @@ void CField::SetState(STATE state)
 	m_nStateCounter = 0;
 }
 
+#define STAGESET		("STAGESET")		// STAGESET
+#define END_STAGESET	("END_STAGESET")	// END_STAGESET
+#define LINE			("LINE")			// LINE
+#define DEPTH			("DEPTH")			// DEPTH
+
 //=============================
 // ステージ配置処理
 //=============================
-void CField::SetStage(const char* pFilePath)
+bool CField::SetStage(const char* pFilePath)
 {
+	FILE* pFile = fopen(pFilePath, "r");
 
+	if (pFile == NULL)
+	{ // 読み込みに失敗
+		return false;
+	}
+
+	// 外部ファイル読み取り処理を生成
+	CLoadScripts* pLoadScripts = new CLoadScripts();
+
+	bool bLoadEnd = false;		// 読み込み終了フラグ
+	char aString[MAX_STRING];		// ローカルで文字列を格納
+	char aStringCopy[MAX_STRING];	// ローカルで文字列を格納[コピー]
+	D3DXVECTOR3 pos = INIT_D3DVEC3;	// 位置
+	float fDepth = 0.0f;			// 奥行き
+
+	do
+	{ // 文字列のクリア
+		memset(&aString[0], 0, sizeof aString);
+		memset(&aStringCopy[0], 0, sizeof aStringCopy);
+
+		// 読み込んだ行の文字列判定
+		fgets(&aString[0], MAX_STRING, pFile);	// 1行読み込む
+		pLoadScripts->Judgment(&aString[0], &aStringCopy[0]);	// 有効文字抜き取り
+
+		if (strstr(&aStringCopy[0], STAGESET) != NULL)
+		{ // STAGESETを読み込んだ
+			while (1)
+			{
+				// 文字列のクリア
+				memset(&aString[0], 0, sizeof aString);
+				memset(&aStringCopy[0], 0, sizeof aStringCopy);
+
+				// 読み込んだ行の文字列判定
+				fgets(&aString[0], MAX_STRING, pFile);	// 1行読み込む
+				pLoadScripts->Judgment(&aString[0], &aStringCopy[0]);	// 有効文字抜き取り
+
+				if (strstr(&aStringCopy[0], POS) != NULL)
+				{ // POSを読み込んだ
+					pos = pLoadScripts->LoadVector3(&aStringCopy[0]);
+				}
+				if (strstr(&aStringCopy[0], LINE) != NULL)
+				{ // LINEを読み込んだ
+					int nLine = pLoadScripts->LoadInt(&aStringCopy[0]);
+					switch (nLine)
+					{
+					case 0:	// 左
+						pos.x = -FIELD_SPACE;
+						break;
+
+					case 1:	// 中央
+						pos.x = 0.0f;
+						break;
+
+					case 2:	// 右
+						pos.x = FIELD_SPACE;
+						break;
+
+					default:	// 例外は中央に集約
+						pos.x = 0.0f;
+						break;
+					}
+				}
+				if (strstr(&aStringCopy[0], DEPTH) != NULL)
+				{ // DEPTHを読み込んだ
+					fDepth = pLoadScripts->LoadFloat(&aStringCopy[0]);
+					
+					// フィールドを生成
+					CField::Create(pos, INIT_D3DVEC3, FIELD_WIDTH, fDepth);
+				}
+				if (strstr(&aStringCopy[0], END_STAGESET) != NULL)
+				{ // END_STAGESETを読み込んだ
+					bLoadEnd = true;
+					break;
+				}
+			}
+		}
+	} while (bLoadEnd == false);
+
+	// ファイルを閉じる
+	fclose(pFile);
+
+	// 外部ファイル読み取り処理を破棄
+	SAFE_DELETE_SINGULAR(pLoadScripts);
+
+	return true;
 }
 
 //=============================
@@ -446,4 +539,14 @@ void CField::SetResize(void)
 	m_apLid[LID_BUTTON]->SetPosition(D3DXVECTOR3(0.0f, -m_fHeight, 0.0f));
 	m_apLid[LID_BUTTON]->SetWidth(m_fWidth);
 	m_apLid[LID_BUTTON]->SetDepth(m_fDepth);
+}
+
+//=============================
+// カメラ位置に応じて削除
+//=============================
+void CField::DeleteLine(void)
+{
+	if (CManager::GetCamera()->GetPosV().z < m_pos.z + m_fDepth) return;
+	// カメラより手前に行ったら削除
+	Release();
 }
