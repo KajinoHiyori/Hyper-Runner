@@ -370,20 +370,61 @@ bool CBlock::SetCollision(D3DXVECTOR3* pPos, float fRadius)
 	return false;
 }
 
+#define RADIUS	(20.0f)	// 余白
 //=============================
 // 地面との判定処理処理
 //=============================
-void CBlock::CollisionField(CField* pField)
+void CBlock::CollisionField(void)
 {
+	CField* pField = NULL;
+	bool bOnField = false;
 	D3DXVECTOR3 pos = CObjectX::GetPosition();
 
-	float fHeight = pField->GetHeight(D3DXVECTOR3(pos.x, pos.y, pos.z));
-	if (pos.y <= fHeight)
-	{ // 地面に埋まった場合
-		pos.y = fHeight;
-		m_move.y = 0.0f;
-		SetPosition(pos);
+	for (int nCntPriority = 0; nCntPriority < MAX_PRIORITYS; nCntPriority++)
+	{
+		CObject* pObject = GetTop(nCntPriority);	// 先頭アドレスを取得
+
+		while (pObject != NULL)
+		{ // 次のオブジェクトがある限りループ
+			CObject* pObjectNext = pObject->GetNext();	// 次のオブジェクトへのポインタを設定
+			bool bOneCollision = false;
+
+			// オブジェクトとの当たり判定
+			if (pObject->GetType() != CObject::TYPE_FIELD)
+			{
+				pObject = pObjectNext;	// NULL判定を行う
+				continue;
+			}
+			// アイテムの場合
+			pField = static_cast<CField*>(pObject);
+
+			// 当たり判定処理を実行
+			if (pField->OnField(pos, RADIUS) == false)
+			{
+				pObject = pObjectNext;	// NULL判定を行う
+				pField = NULL;
+				continue;
+			}
+			else
+			{
+				bOnField = true;
+				break;
+			}
+			pObject = pObjectNext;	// NULL判定を行う
+		}
+
+		if (bOnField == true)break;
 	}
+
+	if (pField == NULL || bOnField == false) return;
+
+	if (pos.y + CObjectX::GetVtxMin().y > pField->GetHeight(pos))return;
+	// 設置処理
+	m_move.y = 0.0f;
+	pos.y = pField->GetHeight(pos) + CObjectX::GetVtxMin().y;
+
+	// 設置
+	CObjectX::SetPosition(pos);
 }
 
 //=============================
@@ -432,9 +473,7 @@ void CBlock::UpdateGame(void)
 	CollisionMagma(pGame->GetMagma());
 
 	// 地面との当たり判定処理
-	if (CField::GetIndex(pos) == -1)return;
-
-	//CollisionField(pGame->GetField(CField::GetIndex(pos)));
+	CollisionField();
 }
 
 //=============================

@@ -50,6 +50,7 @@ CMagma* CGame::m_pMagma = NULL;		// マグマへのポインタ
 #define BLOCK_SETTINGPATH	("data\\SCRIPTS\\block_game.txt")	// ゲーム内でのブロック設置情報
 #define ITEM_SETTINGPATH	("data\\SCRIPTS\\item_game.txt")	// ゲーム内でのアイテム設置情報
 #define MESHSKIN_PATH		("data\\SCRIPTS\\meshskin_flat.txt")	// メッシュスキンの設置情報
+#define STAGE_PATH			("data\\SCRIPTS\\stage_game.txt")		// ステージ情報
 
 //=============================
 // コンストラクタ
@@ -84,7 +85,9 @@ HRESULT CGame::Init(void)
 	CManager::GetSound()->Play(CSound::BGM_GAME);
 
 	// フィールド生成
-	CField::Create(D3DXVECTOR3(0.0f, -150.0f, 0.0f), INIT_D3DVEC3, FIELD_WIDTH, 500.0f);
+	CField::SetStage(STAGE_PATH);
+
+	CField::Create(D3DXVECTOR3(0.0f, 0.0f, -30.0f),INIT_D3DVEC3, FIELD_SIZE, FIELD_SIZE);
 
 	// マグマ生成
 	if (m_pMagma != NULL) return E_FAIL;

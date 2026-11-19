@@ -130,5 +130,5 @@ void CMagma::Draw(void)
 	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
 
 	// •`‰æˆ—
-	CObjectField::Draw();
+	//CObjectField::Draw();
 }

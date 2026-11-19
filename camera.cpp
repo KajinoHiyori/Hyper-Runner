@@ -54,7 +54,7 @@ CCamera::CCamera()
 	m_posRDest = INIT_D3DVEC3;		// 目的の注視点
 	m_rotDest = INIT_D3DVEC3;		// 目的の向き
 	m_nCntCameraRoll = 0;			// カメラの回り込み間隔を設定
-	m_bCameraType = true;			// カメラの操作方法を管理[trueで追従カメラ、falseで操作カメラ]
+	m_bCameraType = false;			// カメラの操作方法を管理[trueで追従カメラ、falseで操作カメラ]
 }
 
 //=============================

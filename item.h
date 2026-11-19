@@ -13,6 +13,7 @@
 #include "main.h"
 #include "objectX.h"
 #include "loadscripts.h"
+#include "shadowST.h"
 
 //=============================
 // マクロ定義
@@ -76,15 +77,16 @@ public:
 	static void LoadInfo(void);
 	static void LoadSetting(const char* pFileName);
 	CPlayer* CollisionPlayer(void);
-	void Release(void) { CObjectX::Release();}
+	void Release(void) { CObjectX::Release(); if (m_pShadow != NULL) { m_pShadow->Release(); } }
 
 private:
 	void UpdateGame(void);
-	void CollisionField(CField* pMagma);
+	void CollisionField(void);
 	void CollisionMagma(CMagma* ｐMagma);
 	void CollisionBlock(void);
 	void Move(void);
 	static void Setter(D3DXVECTOR3 pos, int type);
+	CShadowST* m_pShadow;			// 影情報
 	TYPE m_type;					// 種類
 	D3DXVECTOR3	m_posOld;			// モデルの1フレーム前の位置
 	D3DXVECTOR3 m_posDest;			// 目的値

@@ -22,6 +22,7 @@
 #include "item.h"
 #include "item_speedup.h"
 #include "fileX.h"
+#include "shadowST.h"
 
 //=============================
 // 静的メンバ変数宣言
@@ -348,6 +349,9 @@ void CManager::Uninit(void)
 {
 	// オブジェクトの終了処理
 	CObject::ReleaseAll();
+
+	// ステンシルポリゴンの破棄
+	CShadowST::UninitPolygon();
 	
 	 // オフラインランキングデータの終了処理
 	SAFE_UNINIT(m_pRankingOffline);

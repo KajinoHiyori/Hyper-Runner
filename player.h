@@ -125,7 +125,7 @@ private:
 	void UpdateResult(void);
 	void Move(void);
 	void ChangeLine(int nChangeDir);
-	void CollisionField(CField* pField);
+	void CollisionField(void);
 	void CollisionMagma(CMagma* pMagma);
 	bool CollisionBlock(void);
 	void SpeedUp(void);

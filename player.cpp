@@ -40,9 +40,10 @@
 #define SPEED			(3.0f)	// 移動速度
 #define JUMP			(40.0f)	// ジャンプ
 #define CHANGE_X		(40.0f)	// X方向切り替え
-#define RADIUS			(45.0f)		// 半径
+#define RADIUS			(15.0f)		// 半径
 #define HEIGHT			(117.0f)	// 身長
 #define MARGINE			(0.1f)		// 余白
+#define SHADOW_POS		(D3DXVECTOR3(m_pos.x, m_pos.y + 10.0f, m_pos.z))	// 影の位置
 #define SLOWWALK_FRAME	(40)	// 遅く歩く際のフレーム数
 #define FASTWALK_FRAME	(30)	// 早く歩く際のフレーム数
 #define SLOWRUN_FRAME	(20)	// 遅く走る際のフレーム数
@@ -145,8 +146,8 @@ HRESULT CPlayer::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 	SpeedManager();
 
 	// ステンシルシャドウの生成
-	if (m_pShadow != NULL) return E_FAIL;
-	m_pShadowST = CShadowST::Create(m_pos, SHADOW_RADIUS);
+	if (m_pShadowST != NULL) return E_FAIL;
+	m_pShadowST = CShadowST::Create(SHADOW_POS, SHADOW_RADIUS);
 
 	return S_OK;
 }
@@ -223,7 +224,7 @@ void CPlayer::Update(void)
 	// 影の更新
 	if (m_pShadowST != NULL)
 	{
-		m_pShadowST->SetPosition(m_pos);
+		m_pShadowST->SetPosition(SHADOW_POS);
 	}
 
 	if (CManager::GetInputKeyboard()->GetTrigger(DIK_W) == true)
@@ -421,7 +422,7 @@ void CPlayer::UpdateGame(void)
 	Move();
 
 	// 地面との判定
-	//CollisionField(static_cast<CGame*>(CManager::GetScene())->GetField(m_nLine));
+	CollisionField();
 
 	// マグマとの判定
 	CollisionMagma(static_cast<CGame*>(CManager::GetScene())->GetMagma());
@@ -435,6 +436,8 @@ void CPlayer::UpdateResult(void)
 	
 }
 
+#define ENABLE_MOVE
+#undef	ENABLE_MOVE
 //=============================
 // 移動処理
 //=============================
@@ -445,7 +448,9 @@ void CPlayer::Move(void)
 	CInputJoypad* pJoypad = CManager::GetInputJoypad();
 	int nChangeDir = 0;	// 移動方向設定
 
-#if 0
+#ifndef ENABLE_MOVE
+
+
 	if ((pKeyboard->GetTrigger(DIK_D) == true
 		|| pKeyboard->GetTrigger(DIK_RIGHTARROW) == true
 		|| pJoypad->GetTrigger(CInputJoypad::JOYKEY_RIGHT) == true
@@ -490,39 +495,32 @@ void CPlayer::Move(void)
 		// 下半身でジャンプモーションを設定
 		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_JUMP, true, BLEND_FRAME);
 	}
-#endif
 
 	// 重力
 	m_move.y -= GRAVITY;
 
 	// 移動量更新
-	//m_pos += m_move;
+	m_pos += m_move;
 
-	float fMove = 0.5f;
+#else
+	float fMove = 1.0f;
 	if (pKeyboard->GetPress(DIK_W) == true)
-	{
-		m_pos.z -= fMove;
-	}
-	if (pKeyboard->GetPress(DIK_S) == true)
 	{
 		m_pos.z += fMove;
 	}
-	if (pKeyboard->GetPress(DIK_A) == true)
+	if (pKeyboard->GetPress(DIK_S) == true)
 	{
-		m_pos.x -= fMove;
+		m_pos.z -= fMove;
 	}
 	if (pKeyboard->GetPress(DIK_D) == true)
 	{
 		m_pos.x += fMove;
 	}
-	if (pKeyboard->GetPress(DIK_LSHIFT) == true)
+	if (pKeyboard->GetPress(DIK_A) == true)
 	{
-		m_pos.y -= fMove;
+		m_pos.x -= fMove;
 	}
-	if (pKeyboard->GetPress(DIK_RSHIFT) == true)
-	{
-		m_pos.y += fMove;
-	}
+#endif // !ENABLE_MOVE
 
 	// 移動量の更新
 	m_move.x += (0.0f - m_move.x) * CORRECTION_MOVE;
@@ -542,13 +540,49 @@ void CPlayer::ChangeLine(int nChangeDir)
 //=============================
 // フィールド判定処理
 //=============================
-void CPlayer::CollisionField(CField* pField)
+void CPlayer::CollisionField(void)
 {
-	if (CField::GetIndex(m_pos) == -1)
+	CField* pField = NULL;
+	bool bOnField = false;
+
+	for (int nCntPriority = 0; nCntPriority < MAX_PRIORITYS; nCntPriority++)
 	{
-		m_bJump = true;
-		return;
+		CObject* pObject = GetTop(nCntPriority);	// 先頭アドレスを取得
+
+		while (pObject != NULL)
+		{ // 次のオブジェクトがある限りループ
+			CObject* pObjectNext = pObject->GetNext();	// 次のオブジェクトへのポインタを設定
+			bool bOneCollision = false;
+
+			// オブジェクトとの当たり判定
+			if (pObject->GetType() != CObject::TYPE_FIELD)
+			{
+				pObject = pObjectNext;	// NULL判定を行う
+				continue;
+			}
+			// アイテムの場合
+			pField = static_cast<CField*>(pObject);
+
+			// 当たり判定処理を実行
+			if (pField->OnField(m_pos, RADIUS) == false)
+			{
+				pObject = pObjectNext;	// NULL判定を行う
+				pField = NULL;
+				continue;
+			}
+			else
+			{
+				bOnField = true;
+				break;
+			}
+			pObject = pObjectNext;	// NULL判定を行う
+		}
+
+		if (bOnField == true)break;
 	}
+
+	if (pField == NULL || bOnField == false) return;
+	CManager::GetDebugProc()->Print("pField->GetHeight() %f\n", pField->GetHeight(m_pos));
 
 	if (m_pos.y > pField->GetHeight(m_pos))return;
 	// 設置処理
@@ -559,6 +593,7 @@ void CPlayer::CollisionField(CField* pField)
 	// 設置時のモーション管理
 	SetMoveMotion();
 }
+
 #define PLAYER_HEIGHT	(120.0f)	// プレイヤーの身長
 //=============================
 // フィールド判定処理

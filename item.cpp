@@ -48,6 +48,7 @@
 #define STARCOLOR_CHANGE	(0.05f)	// 色変更
 #define DEFCOLOR			(2)			// デフォルト色の設定
 #define FRAME				(60)	// 移動フレーム
+#define SHADOW_POS			(D3DXVECTOR3(CObjectX::GetPosition().x, CObjectX::GetPosition().y + 5.0f, CObjectX::GetPosition().z))	// 影の位置
 #define ITEMSET				("ITEMSET")		// ITEMSET
 #define END_ITEMSET			("END_ITEMSET")	// END_ITEMSET
 #define ITEMINFO			("ITEMINFO")		// ITEMINFO
@@ -72,6 +73,7 @@ CItem::CItem(CObject::PRIORITY priority): CObjectX(priority)
 	m_state = STATE_NONE;		// ステート管理
 	m_nStateCounter = 0;		// ステート管理カウンター
 	m_fSize = 0.0f;				// サイズ
+	m_pShadow = NULL;			// 影
 	m_nNumAll++;
 }
 
@@ -122,6 +124,10 @@ HRESULT CItem::Init(D3DXVECTOR3 pos, TYPE type, const char* pFileName)
 	m_state = STATE_NONE;
 	m_move = APPEAR_JUMP;
 
+	// ステンシルシャドウの生成
+	if (m_pShadow != NULL) return E_FAIL;
+	m_pShadow = CShadowST::Create(SHADOW_POS, 20.0f);
+
 	return S_OK;
 }
 
@@ -135,6 +141,9 @@ void CItem::Uninit(void)
 
 	// Xオブジェクトの終了処理
 	CObjectX::Uninit();
+
+	// 影の破棄
+	m_pShadow = NULL;
 }
 
 //=============================
@@ -163,6 +172,10 @@ void CItem::Update(void)
 		
 		break;
 	}
+
+	if (m_pShadow == NULL) return;
+	// 影の位置更新
+	m_pShadow->SetPosition(SHADOW_POS);
 }
 
 //=============================
@@ -316,10 +329,7 @@ void CItem::UpdateGame(void)
 	Move();
 
 	// 地面との判定処理
-	if (CField::GetIndex(CObjectX::GetPosition()) != -1)
-	{
-		//CollisionField(pField);
-	}
+	CollisionField();
 
 	// ブロックとの判定処理
 	CollisionBlock();
@@ -328,30 +338,61 @@ void CItem::UpdateGame(void)
 	CollisionMagma(pGame->GetMagma());
 }
 
+#define RADIUS	(10.0f)	// 余白
 //=============================
 // フィールドとの判定
 //=============================
-void CItem::CollisionField(CField* pField)
+void CItem::CollisionField(void)
 {
+	CField* pField = NULL;
+	bool bOnField = false;
 	D3DXVECTOR3 pos = CObjectX::GetPosition();
-	float fHeight = pField->GetHeight(D3DXVECTOR3(pos.x, pos.y + CObjectX::GetVtxMin().y * CObjectX::GetScale().y, pos.z));
-	
-	if (pos.y + CObjectX::GetVtxMin().y * CObjectX::GetScale().y <= fHeight)
-	{ // 地面に埋まった場合
-		pos.y = fHeight - CObjectX::GetVtxMin().y * CObjectX::GetScale().y;
 
-		if (m_move.y >= -NOT_JUMP && m_move.y <= NOT_JUMP)
-		{
-			m_bJump = false;
-			m_move.y = 0.0f;
+	for (int nCntPriority = 0; nCntPriority < MAX_PRIORITYS; nCntPriority++)
+	{
+		CObject* pObject = GetTop(nCntPriority);	// 先頭アドレスを取得
+
+		while (pObject != NULL)
+		{ // 次のオブジェクトがある限りループ
+			CObject* pObjectNext = pObject->GetNext();	// 次のオブジェクトへのポインタを設定
+			bool bOneCollision = false;
+
+			// オブジェクトとの当たり判定
+			if (pObject->GetType() != CObject::TYPE_FIELD)
+			{
+				pObject = pObjectNext;	// NULL判定を行う
+				continue;
+			}
+			// アイテムの場合
+			pField = static_cast<CField*>(pObject);
+
+			// 当たり判定処理を実行
+			if (pField->OnField(pos, RADIUS) == false)
+			{
+				pObject = pObjectNext;	// NULL判定を行う
+				pField = NULL;
+				continue;
+			}
+			else
+			{
+				bOnField = true;
+				break;
+			}
+			pObject = pObjectNext;	// NULL判定を行う
 		}
-		else
-		{
-			m_move.y *= -1.0f;	// 地面に跳ね返る
-		}
+
+		if (bOnField == true)break;
 	}
 
-	// 位置更新
+	if (pField == NULL || bOnField == false) return;
+
+	if (pos.y + CObjectX::GetVtxMin().y > pField->GetHeight(pos))return;
+	// 設置処理
+	m_move.y = 0.0f;
+	m_bJump = false;
+	pos.y = pField->GetHeight(pos) + CObjectX::GetVtxMin().y;
+
+	// 設置
 	CObjectX::SetPosition(pos);
 }
 

@@ -47,7 +47,7 @@ public:
 	static void LoadSetting(const char* pFileName);
 
 private:
-	void CollisionField(CField* pField);
+	void CollisionField(void);
 	void CollisionMagma(CMagma* pMagma);
 	void UpdateGame(void);
 	static int m_nNumAll;	// ëçêî

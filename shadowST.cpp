@@ -127,14 +127,18 @@ void CShadowST::Draw(void)
 	// カラーバッファへの書き込みを無効化
 	pDevice->SetRenderState(D3DRS_COLORWRITEENABLE, 0x00000000);
 
+	//ステンシルテストの参照値を1にする
+	pDevice->SetRenderState(D3DRS_STENCILREF, 0x00);
+
 	// ステンシルバッファの比較パラメータを設定
-	pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_ALWAYS);
+	pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_EQUAL);
 	pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_KEEP);	// Zステンシルテストに合格&&Zテストに合格
 	pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_INCR);	// Zステンシルテストに合格&&Zテストに不合格
 	pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);	// ステンシルテストが不合格
 
 	// 表面をカリング
 	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
+	
 	// モデル描画
 	CObjectX::Draw();
 
@@ -146,25 +150,30 @@ void CShadowST::Draw(void)
 	pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_INCR);	// Zステンシルテストに合格&&Zテストに合格
 	pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP);	// Zステンシルテストに合格&&Zテストに不合格
 	pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);	// ステンシルテストが不合格
+
+	// 切り抜き
+	//pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_ZERO);	// Zステンシルテストに合格&&Zテストに不合格
+	//pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_ZERO);	// ステンシルテストが不合格
 	
 	// 裏面をカリング
 	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	// モデル描画
 	CObjectX::Draw();
 
-	// カラーバッファへの書き込みを有効化
-	pDevice->SetRenderState(D3DRS_COLORWRITEENABLE, 0x000000F);
-	// ステンシルバッファの参照値を2に設定
+	//ステンシルテストの参照値を2にする
 	pDevice->SetRenderState(D3DRS_STENCILREF, 0x02);
 
 	// ステンシルバッファの比較パラメータを設定
 	pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_EQUAL);
 	pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_KEEP);	// Zステンシルテストに合格&&Zテストに合格
-	pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP);	// Zステンシルテストに合格&&Zテストに不合格
+	pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_INCR);	// Zステンシルテストに合格&&Zテストに不合格
 	pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);	// ステンシルテストが不合格
-	
-	// ポリゴンの描画
-	m_pShadow->Draw();
+
+	// 表面をカリング
+	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
+
+	// モデル描画
+	CObjectX::Draw();
 
 	// ステンシルテストを無効にする
 	pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
@@ -172,6 +181,8 @@ void CShadowST::Draw(void)
 	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 	// カラーバッファへの書き込みを有効化
 	pDevice->SetRenderState(D3DRS_COLORWRITEENABLE, 0x0000000F);
+	// 裏面をカリング
+	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 }
 
 //=============================
@@ -187,5 +198,31 @@ void CShadowST::UninitPolygon(void)
 //=============================
 void CShadowST::DrawStencil(void)
 {
+	// デバイスの取得
+	LPDIRECT3DDEVICE9 pDevice = CManager::GetRenderer()->GetDevice();
 
+	// ステンシルテストを有効にする
+	pDevice->SetRenderState(D3DRS_STENCILENABLE, TRUE);
+	// Zバッファへの書き込みを無効化
+	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+	// カラーバッファへの書き込みを有効化
+	pDevice->SetRenderState(D3DRS_COLORWRITEENABLE, 0x000000F);
+	// ステンシルバッファの参照値を3に設定
+	pDevice->SetRenderState(D3DRS_STENCILREF, 0x03);
+
+	// ステンシルバッファの比較パラメータを設定
+	pDevice->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_EQUAL);
+	pDevice->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_KEEP);	// Zステンシルテストに合格&&Zテストに合格
+	pDevice->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP);	// Zステンシルテストに合格&&Zテストに不合格
+	pDevice->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);	// ステンシルテストが不合格
+
+	// ポリゴンの描画
+	m_pShadow->Draw();
+
+	// ステンシルテストを無効にする
+	pDevice->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+	// Zバッファへの書き込みを有効化
+	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+	// カラーバッファへの書き込みを有効化
+	pDevice->SetRenderState(D3DRS_COLORWRITEENABLE, 0x0000000F);
 }

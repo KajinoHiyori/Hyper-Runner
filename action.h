@@ -76,7 +76,7 @@ private:
 	void StateManager(CPlayer* pPlayer);
 	void UpdateStateNone(CPlayer* pPlayer);
 	void UpdateStatePlayer(CPlayer* pPlayer);
-	void CollisionField(CField* pField);
+	void CollisionField(void);
 	void CollisionMagma(CMagma* pMagma);
 	void CollisionBlock(void);
 	void Move(void);
