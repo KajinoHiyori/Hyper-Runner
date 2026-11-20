@@ -517,21 +517,21 @@ void CPlayer::Move(void)
 	// X方向管理
 	switch (m_nLine)
 	{
-	case 0:	// 左のラインに向かう
-		if (m_nLineOld == 1 && m_pos.x < -FIELD_POSX)
+	case LINE_LEFT:	// 左のラインに向かう
+		if (m_nLineOld == LINE_CENTER && m_pos.x < -FIELD_POSX)
 		{ // 位置補正
 			m_pos.x = -FIELD_POSX;
 			bFall = true;
 		}
 		break;
 
-	case 1:	// 中央のラインに向かう
-		if (m_nLineOld == 0 && m_pos.x > 0.0f)
+	case LINE_CENTER:	// 中央のラインに向かう
+		if (m_nLineOld == LINE_LEFT && m_pos.x > 0.0f)
 		{ // 位置補正
 			m_pos.x = 0.0f;
 			bFall = true;
 		}
-		else if (m_nLineOld == 2 && m_pos.x < 0.0f)
+		else if (m_nLineOld == LINE_RIGHT && m_pos.x < 0.0f)
 		{ // 位置補正
 			m_pos.x = 0.0f;
 			bFall = true;
@@ -539,7 +539,7 @@ void CPlayer::Move(void)
 		break;
 
 	case LINE_RIGHT:	// 右のラインに向かう
-		if (m_pos.x > FIELD_POSX)
+		if (m_nLineOld == LINE_CENTER && m_pos.x > FIELD_POSX)
 		{ // 位置補正
 			m_pos.x = FIELD_POSX;
 			bFall = true;
