@@ -192,7 +192,7 @@ void CField::Update(void)
 	}
 
 	// ƒJƒƒ‰ˆÊ’u‚É‰‚¶‚Äíœ
-	//DeleteLine();
+	DeleteLine();
 }
 
 //=============================

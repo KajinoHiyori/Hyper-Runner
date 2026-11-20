@@ -538,7 +538,7 @@ void CPlayer::Move(void)
 		}
 		break;
 
-	case 2:	// 右のラインに向かう
+	case LINE_RIGHT:	// 右のラインに向かう
 		if (m_pos.x > FIELD_POSX)
 		{ // 位置補正
 			m_pos.x = FIELD_POSX;
