@@ -39,7 +39,8 @@
 #define SHADOW_RADIUS	(2.0f)	// 影の拡大率
 #define SPEED			(3.0f)	// 移動速度
 #define JUMP			(40.0f)	// ジャンプ
-#define CHANGE_X		(40.0f)	// X方向切り替え
+//#define CHANGE_X		(40.0f)	// X方向切り替え
+#define CHANGE_X		(50.0f)	// X方向切り替え
 #define RADIUS			(15.0f)		// 半径
 #define HEIGHT			(117.0f)	// 身長
 #define MARGINE			(0.1f)		// 余白
@@ -49,6 +50,7 @@
 #define SLOWRUN_FRAME	(20)	// 遅く走る際のフレーム数
 #define FASTRUN_FRAME	(10)	// 早く走る際のフレーム数
 #define FASTEST_RUN		(5)		// 最速で走る際のフレーム数
+#define FIELD_POSX		(400.0f)	// 行動ラインを指定
 #define ENABLE_CHANGEFRAME	// フレーム切り替え
 //#undef	ENABLE_CHANGEFRAME	// ENABLE_CHANGEFRAMEの無効化
 // ファイルパス
@@ -190,6 +192,7 @@ void CPlayer::Update(void)
 
 	// 過去の位置を保存
 	m_posOld = m_pos;
+
 	m_bJumpOld = m_bJump;
 
 	// シーンごとに処理を分割
@@ -416,11 +419,16 @@ void CPlayer::UpdateTutorial(void)
 //=============================
 void CPlayer::UpdateGame(void)
 {
-	// ブロックとの判定
-	CollisionBlock();
-
 	// 移動処理
 	Move();
+
+#ifdef ENABLE_STAGESET
+	// ブロックを配置
+	SetBlock();
+#else
+	// ブロックとの判定
+	CollisionBlock();
+#endif // ENABLE_STAGESET
 
 	// 地面との判定
 	CollisionField();
@@ -448,7 +456,6 @@ void CPlayer::Move(void)
 	CInputKeyboard* pKeyboard = CManager::GetInputKeyboard();
 	CInputJoypad* pJoypad = CManager::GetInputJoypad();
 	int nChangeDir = 0;	// 移動方向設定
-
 #ifndef ENABLE_MOVE
 
 
@@ -464,6 +471,7 @@ void CPlayer::Move(void)
 		}
 		else
 		{
+			m_nLineOld = m_nLine;
 			m_nLine++;
 			nChangeDir = 1;
 		}
@@ -473,6 +481,7 @@ void CPlayer::Move(void)
 
 		// 下半身でジャンプモーションを設定
 		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_JUMP, true, BLEND_FRAME);
+
 	}
 	else if ((pKeyboard->GetTrigger(DIK_A) == true
 		|| pKeyboard->GetTrigger(DIK_LEFTARROW) == true
@@ -486,6 +495,7 @@ void CPlayer::Move(void)
 		}
 		else
 		{
+			m_nLineOld = m_nLine;
 			m_nLine--;
 			nChangeDir = -1;
 		}
@@ -502,6 +512,45 @@ void CPlayer::Move(void)
 
 	// 移動量更新
 	m_pos += m_move;
+
+	bool bFall = false;	// X方向の移動管理
+	// X方向管理
+	switch (m_nLine)
+	{
+	case 0:	// 左のラインに向かう
+		if (m_nLineOld == 1 && m_pos.x < -FIELD_POSX)
+		{ // 位置補正
+			m_pos.x = -FIELD_POSX;
+			bFall = true;
+		}
+		break;
+
+	case 1:	// 中央のラインに向かう
+		if (m_nLineOld == 0 && m_pos.x > 0.0f)
+		{ // 位置補正
+			m_pos.x = 0.0f;
+			bFall = true;
+		}
+		else if (m_nLineOld == 2 && m_pos.x < 0.0f)
+		{ // 位置補正
+			m_pos.x = 0.0f;
+			bFall = true;
+		}
+		break;
+
+	case 2:	// 右のラインに向かう
+		if (m_pos.x > FIELD_POSX)
+		{ // 位置補正
+			m_pos.x = FIELD_POSX;
+			bFall = true;
+		}
+		break;
+	}
+
+	if (m_apMotion[DIV_MOTION_UNDER]->GetBlendType() != MOTIONUNDER_FALLX && bFall == true && m_bJump == true)
+	{ // 落下モーションでない
+		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_FALLX, BLEND_FRAME, true);
+	}
 
 #else
 	float fMove = 1.0f;
@@ -582,11 +631,9 @@ void CPlayer::CollisionField(void)
 		if (bOnField == true)break;
 	}
 
-	if (bOnField == false) return;
-	float fHeight = pField->GetHeight(m_pos);
-	CManager::GetDebugProc()->Print("pField->GetHeight() %f\n", fHeight);
+	if (pField == NULL) return;
 
-	if (m_pos.y > fHeight)return;
+	if (m_pos.y > pField->GetHeight(m_pos) || m_pos.y <= -pField->GetHeight(m_pos)*2)return;
 	// 設置処理
 	m_move.y = 0.0f;
 	m_bJump = false;
@@ -644,9 +691,10 @@ bool CPlayer::CollisionBlock(void)
 			CBlock* pBlock = static_cast<CBlock*>(pObject);
 
 			// 当たり判定処理を実行
-			if (pBlock->Collision(&m_pos, m_posOld, m_fRadius, MARGINE))
+			D3DXVECTOR3 pos = m_pos;
+			if (pBlock->Collision(&pos, m_posOld, m_fRadius, MARGINE))
 			{
-				bool bHeight = pBlock->CollisionHeight(m_pos, m_posOld, 0.0f, MARGINE, false);
+				bool bHeight = pBlock->CollisionHeight(m_pos, m_posOld, HEIGHT, MARGINE, false);
 				if (bHeight == true)
 				{
 					m_pos.y = pBlock->GetPosition().y + pBlock->GetVtxMax().y;
@@ -658,6 +706,10 @@ bool CPlayer::CollisionBlock(void)
 				else
 				{
 					bColl = true;
+					if (m_pos.y <= pBlock->GetPosition().y + pBlock->GetVtxMax().y)
+					{
+						m_pos = pos;
+					}
 				}
 			}
 			
@@ -1167,4 +1219,24 @@ bool CPlayer::LoadMotion(int nNumModel, int nModelStart, const char* pFileName, 
 	SAFE_DELETE_SINGULAR(pLoadScripts);
 
 	return true;
+}
+
+//=============================
+// ブロック配置処理
+//=============================
+void CPlayer::SetBlock(void) 
+{
+	CInputKeyboard* pKeyboard = CManager::GetInputKeyboard();
+	if (pKeyboard->GetTrigger(DIK_Q) == true)
+	{ // ブロック0を配置
+		CBlock::Create(m_pos, INIT_D3DVEC3, 0);
+	}
+	else if (pKeyboard->GetTrigger(DIK_E) == true)
+	{ // ブロック1を配置
+		CBlock::Create(m_pos, INIT_D3DVEC3, 1);
+	}
+	else if (pKeyboard->GetTrigger(DIK_S) == true)
+	{ // 情報をセーブ
+		CBlock::SaveSetting();
+	}
 }

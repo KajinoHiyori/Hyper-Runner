@@ -142,7 +142,7 @@ HRESULT CGame::Init(void)
 	//CManager::GetPopcornManager()->Reset();
 
 	// ブロックを生成
-	//CBlock::LoadSetting(BLOCK_SETTINGPATH);
+	CBlock::LoadSetting(BLOCK_SETTINGPATH);
 
 	// アイテムを生成
 	//CItem::LoadSetting(ITEM_SETTINGPATH);

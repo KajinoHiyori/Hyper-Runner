@@ -42,9 +42,13 @@ public:
 	bool CollisionHeight(D3DXVECTOR3 pos, D3DXVECTOR3 posOld, float fHeight, float fMargin, bool bCollision);
 	bool SetCollision(D3DXVECTOR3* pPos, float fRadius);
 	float GetSize(void) { return m_fSize; }
+	int GetType(void) { return m_nType; }
+	D3DXVECTOR3 GetPosition(void) { return CObjectX::GetPosition(); }
+	D3DXVECTOR3 GetRotation(void) { return CObjectX::GetRotation(); }
 	static int GetNumAll(void) { return m_nNumAll; }
 	static void LoadInfo(void);
 	static void LoadSetting(const char* pFileName);
+	static void SaveSetting(void);
 
 private:
 	void CollisionField(void);

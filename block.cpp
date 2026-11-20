@@ -38,6 +38,7 @@
 #define TYPE				("TYPE")				// TYPE
 // ファイルパス
 #define BLOCKINFO_PATH		("data\\SCRIPTS\\block_info.txt")	// モデル名情報
+#define BLOCK_SETTINGPATH	("data\\SCRIPTS\\block_game.txt")	// ゲーム内でのブロック設置情報
 
 //=============================
 // 静的メンバ変数宣言
@@ -97,7 +98,7 @@ HRESULT CBlock::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int type)
 {
 	m_nType = type;
 	// モデルを用意
-	CObjectX::Init(pos, rot, m_apModelName[type]);
+	CObjectX::Init(pos, rot, m_apModelName[m_nType]);
 	// 種類設定
 	SetType(TYPE_BLOCK);
 	D3DXVECTOR3 vtxMin = CObjectX::GetVtxMin();	// 最小値
@@ -227,8 +228,7 @@ bool CBlock::Collision(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld, float fRadius, flo
 		&& (CrossCollisionLeft(posLocal, posRightFront, vecLineRFLF) == true)	// 右手前基準
 		&& (CrossCollisionLeft(posLocal, posLeftFront, vecLineLFLB) == true)	// 左手前基準
 		&& (CrossCollisionLeft(posLocal, posRightBack, vecLineRBRF) == true))	// 右奥基準
-	{ // オブジェクトにめり込んでいる
-		// どこから侵入したかの判定
+	{ // どこから侵入したかの判定
 		if (CrossCollisionLeft(posOld, posLeftBack, vecLineLBRB) == false)
 		{ // 左奥から侵入
 			vecToPos = posLocal - posLeftBack;	// 対象ベクトル
@@ -308,9 +308,11 @@ bool CBlock::CollisionHeight(D3DXVECTOR3 pos, D3DXVECTOR3 posOld, float fHeight,
 {
 	D3DXVECTOR3 posBlock = CObjectX::GetPosition();
 	D3DXVECTOR3 vtxMax = CObjectX::GetVtxMax(); 
+	D3DXVECTOR3 vtxMin = CObjectX::GetVtxMin(); 
 	if (posOld.y < pos.y || pos.y <= posBlock.y)return false;
 	
-	if (pos.y < posBlock.y + vtxMax.y)
+	// 上端より下 && 上端より上に頭が出ている
+	if (posBlock.y + vtxMax.y >= pos.y && posBlock.y + vtxMax.y < pos.y + fHeight)
 	{
 		return true;
 	}
@@ -616,7 +618,7 @@ void CBlock::LoadSetting(const char* pFileName)
 					CBlock::Create(pos, rot, nType);
 				}
 				if (strstr(&aStringCopy[0], END_BLOCKSET) != NULL)
-				{ // END_PLAYERSETを読み込んだ
+				{ // END_BLOCKSETを読み込んだ
 					bLoadEnd = true;
 					break;
 				}
@@ -629,4 +631,49 @@ void CBlock::LoadSetting(const char* pFileName)
 
 	// スクリプト破棄
 	SAFE_DELETE_SINGULAR(pLoadScripts);
+}
+
+//=============================
+// ブロック配置情報書き出し
+//=============================
+void CBlock::SaveSetting(void)
+{
+	FILE* pFile = fopen(BLOCK_SETTINGPATH, "w");
+	if (pFile == NULL) return;
+
+	// ヘッダを書き込み
+	fprintf(pFile, "#===============================================\n");
+	fprintf(pFile, "# ゲーム内ブロックの配置情報 block_game.txt\n");
+	fprintf(pFile, "#===============================================\n");
+	fprintf(pFile, "BLOCKSET\n");
+
+	for (int nCntPriority = 0; nCntPriority < MAX_PRIORITYS; nCntPriority++)
+	{
+		CObject* pObject = GetTop(nCntPriority);	// 先頭アドレスを取得
+
+		while (pObject != NULL)
+		{ // 次のオブジェクトがある限りループ
+			CObject* pObjectNext = pObject->GetNext();	// 次のオブジェクトへのポインタを設定
+			bool bOneCollision = false;
+
+			// オブジェクトとの当たり判定
+			if (pObject->GetType() != CObject::TYPE_BLOCK)
+			{
+				pObject = pObjectNext;	// NULL判定を行う
+				continue;
+			}
+			// ブロックの場合
+			CBlock* pBlock = static_cast<CBlock*>(pObject);
+			int nType = pBlock->GetType();
+			D3DXVECTOR3 pos = pBlock->GetPosition();
+			D3DXVECTOR3 rot = pBlock->GetRotation();
+			fprintf(pFile, "\n\tTYPE = %d\n", nType);
+			fprintf(pFile, "\tPOS = %.2f %.2f %.2f\n", pos.x, pos.y, pos.z);
+			fprintf(pFile, "\tROT = %.2f %.2f %.2f\n", rot.x, rot.y, rot.z);
+			
+			pObject = pObjectNext;	// NULL判定を行う
+		}
+	}
+	fprintf(pFile, "END_BLOCKSET\n");
+	fclose(pFile);
 }

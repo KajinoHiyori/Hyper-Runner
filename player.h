@@ -67,6 +67,7 @@ public:
 		MOTIONUNDER_WALK = 0,		// 歩き
 		MOTIONUNDER_RUN,			// 走る
 		MOTIONUNDER_JUMP,			// ジャンプ
+		MOTIONUNDER_FALLX,			// X方向管理落下
 		MOTIONUNDER_MAX
 	}MOTIONUNDER;
 
@@ -138,6 +139,7 @@ private:
 	bool LoadModelSetting(void);
 	bool LoadMotion(void);
 	bool LoadMotion(int nNumModel, int nModelStart, const char* pFileName, DIV_MOTION div, int nNumMotion);
+	void SetBlock(void);
 	D3DXVECTOR3	m_pos;		// モデルの位置
 	D3DXVECTOR3	m_posOld;	// モデルの1フレーム前の位置
 	D3DXVECTOR3	m_move;		// モデルの移動量
@@ -156,6 +158,7 @@ private:
 	bool m_bJumpOld;	// ジャンプ
 	float m_fRadius;	// 当たり判定半径
 	int m_nLine;	// 移動しているラインを取得
+	int m_nLineOld;	// 移動しているラインを取得
 };
 
 #endif

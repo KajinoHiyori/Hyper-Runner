@@ -17,8 +17,8 @@
 //=============================
 // マクロ定義
 //=============================
-#define MAX_GAMEWALL	(128)	// 壁の最大数
-#define MAX_FIELDLINE	(3)		// 移動レーン数
+#define ENABLE_STAGESET	// ステージ配置情報
+#undef	ENABLE_STAGESET	// ENABLE_STAGESETの無効化
 
 //=============================
 // 前方宣言
