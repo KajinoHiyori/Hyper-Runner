@@ -71,7 +71,10 @@ CPlayer::CPlayer(CObject::PRIORITY priority) : CObject(priority)
 	m_rotDest = INIT_D3DVEC3;	// モデルの目的の向き
 	memset(&m_apModel[0], NULL, sizeof m_apModel);	// モデルのポインタ
 	m_nNumModel = 0;			// モデル総数
-	m_apMotion[DIV_MOTION_MAX] = {};			// モーション情報
+	for (int nCntDiv = 0; nCntDiv < DIV_MOTION_MAX; nCntDiv++)
+	{
+		m_apMotion[nCntDiv] = NULL;			// モーション情報
+	}
 	m_pShadow = NULL;			// 影情報
 	m_pShadowST = NULL;		// 影情報
 	for (int nCntModel = 0; nCntModel < MODEL_MAX; nCntModel++)

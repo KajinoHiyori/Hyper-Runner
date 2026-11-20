@@ -71,6 +71,7 @@ CField::CField(CObject::PRIORITY priority) : CObject(priority)
 	{
 		m_apLid[nCntLib] = NULL;	// ã‰º–Ê
 	}
+	m_warning = WARNING_ADD;
 	m_nNumAll++;
 }
 
@@ -191,8 +192,10 @@ void CField::Update(void)
 		break;
 	}
 
+#ifndef ENABLE_STAGESET
 	// ƒJƒƒ‰ˆÊ’u‚É‰‚¶‚Äíœ
 	DeleteLine();
+#endif // !ENABLE_STAGESET
 }
 
 //=============================

@@ -30,12 +30,14 @@
 #define PARTICLE_LIFE		(20)	// パーティクル寿命
 #define EXPLOSION_DAMAGE	(360)	// 爆発によるダメージ
 #define NOT_JUMP			(0.1f)	// ジャンプ停止
+#define RADIUS				(20.0f)	// 余白
 #define BLOCKINFO			("BLOCKINFO")		// BLOCKINFO
 #define END_BLOCKINFO		("END_BLOCKINFO")	// END_BLOCKINFO
 #define NUMBLOCK			("NUMBLOCK")		// NUMBLOCK
-#define BLOCKSET			("BLOCKSET")	// BLOCKSET
+#define BLOCKSET			("BLOCKSET")		// BLOCKSET
 #define END_BLOCKSET		("END_BLOCKSET")	// END_BLOCKSET
-#define TYPE				("TYPE")				// TYPE
+#define TYPE				("TYPE")			// TYPE
+#define GRAVITY_FOR_SQRIPTS	("GRAVITY")			// 重力
 // ファイルパス
 #define BLOCKINFO_PATH		("data\\SCRIPTS\\block_info.txt")	// モデル名情報
 #define BLOCK_SETTINGPATH	("data\\SCRIPTS\\block_game.txt")	// ゲーム内でのブロック設置情報
@@ -59,6 +61,7 @@ CBlock::CBlock(CObject::PRIORITY priority) : CObjectX(priority)
 	m_fDepth = 0.0f;	// 奥行き
 	m_nType = 0;		// 種類
 	m_fSize = 0.0f;		// サイズ
+	m_bGravity = false;	// 重力
 	m_nNumAll++;
 }
 
@@ -73,7 +76,7 @@ CBlock::~CBlock()
 //=============================
 // アイテム生成処理
 //=============================
-CBlock* CBlock::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int type)
+CBlock* CBlock::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int type, bool bGravity)
 {
 	CBlock* pBlock = NULL;	// オブジェクトへのポインタを用意
 	if (pBlock == NULL)
@@ -82,7 +85,7 @@ CBlock* CBlock::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int type)
 		if (pBlock != NULL)
 		{ // インスタンス生成に成功した場合
 			// 初期化処理
-			pBlock->Init(pos, rot, type);
+			pBlock->Init(pos, rot, type, bGravity);
 
 			return pBlock;
 		}
@@ -94,7 +97,7 @@ CBlock* CBlock::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int type)
 //=============================
 // 初期化処理
 //=============================
-HRESULT CBlock::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int type)
+HRESULT CBlock::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int type, bool bGravity)
 {
 	m_nType = type;
 	// モデルを用意
@@ -108,6 +111,7 @@ HRESULT CBlock::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int type)
 	m_fSize = m_fWidth;
 	m_fLength = sqrtf(m_fWidth * m_fWidth + m_fDepth * m_fDepth) * 0.5f;	// 対角線の長さ
 	m_fAngle = atan2f(m_fWidth, m_fDepth);				// 対角線の長さ
+	m_bGravity = bGravity;	// 重力
 	return S_OK;
 }
 
@@ -372,7 +376,6 @@ bool CBlock::SetCollision(D3DXVECTOR3* pPos, float fRadius)
 	return false;
 }
 
-#define RADIUS	(20.0f)	// 余白
 //=============================
 // 地面との判定処理処理
 //=============================
@@ -401,7 +404,7 @@ void CBlock::CollisionField(void)
 			pField = static_cast<CField*>(pObject);
 
 			// 当たり判定処理を実行
-			if (pField->OnField(pos, RADIUS) == false)
+			if (pField->OnField(pos, RADIUS) == false || pField->GetIndex() == -1)
 			{
 				pObject = pObjectNext;	// NULL判定を行う
 				pField = NULL;
@@ -458,7 +461,10 @@ void CBlock::UpdateGame(void)
 	CDebugProc* pDebug = CManager::GetDebugProc();
 
 	// 重力
-	m_move.y -= GRAVITY;
+	if (m_bGravity == true)
+	{
+		m_move.y -= GRAVITY;
+	}
 
 	// 位置更新
 	pos += m_move;
@@ -574,6 +580,7 @@ void CBlock::LoadSetting(const char* pFileName)
 	D3DXVECTOR3 pos;	// 位置
 	D3DXVECTOR3 rot;	// 向き
 	int nType = 0;	// 種類
+	bool bGravity = true;	// 重力
 
 	// ファイルを開く
 	FILE* pFile = fopen(pFileName, "r");
@@ -608,6 +615,18 @@ void CBlock::LoadSetting(const char* pFileName)
 				{ // TYPEを読み込んだ
 					nType = pLoadScripts->LoadInt(&aStringCopy[0]);
 				}
+				if (strstr(&aStringCopy[0], GRAVITY_FOR_SQRIPTS) != NULL)
+				{ // GRAVITYを読み込んだ
+					int nGravity = pLoadScripts->LoadInt(&aStringCopy[0]);
+					if (nGravity == 0)
+					{
+						bGravity == false;
+					}
+					else
+					{
+						bGravity = true;
+					}
+				}
 				if (strstr(&aStringCopy[0], POS) != NULL)
 				{ // POSを読み込んだ
 					pos = pLoadScripts->LoadVector3(&aStringCopy[0]);
@@ -615,7 +634,7 @@ void CBlock::LoadSetting(const char* pFileName)
 				if (strstr(&aStringCopy[0], ROT) != NULL)
 				{ // ROTを読み込んだ
 					rot = pLoadScripts->LoadVector3(&aStringCopy[0]);
-					CBlock::Create(pos, rot, nType);
+					CBlock::Create(pos, rot, nType, bGravity);
 				}
 				if (strstr(&aStringCopy[0], END_BLOCKSET) != NULL)
 				{ // END_BLOCKSETを読み込んだ
@@ -667,7 +686,9 @@ void CBlock::SaveSetting(void)
 			int nType = pBlock->GetType();
 			D3DXVECTOR3 pos = pBlock->GetPosition();
 			D3DXVECTOR3 rot = pBlock->GetRotation();
+			bool bGravity = pBlock->GetGravity();
 			fprintf(pFile, "\n\tTYPE = %d\n", nType);
+			fprintf(pFile, "\tGRAVITY = %d\n", bGravity);
 			fprintf(pFile, "\tPOS = %.2f %.2f %.2f\n", pos.x, pos.y, pos.z);
 			fprintf(pFile, "\tROT = %.2f %.2f %.2f\n", rot.x, rot.y, rot.z);
 			

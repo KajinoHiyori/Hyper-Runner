@@ -30,11 +30,11 @@ class CMagma;	// マグマクラス
 class CBlock : public CObjectX
 {
 public:
-	static CBlock* Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int type);
+	static CBlock* Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int type, bool bGravity = true);
 	CBlock(CObject::PRIORITY priority = CObject::PRIORITY_EVENTS);
 	~CBlock();
 	HRESULT Init(void) { return S_OK; }
-	HRESULT Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int type);
+	HRESULT Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot, int type, bool bGravity);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
@@ -43,6 +43,7 @@ public:
 	bool SetCollision(D3DXVECTOR3* pPos, float fRadius);
 	float GetSize(void) { return m_fSize; }
 	int GetType(void) { return m_nType; }
+	bool GetGravity(void) { return m_bGravity; }
 	D3DXVECTOR3 GetPosition(void) { return CObjectX::GetPosition(); }
 	D3DXVECTOR3 GetRotation(void) { return CObjectX::GetRotation(); }
 	static int GetNumAll(void) { return m_nNumAll; }
@@ -63,6 +64,7 @@ private:
 	float m_fAngle;		// 対角線の角度
 	float m_fSize;		// 当たり判定サイズ
 	D3DXVECTOR3 m_scl;	// 拡大率
+	bool m_bGravity;	// 重力
 	static char m_apModelName[MAX_BLOCK][MAX_STRING];	// モデル名
 };
 
