@@ -60,7 +60,7 @@
 #define CAMERATYPE_ORTHO				// 平衡投影
 #undef	CAMERATYPE_ORTHO				// 平衡投影定義の無効化
 #define FOV_DEFAULT						(45.0f)	// 基本の視野角
-#define CAMERA_CLOSEST					(150.0f)		// カメラとの距離がこれ以上近い場合、描画を行わない
+#define CAMERA_CLOSEST					(350.0f)		// カメラとの距離がこれ以上近い場合、描画を行わない
 #define CAMERA_FARTHEST					(10000.0f)	// カメラとの距離がこれ以上遠い場合、描画を行わない
 #define CORRECTION_MOVE					(0.1f)	// 移動の減衰係数
 #define GRAVITY							(1.0f)			// 重力
