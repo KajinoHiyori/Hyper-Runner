@@ -153,6 +153,8 @@ HRESULT CRenderer::Init(const HWND hWnd, const BOOL bWindow)
 
 		m_pD3DDevice->SetRenderTarget(0, pRenderDef);	// レンダリングターゲットを元に戻す
 		m_pD3DDevice->SetDepthStencilSurface(pZBuffDef);	// Zバッファを元に戻す
+		SAFE_RELEASE(pRenderDef);
+		SAFE_RELEASE(pZBuffDef);
 	}
 
 	// テクスチャレンダリング用ビューポートの設定
@@ -281,8 +283,10 @@ void CRenderer::Update(void)
 		break;
 	}
 
+#ifdef ENABLE_MULTITARGETRENDERING
 	// 頂点情報更新
 	SetVtxPos();
+#endif
 
 	CManager::GetDebugProc()->Print("m_fShake = %f\n", m_fShake);
 	CManager::GetDebugProc()->Print("m_fShakehorizontal = %f\n", m_fShakehorizontal);
@@ -361,6 +365,10 @@ void CRenderer::Draw(void)
 		m_pD3DDevice->SetTransform(D3DTS_VIEW, &mtxView);	// ビューマトリックス
 		m_pD3DDevice->SetTransform(D3DTS_PROJECTION, &mtxProjectionDef);	// プロジェクションマトリックス
 
+		// 取得したCOMインターフェースを解放
+		SAFE_RELEASE(pRenderDef);
+		SAFE_RELEASE(pZBuffDef);
+
 		// フィードバック用ポリゴンにテクスチャ0を貼り付ける
 		DrawCurrentImages();
 
@@ -385,7 +393,7 @@ void CRenderer::Draw(void)
 	}
 
 	// バックバッファとフロントバッファの入れ替え
-	m_pD3DDevice->Present(NULL, NULL, NULL, NULL);
+	HRESULT hr = m_pD3DDevice->Present(NULL, NULL, NULL, NULL);
 }
 
 //========================================================================
