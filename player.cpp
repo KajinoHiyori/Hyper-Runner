@@ -494,10 +494,6 @@ void CPlayer::Move(void)
 		
 		// 列切り替え処理
 		ChangeLine(nChangeDir);
-
-		// 下半身でジャンプモーションを設定
-		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_JUMP, true, BLEND_FRAME);
-
 	}
 	else if ((pKeyboard->GetTrigger(DIK_A) == true
 		|| pKeyboard->GetTrigger(DIK_LEFTARROW) == true
@@ -518,9 +514,6 @@ void CPlayer::Move(void)
 		
 		// 列切り替え処理
 		ChangeLine(nChangeDir);
-
-		// 下半身でジャンプモーションを設定
-		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_JUMP, true, BLEND_FRAME);
 	}
 
 	// 重力
@@ -612,6 +605,9 @@ void CPlayer::ChangeLine(int nChangeDir)
 	m_move.x = CHANGE_X * nChangeDir;
 	m_move.y = JUMP;
 	m_bJump = true;
+
+	// 下半身でジャンプモーションを設定
+	m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_JUMP, true, BLEND_FRAME);
 }
 
 //=============================
@@ -704,6 +700,10 @@ bool CPlayer::CollisionBlock(void)
 {
 	bool bColl = false;
 	bool bHeight = false;
+	float fHeight = 0.0f;
+	bool bHead = false;
+	float fHead = 0.0f;
+
 	for (int nCntPriority = 0; nCntPriority < MAX_PRIORITYS; nCntPriority++)
 	{
 		CObject* pObject = GetTop(nCntPriority);	// 先頭アドレスを取得
@@ -730,7 +730,7 @@ bool CPlayer::CollisionBlock(void)
 				
 				if (bHeight == true && pBlock->CollisionHeight(D3DXVECTOR3(m_pos.x, m_pos.y + FOOT_HEIGHT, m_pos.z), D3DXVECTOR3(m_posOld.x, m_posOld.y + FOOT_HEIGHT, m_posOld.z), HEIGHT, MARGINE, false) == false)
 				{ // ブロックに乗り上げる
-					m_pos.y = pBlock->GetPosition().y + pBlock->GetVtxMax().y;
+					fHeight = pBlock->GetPosition().y + pBlock->GetVtxMax().y;
 					if (pBlock->GetType() == BLOCKIDX_BOUND)
 					{ // バウンドブロック
 						m_move.y = BOUND_HEIGHT;
@@ -743,12 +743,6 @@ bool CPlayer::CollisionBlock(void)
 						pBlock->SetBreak();
 						m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_JUMP, true, BLEND_FRAME);
 					}
-					else
-					{
-						m_bJump = false;
-						// 設置時のモーション管理
-						SetMoveMotion();
-					}
 					bHeight = true;
 				}
 				else if (m_pos.y + HEIGHT >= pBlock->GetPosition().y + pBlock->GetVtxMin().y && m_pos.y + FOOT_HEIGHT < pBlock->GetPosition().y + pBlock->GetVtxMin().y && m_pos.y >= m_posOld.y)
@@ -757,7 +751,7 @@ bool CPlayer::CollisionBlock(void)
 					{
 						m_move.y = -BOUND_HEIGHT;
 					}
-					m_pos.y = pBlock->GetPosition().y + pBlock->GetVtxMin().y - HEIGHT;
+					fHead= pBlock->GetPosition().y + pBlock->GetVtxMin().y - HEIGHT;
 				}
 				else if (m_pos.y + HEIGHT <= pBlock->GetPosition().y + pBlock->GetVtxMin().y || bHeight == false && m_pos.y >= pBlock->GetPosition().y + pBlock->GetVtxMax().y)
 				{ // ブロックに潜り込む || ブロックの上端より上にいる
@@ -783,6 +777,21 @@ bool CPlayer::CollisionBlock(void)
 			pObject = pObjectNext;	// NULL判定を行う
 		}
 	}
+
+	// 座標を更新
+	if (bHeight == true)
+	{ // ブロック状にいる
+		m_pos.y = fHeight;
+		m_bJump = false;
+		m_bOnBlock = true;
+		// 設置時のモーション管理
+		SetBlockMotion();
+	}
+	else if (bHead == true)
+	{ // ブロックに頭をぶつける
+		m_pos.y = fHead;
+	}
+
 
 #ifdef ENABLE_KNOCKBACK
 	if (m_bKockback == true) return false;
@@ -913,13 +922,31 @@ void CPlayer::SetMoveMotion(void)
 }
 
 //=============================
-// 接地へののモーション管理
+// 接地へのモーション管理
 //=============================
 void CPlayer::SetLandMotion(void)
 {
 	if (m_bOnBlock == false && m_bOnBlockOld == true && m_apMotion[DIV_MOTION_UNDER]->GetBlendType() != MOTIONUNDER_JUMP)
 	{
 		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_FALLX, true, BLEND_FRAME);
+	}
+}
+
+//=============================
+// ブロック接地へのモーション管理
+//=============================
+void CPlayer::SetBlockMotion(void)
+{
+	if (m_bOnBlock == true && m_bOnBlockOld == false)
+	{ // 移動モーションに戻す
+		if (m_speed >= SPEED_SLOWRUN)
+		{
+			m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_RUN, true, BLEND_FRAME);
+		}
+		else
+		{
+			m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_WALK, true, BLEND_FRAME);
+		}
 	}
 }
 

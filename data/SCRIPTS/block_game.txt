@@ -55,14 +55,9 @@ BLOCKSET
 
 #AREA2
 #[右]シンプルなジャンプで空中Aへ
-	TYPE = 0
+	TYPE = 5
 	GRAVITY = 1
-	POS = 400.0 100.0 -8000.0
-	ROT = 0.0 0.0 0.0
-
-	TYPE = 0
-	GRAVITY = 1
-	POS = 400.0 100.0 -7800.0
+	POS = 400.0 100.0 -7900.0
 	ROT = 0.0 0.0 0.0
 
 	TYPE = 0

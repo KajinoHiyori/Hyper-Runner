@@ -134,6 +134,7 @@ private:
 	void SpeedDown(void);
 	void SpeedManager(void);
 	void SetMoveMotion(void);
+	void SetBlockMotion(void);
 	void SetLandMotion(void);
 	HRESULT LoadScripts(void);
 	bool LoadCharactor(void);
