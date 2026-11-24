@@ -97,8 +97,6 @@ void CBox::Update(void)
 
 	// ƒAƒNƒVƒ‡ƒ“ˆ—
 	UpdateAction();
-
-	CManager::GetDebugProc()->Print("BoxPos %f %f %f\n", GetPosition().x, GetPosition().y, GetPosition().z);
 }
 
 //=============================

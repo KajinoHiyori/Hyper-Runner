@@ -173,7 +173,6 @@ void COrbit3D::Update(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 
 	CDebugProc* pDebug = CManager::GetDebugProc();
 	int nSize = sizeof(m_pVtxBuff);
-	pDebug->Print("メッシュオービットのサイズ : %d\n", nSize);
 }
 
 //=============================

@@ -720,6 +720,7 @@ bool CPlayer::CollisionBlock(void)
 			if (pBlock->Collision(&pos, m_posOld, m_fRadius, MARGINE))
 			{
 				bool bHeight = pBlock->CollisionHeight(m_pos, m_posOld, HEIGHT, MARGINE, false);
+				
 				if (bHeight == true && pBlock->CollisionHeight(D3DXVECTOR3(m_pos.x, m_pos.y + FOOT_HEIGHT, m_pos.z), D3DXVECTOR3(m_posOld.x, m_posOld.y + FOOT_HEIGHT, m_posOld.z), HEIGHT, MARGINE, false) == false)
 				{ // ブロックに乗り上げる
 					m_pos.y = pBlock->GetPosition().y + pBlock->GetVtxMax().y;
@@ -734,6 +735,14 @@ bool CPlayer::CollisionBlock(void)
 						SetMoveMotion();
 					}
 					bHeight = true;
+				}
+				else if (m_pos.y + HEIGHT >= pBlock->GetPosition().y + pBlock->GetVtxMin().y && m_pos.y + FOOT_HEIGHT < pBlock->GetPosition().y + pBlock->GetVtxMin().y && m_pos.y >= m_posOld.y)
+				{ // ブロックの下端に頭をぶつける
+					if (pBlock->GetType() == BLOCKIDX_BOUND)
+					{
+						m_move.y = -BOUND_HEIGHT;
+					}
+					m_pos.y = pBlock->GetPosition().y + pBlock->GetVtxMin().y - HEIGHT;
 				}
 				else if (m_pos.y + HEIGHT <= pBlock->GetPosition().y + pBlock->GetVtxMin().y || bHeight == false && m_pos.y >= pBlock->GetPosition().y + pBlock->GetVtxMax().y)
 				{ // ブロックに潜り込む || ブロックの上端より上にいる

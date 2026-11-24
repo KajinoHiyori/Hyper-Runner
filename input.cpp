@@ -505,18 +505,8 @@ void CInputMouse::Update(void)
 	}
 	else
 	{
-		pDebugProc->Print("\nマウスのアクセスを喪失\n");
 		m_pDevice->Acquire();	// アクセス権取得
 	}
-
-	// マウスの位置
-	POINT mouse = { 0 };
-	GetCursorPos(&mouse);
-	pDebugProc->Print("スクリーン全体でのマウス座標 : %d, %d\n", mouse.x, mouse.y);
-
-	// クライアント領域でのマウス位置
-	D3DXVECTOR3 pos = GetClientPos();
-	pDebugProc->Print("クライアント領域でのマウス座標 : %.2f, %.2f\n", pos.x, pos.y);
 }
 
 //===============================

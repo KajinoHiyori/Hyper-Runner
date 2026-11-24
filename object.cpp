@@ -113,7 +113,6 @@ void CObject::ReleaseAll(void)
 	if (m_nNumAll != 0)
 	{// ”jŠü‚ÉŽ¸”s
 		CDebugProc* pDebug = CManager::GetDebugProc();
-		pDebug->Print("ERROR!!\n");
 	}
 }
 

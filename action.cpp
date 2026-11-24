@@ -483,8 +483,6 @@ void CAction::Move(void)
 	m_move.x += (0.0f - m_move.x) * CORRECTION_MOVE;
 	m_move.y += (0.0f - m_move.y) * CORRECTION_MOVE;
 	m_move.z += (0.0f - m_move.z) * CORRECTION_MOVE;
-
-	CManager::GetDebugProc()->Print("Boxmove %f %f %f\n", m_move.x, m_move.y, m_move.z);
 }
 
 //=============================

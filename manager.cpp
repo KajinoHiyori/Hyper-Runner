@@ -421,7 +421,6 @@ void CManager::Update(void)
 
 	// デバック表示
 	m_pDebugProc->Print("オブジェクト数 : %d\n", CObject::GetNumAll());
-	m_pDebugProc->Print("アイテム数 : %d [加速 %d]\n", CItem::GetNumAll(), CSpeedUP::GetNumAll());
 
 	// レンダラー更新処理
 	m_pRenderer->Update();

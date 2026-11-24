@@ -412,7 +412,6 @@ void CMeshField::SetVtxBuff(void)
 
 	// 目的値に向けて頂点情報を更新
 	float fRate = (float)m_nCntFrame / (float)FRAME;
-	CManager::GetDebugProc()->Print("m_nCntFrame %d : fRate %f\n", m_nCntFrame,  fRate);
 
 	for (int nCntVtx = 0; nCntVtx < m_nNumVertex; nCntVtx++)
 	{
