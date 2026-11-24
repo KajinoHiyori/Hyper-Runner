@@ -474,7 +474,18 @@ void CBlock::UpdateScale(void)
 	float fDiffY = 0.0f;
 	switch (m_nType)
 	{
-	case BLOCKIDX_BOUND:	// バウンドブロック
+	case BLOCKIDX_BREAK:	// 破壊可能
+		fDiffY = -1.0f;
+		scl.y = 1.0f + fDiffY * fRate;
+		if (m_fScaleCounter >= SCALE_CHANGER)
+		{
+			m_fScaleCounter = 0.0f;
+			scl = INIT_SCALE;
+			Release();	// 潰れて破棄
+		}
+		break;
+
+	default:	// バウンド処理
 		fDiffX = 1.0f - BOUNDSIZE_XZ;
 		fDiffY = 1.0f - BOUNDSIZE_Y;
 		scl.x = BOUNDSIZE_XZ + fDiffX * fRate;
@@ -485,17 +496,6 @@ void CBlock::UpdateScale(void)
 			scl = INIT_SCALE;
 			m_fScaleCounter = 0.0f;
 			m_bScaing = false;
-		}
-		break;
-
-	case BLOCKIDX_BREAK:	// 破壊可能
-		fDiffY = -1.0f;
-		scl.y = 1.0f + fDiffY * fRate;
-		if (m_fScaleCounter >= SCALE_CHANGER)
-		{
-			m_fScaleCounter = 0.0f;
-			scl = INIT_SCALE;
-			Release();	// 潰れて破棄
 		}
 		break;
 	}

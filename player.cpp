@@ -265,6 +265,7 @@ void CPlayer::Update(void)
 	pDebugProc->Print("Player存在ライン : %d\n", m_nLine);
 	pDebugProc->Print("Player速度 : %f\n", m_fSpeed);
 	pDebugProc->Print("Playerブロック状態 : %d\n", m_bOnBlock);
+	pDebugProc->Print("Playerジャンプ状態 : %d\n", m_bJump);
 }
 
 //=============================
@@ -721,7 +722,10 @@ bool CPlayer::CollisionBlock(void)
 			}
 			// アイテムの場合
 			CBlock* pBlock = static_cast<CBlock*>(pObject);
-
+			D3DXVECTOR3 posBlock = pBlock->GetPosition();
+			D3DXVECTOR3 vtxMax = pBlock->GetVtxMax();
+			D3DXVECTOR3 vtxMin = pBlock->GetVtxMin();
+			int nType = pBlock->GetType();
 			// 当たり判定処理を実行
 			D3DXVECTOR3 pos = m_pos;
 			if (pBlock->Collision(&pos, m_posOld, m_fRadius, MARGINE))
@@ -730,30 +734,35 @@ bool CPlayer::CollisionBlock(void)
 				
 				if (bHeight == true && pBlock->CollisionHeight(D3DXVECTOR3(m_pos.x, m_pos.y + FOOT_HEIGHT, m_pos.z), D3DXVECTOR3(m_posOld.x, m_posOld.y + FOOT_HEIGHT, m_posOld.z), HEIGHT, MARGINE, false) == false)
 				{ // ブロックに乗り上げる
-					fHeight = pBlock->GetPosition().y + pBlock->GetVtxMax().y;
-					if (pBlock->GetType() == BLOCKIDX_BOUND)
+					fHeight = posBlock.y + vtxMax.y;
+					if (nType == BLOCKIDX_BOUND)
 					{ // バウンドブロック
 						m_move.y = BOUND_HEIGHT;
 						pBlock->SetBound();
 						m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_JUMP, true, BLEND_FRAME);
 					}
-					else if (pBlock->GetType() == BLOCKIDX_BREAK)
+					else if (nType == BLOCKIDX_BREAK)
 					{ // 破壊可能ブロック
 						m_move.y = BOUND_HEIGHT;
 						pBlock->SetBreak();
 						m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_JUMP, true, BLEND_FRAME);
 					}
+					else
+					{
+						m_bJump = false;
+						m_bOnBlock = true;
+					}
 					bHeight = true;
 				}
-				else if (m_pos.y + HEIGHT >= pBlock->GetPosition().y + pBlock->GetVtxMin().y && m_pos.y + FOOT_HEIGHT < pBlock->GetPosition().y + pBlock->GetVtxMin().y && m_pos.y >= m_posOld.y)
+				else if (m_pos.y + HEIGHT >= posBlock.y + vtxMin.y && m_pos.y + FOOT_HEIGHT < posBlock.y + vtxMin.y && m_pos.y >= m_posOld.y)
 				{ // ブロックの下端に頭をぶつける
-					if (pBlock->GetType() == BLOCKIDX_BOUND)
+					if (nType == BLOCKIDX_BOUND)
 					{
 						m_move.y = -BOUND_HEIGHT;
 					}
-					fHead= pBlock->GetPosition().y + pBlock->GetVtxMin().y - HEIGHT;
+					fHead= posBlock.y + vtxMin.y - HEIGHT;
 				}
-				else if (m_pos.y + HEIGHT <= pBlock->GetPosition().y + pBlock->GetVtxMin().y || bHeight == false && m_pos.y >= pBlock->GetPosition().y + pBlock->GetVtxMax().y)
+				else if (m_pos.y + HEIGHT <= posBlock.y + vtxMin.y || bHeight == false && m_pos.y >= posBlock.y + vtxMax.y)
 				{ // ブロックに潜り込む || ブロックの上端より上にいる
 				
 				}
@@ -767,6 +776,11 @@ bool CPlayer::CollisionBlock(void)
 						m_move.y = KNOCKBACK_Y;
 						m_bJump = true;
 					}
+					if (nType == BLOCKIDX_BOUND || nType == BLOCKIDX_BREAK)
+					{ // 破壊可能ブロック
+						m_move.x *= -1.0f;
+					}
+					pBlock->SetBound();
 #endif
 					bColl = true;
 					m_pos = pos;
@@ -782,14 +796,13 @@ bool CPlayer::CollisionBlock(void)
 	if (bHeight == true)
 	{ // ブロック状にいる
 		m_pos.y = fHeight;
-		m_bJump = false;
-		m_bOnBlock = true;
 		// 設置時のモーション管理
 		SetBlockMotion();
 	}
 	else if (bHead == true)
 	{ // ブロックに頭をぶつける
 		m_pos.y = fHead;
+		return false;
 	}
 
 

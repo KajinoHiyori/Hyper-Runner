@@ -92,20 +92,24 @@ void CDebugProc::Draw(void)
 //=============================
 void CDebugProc::Print(const char* fmt, ...)
 {
-	char aStr[256] = {};
+	int nCurrentSize = strlen(m_aStr);
+	if (nCurrentSize >= sizeof(m_aStr) - 1)
+	{ // 既定の文字数を超えないように制限
+		return;
+	}
 
-	// 可変長引数リストの変数を定義する
+	// 表示したい文字列を格納
+	char aStr[1024] = {};
+
+	// 可変長引数リストの変数を定義する	
 	va_list args;
-
-	// リストに受けとった文字列を代入
 	va_start(args, fmt);
 
 	// リストからバッファへ文字列を代入
-	vsprintf(&aStr[0], fmt, args);
-
-	// 終了
+	vsnprintf(aStr, sizeof(aStr), fmt, args);
 	va_end(args);
 
-	// デバッグ表示バッファに受け取った文字列を連結
-	strcat(&m_aStr[0], &aStr[0]);
+	// 格納できる文字列に応じて表示用文字列に格納
+	int nLength = sizeof(m_aStr) - nCurrentSize - 1;
+	strncat_s(m_aStr, sizeof(m_aStr), aStr, nLength);
 }
