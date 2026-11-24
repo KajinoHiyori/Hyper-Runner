@@ -39,7 +39,6 @@
 #define SHADOW_RADIUS	(2.0f)	// 影の拡大率
 #define SPEED			(3.0f)	// 移動速度
 #define JUMP			(30.0f)	// ジャンプ
-//#define CHANGE_X		(40.0f)	// X方向切り替え
 #define CHANGE_X		(50.0f)	// X方向切り替え
 #define RADIUS			(15.0f)		// 半径
 #define HEIGHT			(117.0f)	// 身長
@@ -52,9 +51,14 @@
 #define FASTRUN_FRAME	(10)	// 早く走る際のフレーム数
 #define FASTEST_RUN		(5)		// 最速で走る際のフレーム数
 #define FIELD_POSX		(400.0f)	// 行動ラインを指定
-#define ON_BLOCK		(20.0f)		// ブロックに乗る判定
+#define KNOCKBACK_Y		(10.0f)		// 跳ね返り高度
+#define KNOCKBACK_Z		(-10.0f)	// 跳ね返り速度
+#define END_KNOCKBACK	(-0.1f)		// 跳ね返り終了
 #define ENABLE_CHANGEFRAME	// フレーム切り替え
 //#undef	ENABLE_CHANGEFRAME	// ENABLE_CHANGEFRAMEの無効化
+#define ENABLE_KNOCKBACK	// 跳ね返り
+//#undef	ENABLE_KNOCKBACK	// ENABLE_KNOCKBACKの無効化
+
 // ファイルパス
 #define SETTING_PATH		("data\\SCRIPTS\\player_setting.txt")	// プレイヤー設定情報
 #define UPPERMOTION_PATH	("data\\SCRIPTS\\player_uppermotion.txt")	// 上半身モーション
@@ -89,6 +93,8 @@ CPlayer::CPlayer(CObject::PRIORITY priority) : CObject(priority)
 	m_bJumpOld = false;	// ジャンプフラグ
 	m_fRadius = 0.0f;	// 当たり判定半径
 	m_speed = SPEED_SLOWWALK;	// 移動速度管理
+	m_bKockback = false;	// 跳ね返り管理
+	m_bKockbackOld = false;	// 跳ね返り管理
 }
 
 //=============================
@@ -197,8 +203,8 @@ void CPlayer::Update(void)
 
 	// 過去の位置を保存
 	m_posOld = m_pos;
-
 	m_bJumpOld = m_bJump;
+	m_bKockbackOld = m_bKockback;
 
 	// シーンごとに処理を分割
 	switch (mode)
@@ -462,8 +468,6 @@ void CPlayer::Move(void)
 	CInputJoypad* pJoypad = CManager::GetInputJoypad();
 	int nChangeDir = 0;	// 移動方向設定
 #ifndef ENABLE_MOVE
-
-
 	if ((pKeyboard->GetTrigger(DIK_D) == true
 		|| pKeyboard->GetTrigger(DIK_RIGHTARROW) == true
 		|| pJoypad->GetTrigger(CInputJoypad::JOYKEY_RIGHT) == true
@@ -580,6 +584,17 @@ void CPlayer::Move(void)
 	// 移動量の更新
 	m_move.x += (0.0f - m_move.x) * CORRECTION_MOVE;
 	m_move.y += (0.0f - m_move.y) * CORRECTION_MOVE;
+
+#ifdef ENABLE_KNOCKBACK
+	if (m_bKockback == true)
+	{
+		m_move.z += (0.0f - m_move.z) * CORRECTION_MOVE;
+		if (m_move.z >= END_KNOCKBACK)
+		{
+			m_bKockback = false;
+		}
+	}
+#endif
 }
 
 //=============================
@@ -638,7 +653,12 @@ void CPlayer::CollisionField(void)
 
 	if (pField == NULL) return;
 
+	
 	if (m_pos.y > pField->GetHeight(m_pos) || m_pos.y <= -pField->GetHeight(m_pos)*2)return;
+#ifdef ENABLE_KNOCKBACK
+	if (m_bKockbackOld == false && m_bKockback == true)return;
+#endif
+	
 	// 設置処理
 	m_move.y = 0.0f;
 	m_bJump = false;
@@ -703,28 +723,46 @@ bool CPlayer::CollisionBlock(void)
 				if (bHeight == true && pBlock->CollisionHeight(D3DXVECTOR3(m_pos.x, m_pos.y + FOOT_HEIGHT, m_pos.z), D3DXVECTOR3(m_posOld.x, m_posOld.y + FOOT_HEIGHT, m_posOld.z), HEIGHT, MARGINE, false) == false)
 				{ // ブロックに乗り上げる
 					m_pos.y = pBlock->GetPosition().y + pBlock->GetVtxMax().y;
-					m_bJump = false;
+					if (pBlock->GetType() == BLOCKIDX_BOUND)
+					{
+						m_move.y = BOUND_HEIGHT;
+					}
+					else
+					{
+						m_bJump = false;
+						// 設置時のモーション管理
+						SetMoveMotion();
+					}
 					bHeight = true;
-					// 設置時のモーション管理
-					SetMoveMotion();
 				}
-				else if (m_pos.y + HEIGHT <= pBlock->GetPosition().y + pBlock->GetVtxMin().y)
-				{ // ブロックに潜り込む
-
+				else if (m_pos.y + HEIGHT <= pBlock->GetPosition().y + pBlock->GetVtxMin().y || bHeight == false && m_pos.y >= pBlock->GetPosition().y + pBlock->GetVtxMax().y)
+				{ // ブロックに潜り込む || ブロックの上端より上にいる
+				
 				}
 				else
 				{ // 側面で接触
-					bColl = true;
-					if (m_pos.y <= pBlock->GetPosition().y + pBlock->GetVtxMax().y)
-					{
-						m_pos = pos;
+#ifdef ENABLE_KNOCKBACK
+					m_bKockback = true;
+					m_move.z = KNOCKBACK_Z;
+					if (m_bJump == false)
+					{ // 接地中のみY方向にも跳ね返り
+						m_move.y = KNOCKBACK_Y;
+						m_bJump = true;
 					}
+#endif
+					bColl = true;
+					m_pos = pos;
+					return true;
 				}
 			}
 			
 			pObject = pObjectNext;	// NULL判定を行う
 		}
 	}
+
+#ifdef ENABLE_KNOCKBACK
+	if (m_bKockback == true) return false;
+#endif
 
 	if (bColl == true)
 	{ // 側面で接触
@@ -736,7 +774,7 @@ bool CPlayer::CollisionBlock(void)
 		m_move.z = m_fSpeed;
 		return true;
 	}
-	
+
 	m_move.z = m_fSpeed;
 	return false;
 }

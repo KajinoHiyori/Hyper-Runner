@@ -206,10 +206,11 @@ void CCamera::UpdateGame(void)
 	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
 	
 	m_posRDest.x = posPlayer.x;
-	if (pPlayer->GetJump() == false)
-	{
-		m_posRDest.y = posPlayer.y + PLAYER_HEIGHT;
-	}
+	m_posRDest.y = posPlayer.y + PLAYER_HEIGHT;
+	//if (pPlayer->GetJump() == false)
+	//{
+	//	m_posRDest.y = posPlayer.y + PLAYER_HEIGHT;
+	//}
 	m_posRDest.z = posPlayer.z + FORWARD;
 
 	CDebugProc* pDebug = CManager::GetDebugProc();

@@ -160,6 +160,8 @@ private:
 	float m_fRadius;	// “–‚½‚è”»’è”¼Œa
 	int m_nLine;	// ˆÚ“®‚µ‚Ä‚¢‚éƒ‰ƒCƒ“‚ğæ“¾
 	int m_nLineOld;	// ˆÚ“®‚µ‚Ä‚¢‚éƒ‰ƒCƒ“‚ğæ“¾
+	bool m_bKockback;	// ’µ‚Ë•Ô‚èŠÇ—
+	bool m_bKockbackOld;	// ’µ‚Ë•Ô‚èŠÇ—
 };
 
 #endif

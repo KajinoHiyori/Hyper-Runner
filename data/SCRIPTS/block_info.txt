@@ -6,8 +6,9 @@
 # ブロック情報
 #==================
 BLOCKINFO
-	NUMBLOCK = 3	# ブロックの種類
-	MODELNAME = data/MODEL/block/block000.x
-	MODELNAME = data/MODEL/block/block001.x
-	MODELNAME = data/MODEL/block/block002.x
+	NUMBLOCK = 4	# ブロックの種類
+	MODELNAME = data/MODEL/block/block000.x	# [0]通常
+	MODELNAME = data/MODEL/block/block001.x	# [1]やや高めの通常
+	MODELNAME = data/MODEL/block/block002.x	# [2]高い通常
+	MODELNAME = data/MODEL/block/block003.x	# [3]バウンド
 END_BLOCKINFO
