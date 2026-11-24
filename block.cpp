@@ -62,6 +62,8 @@ CBlock::CBlock(CObject::PRIORITY priority) : CObjectX(priority)
 	m_nType = 0;		// 種類
 	m_fSize = 0.0f;		// サイズ
 	m_bGravity = false;	// 重力
+	m_bScaing = false;		// スケール管理
+	m_fScaleCounter = 0.0f;	// スケールカウンター
 	m_nNumAll++;
 }
 
@@ -162,6 +164,9 @@ void CBlock::Update(void)
 	//case CScene::MODE_CREDIT:	// クレジット
 	//	break;
 	}
+
+	// スケール管理
+	UpdateScale();
 }
 
 //=============================
@@ -376,6 +381,17 @@ bool CBlock::SetCollision(D3DXVECTOR3* pPos, float fRadius)
 	return false;
 }
 
+#define BOUNDSIZE_XZ	(0.9f)	// バウンド時の拡縮
+#define BOUNDSIZE_Y		(1.3f)	// バウンド時の拡縮
+//=============================
+// ブロックのバウンド処理
+//=============================
+void CBlock::SetBound(void)
+{
+	m_bScaing = true;
+	CObjectX::SetScale(D3DXVECTOR3(BOUNDSIZE_XZ, BOUNDSIZE_Y, BOUNDSIZE_XZ));
+}
+
 //=============================
 // 地面との判定処理処理
 //=============================
@@ -442,6 +458,51 @@ void CBlock::CollisionMagma(CMagma* pMagma)
 
 	if (pos.y + CObjectX::GetVtxMin().y * CObjectX::GetScale().y > fHeight)return;
 	Release();	// 自身を破棄
+}
+
+#define SCALE_CHANGER	(10.0f)	// スケール変更値
+//=============================
+// スケール処理
+//=============================
+void CBlock::UpdateScale(void)
+{
+	if (m_bScaing == false) return;
+	m_fScaleCounter += 1.0f;	// カウンターを加算
+	D3DXVECTOR3 scl = INIT_SCALE;
+	float fRate = m_fScaleCounter / SCALE_CHANGER;
+	float fDiffX = 0.0f;
+	float fDiffY = 0.0f;
+	switch (m_nType)
+	{
+	case BLOCKIDX_BOUND:	// バウンドブロック
+		fDiffX = 1.0f - BOUNDSIZE_XZ;
+		fDiffY = 1.0f - BOUNDSIZE_Y;
+		scl.x = BOUNDSIZE_XZ + fDiffX * fRate;
+		scl.y = BOUNDSIZE_Y + fDiffY * fRate;
+		scl.z = scl.x;
+		if (m_fScaleCounter >= SCALE_CHANGER)
+		{
+			scl = INIT_SCALE;
+			m_fScaleCounter = 0.0f;
+			m_bScaing = false;
+		}
+		break;
+
+	case BLOCKIDX_BREAK:	// 破壊可能
+		fDiffY = -1.0f;
+		scl.y = 1.0f + fDiffY * fRate;
+		if (m_fScaleCounter >= SCALE_CHANGER)
+		{
+			m_fScaleCounter = 0.0f;
+			scl = INIT_SCALE;
+			Release();	// 潰れて破棄
+		}
+		break;
+	}
+	
+
+	// スケールを設定
+	CObjectX::SetScale(scl);
 }
 
 //=============================

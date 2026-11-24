@@ -109,11 +109,6 @@ void CObject::ReleaseAll(void)
 			pObject = pObjectNext;	// NULLîªíËÇçsÇ§
 		}
 	}
-
-	if (m_nNumAll != 0)
-	{// îjä¸Ç…é∏îs
-		CDebugProc* pDebug = CManager::GetDebugProc();
-	}
 }
 
 //========================================================================

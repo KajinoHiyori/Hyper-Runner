@@ -19,6 +19,7 @@
 #define MAX_BLOCK	(16)	// ブロックの種類の最大数
 #define BLOCKIDX_BOUND	(3)	// バウンドブロック
 #define BOUND_HEIGHT	(30.0f)	// バウンド時の高度
+#define BLOCKIDX_BREAK	(4)	// 破壊ブロック
 
 //=============================
 // 前方宣言
@@ -48,6 +49,8 @@ public:
 	bool GetGravity(void) { return m_bGravity; }
 	D3DXVECTOR3 GetPosition(void) { return CObjectX::GetPosition(); }
 	D3DXVECTOR3 GetRotation(void) { return CObjectX::GetRotation(); }
+	void SetBound(void);
+	void SetBreak(void) { m_bScaing = true; }
 	static int GetNumAll(void) { return m_nNumAll; }
 	static void LoadInfo(void);
 	static void LoadSetting(const char* pFileName);
@@ -56,6 +59,7 @@ public:
 private:
 	void CollisionField(void);
 	void CollisionMagma(CMagma* pMagma);
+	void UpdateScale(void);
 	void UpdateGame(void);
 	static int m_nNumAll;	// 総数
 	int m_nType;		// 種類
@@ -67,6 +71,8 @@ private:
 	float m_fSize;		// 当たり判定サイズ
 	D3DXVECTOR3 m_scl;	// 拡大率
 	bool m_bGravity;	// 重力
+	bool m_bScaing;		// スケール管理
+	float m_fScaleCounter;	// スケールカウンター
 	static char m_apModelName[MAX_BLOCK][MAX_STRING];	// モデル名
 };
 

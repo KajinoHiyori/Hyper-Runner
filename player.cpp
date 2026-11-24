@@ -725,8 +725,14 @@ bool CPlayer::CollisionBlock(void)
 				{ // ブロックに乗り上げる
 					m_pos.y = pBlock->GetPosition().y + pBlock->GetVtxMax().y;
 					if (pBlock->GetType() == BLOCKIDX_BOUND)
-					{
+					{ // バウンドブロック
 						m_move.y = BOUND_HEIGHT;
+						pBlock->SetBound();
+					}
+					else if (pBlock->GetType() == BLOCKIDX_BREAK)
+					{ // 破壊可能ブロック
+						m_move.y = BOUND_HEIGHT;
+						pBlock->SetBreak();
 					}
 					else
 					{
