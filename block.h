@@ -18,7 +18,7 @@
 //=============================
 #define MAX_BLOCK	(16)	// ブロックの種類の最大数
 #define BLOCKIDX_BOUND	(3)	// バウンドブロック
-#define BOUND_HEIGHT	(30.0f)	// バウンド時の高度
+#define BOUND_HEIGHT	(40.0f)	// バウンド時の高度
 #define BLOCKIDX_BREAK	(4)	// 破壊ブロック
 
 //=============================

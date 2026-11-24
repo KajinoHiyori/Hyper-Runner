@@ -95,6 +95,8 @@ CPlayer::CPlayer(CObject::PRIORITY priority) : CObject(priority)
 	m_speed = SPEED_SLOWWALK;	// 移動速度管理
 	m_bKockback = false;	// 跳ね返り管理
 	m_bKockbackOld = false;	// 跳ね返り管理
+	m_bOnBlock = false;	// ブロック上にいる
+	m_bOnBlockOld = false;	// ブロック上にいる
 }
 
 //=============================
@@ -205,6 +207,7 @@ void CPlayer::Update(void)
 	m_posOld = m_pos;
 	m_bJumpOld = m_bJump;
 	m_bKockbackOld = m_bKockback;
+	m_bOnBlockOld = m_bOnBlock;
 
 	// シーンごとに処理を分割
 	switch (mode)
@@ -228,6 +231,9 @@ void CPlayer::Update(void)
 	case CScene::MODE_RANKING:	// ランキング
 		break;
 	}
+
+	// 接地へのモーション管理
+	SetLandMotion();
 
 	// モーションの更新
 	for (int nCntDiv = 0; nCntDiv < DIV_MOTION_MAX; nCntDiv++)
@@ -258,6 +264,7 @@ void CPlayer::Update(void)
 	pDebugProc->Print("Player移動量 : (%.2f, %.2f, %.2f)\n", m_move.x, m_move.y, m_move.z);
 	pDebugProc->Print("Player存在ライン : %d\n", m_nLine);
 	pDebugProc->Print("Player速度 : %f\n", m_fSpeed);
+	pDebugProc->Print("Playerブロック状態 : %d\n", m_bOnBlock);
 }
 
 //=============================
@@ -556,7 +563,7 @@ void CPlayer::Move(void)
 		break;
 	}
 
-	if (m_apMotion[DIV_MOTION_UNDER]->GetBlendType() != MOTIONUNDER_FALLX && bFall == true && m_bJump == true)
+	if ((m_apMotion[DIV_MOTION_UNDER]->GetBlendType() != MOTIONUNDER_FALLX && m_bOnBlock == false) && bFall == true && m_bJump == true)
 	{ // 落下モーションでない
 		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_FALLX, BLEND_FRAME, true);
 	}
@@ -719,7 +726,7 @@ bool CPlayer::CollisionBlock(void)
 			D3DXVECTOR3 pos = m_pos;
 			if (pBlock->Collision(&pos, m_posOld, m_fRadius, MARGINE))
 			{
-				bool bHeight = pBlock->CollisionHeight(m_pos, m_posOld, HEIGHT, MARGINE, false);
+				bHeight = pBlock->CollisionHeight(m_pos, m_posOld, HEIGHT, MARGINE, false);
 				
 				if (bHeight == true && pBlock->CollisionHeight(D3DXVECTOR3(m_pos.x, m_pos.y + FOOT_HEIGHT, m_pos.z), D3DXVECTOR3(m_posOld.x, m_posOld.y + FOOT_HEIGHT, m_posOld.z), HEIGHT, MARGINE, false) == false)
 				{ // ブロックに乗り上げる
@@ -728,11 +735,13 @@ bool CPlayer::CollisionBlock(void)
 					{ // バウンドブロック
 						m_move.y = BOUND_HEIGHT;
 						pBlock->SetBound();
+						m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_JUMP, true, BLEND_FRAME);
 					}
 					else if (pBlock->GetType() == BLOCKIDX_BREAK)
 					{ // 破壊可能ブロック
 						m_move.y = BOUND_HEIGHT;
 						pBlock->SetBreak();
+						m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_JUMP, true, BLEND_FRAME);
 					}
 					else
 					{
@@ -787,10 +796,12 @@ bool CPlayer::CollisionBlock(void)
 	if (bHeight == true)
 	{ // 上面で接触
 		m_move.z = m_fSpeed;
+		m_bOnBlock = true;
 		return true;
 	}
 
 	m_move.z = m_fSpeed;
+	m_bOnBlock = false;
 	return false;
 }
 
@@ -884,11 +895,11 @@ void CPlayer::SpeedManager(void)
 }
 
 //=============================
-// 設置時のモーション管理
+// 移動へのモーション管理
 //=============================
 void CPlayer::SetMoveMotion(void)
 {
-	if (m_bJumpOld == true)
+	if (m_bJumpOld == true || m_pos.y < m_posOld.y)
 	{ // 移動モーションに戻す
 		if (m_speed >= SPEED_SLOWRUN)
 		{
@@ -898,6 +909,17 @@ void CPlayer::SetMoveMotion(void)
 		{
 			m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_WALK, true, BLEND_FRAME);
 		}
+	}
+}
+
+//=============================
+// 接地へののモーション管理
+//=============================
+void CPlayer::SetLandMotion(void)
+{
+	if (m_bOnBlock == false && m_bOnBlockOld == true && m_apMotion[DIV_MOTION_UNDER]->GetBlendType() != MOTIONUNDER_JUMP)
+	{
+		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_FALLX, true, BLEND_FRAME);
 	}
 }
 

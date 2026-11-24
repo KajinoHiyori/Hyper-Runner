@@ -134,6 +134,7 @@ private:
 	void SpeedDown(void);
 	void SpeedManager(void);
 	void SetMoveMotion(void);
+	void SetLandMotion(void);
 	HRESULT LoadScripts(void);
 	bool LoadCharactor(void);
 	bool LoadModelFile(void);
@@ -157,6 +158,8 @@ private:
 	float m_fSpeed;	// 移動速度
 	bool m_bJump;	// ジャンプ
 	bool m_bJumpOld;	// ジャンプ
+	bool m_bOnBlock;	// ブロック上にいる
+	bool m_bOnBlockOld;	// ブロック上にいる
 	float m_fRadius;	// 当たり判定半径
 	int m_nLine;	// 移動しているラインを取得
 	int m_nLineOld;	// 移動しているラインを取得
