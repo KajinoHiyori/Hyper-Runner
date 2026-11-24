@@ -510,8 +510,6 @@ void CBlock::LoadInfo(void)
 	bool bLoadEnd = false;		// 読み込み終了フラグ
 	char aString[MAX_STRING];		// ローカルで文字列を格納
 	char aStringCopy[MAX_STRING];	// ローカルで文字列を格納[コピー]
-	char aFileName[MAX_BLOCK][MAX_STRING];	// ローカルで文字列を格納[コピー]
-	memset(&aFileName[0], 0, sizeof aFileName);
 	D3DXVECTOR3 pos;	// 位置
 	int nType = 0;	// 種類
 	int nNumType = 0;
@@ -620,7 +618,7 @@ void CBlock::LoadSetting(const char* pFileName)
 					int nGravity = pLoadScripts->LoadInt(&aStringCopy[0]);
 					if (nGravity == 0)
 					{
-						bGravity == false;
+						bGravity = false;
 					}
 					else
 					{

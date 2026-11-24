@@ -38,19 +38,21 @@
 #define BLEND_FRAME		(10)	// ブレンドモーションのフレーム数
 #define SHADOW_RADIUS	(2.0f)	// 影の拡大率
 #define SPEED			(3.0f)	// 移動速度
-#define JUMP			(40.0f)	// ジャンプ
+#define JUMP			(30.0f)	// ジャンプ
 //#define CHANGE_X		(40.0f)	// X方向切り替え
 #define CHANGE_X		(50.0f)	// X方向切り替え
 #define RADIUS			(15.0f)		// 半径
 #define HEIGHT			(117.0f)	// 身長
+#define FOOT_HEIGHT		(12.0f)		// 足の高さ
 #define MARGINE			(0.1f)		// 余白
-#define SHADOW_POS		(D3DXVECTOR3(m_pos.x, m_pos.y + 10.0f, m_pos.z))	// 影の位置
+#define SHADOW_POS		(D3DXVECTOR3(m_pos.x, m_pos.y + 1.0f, m_pos.z))	// 影の位置
 #define SLOWWALK_FRAME	(40)	// 遅く歩く際のフレーム数
 #define FASTWALK_FRAME	(30)	// 早く歩く際のフレーム数
 #define SLOWRUN_FRAME	(20)	// 遅く走る際のフレーム数
 #define FASTRUN_FRAME	(10)	// 早く走る際のフレーム数
 #define FASTEST_RUN		(5)		// 最速で走る際のフレーム数
 #define FIELD_POSX		(400.0f)	// 行動ラインを指定
+#define ON_BLOCK		(20.0f)		// ブロックに乗る判定
 #define ENABLE_CHANGEFRAME	// フレーム切り替え
 //#undef	ENABLE_CHANGEFRAME	// ENABLE_CHANGEFRAMEの無効化
 // ファイルパス
@@ -698,16 +700,20 @@ bool CPlayer::CollisionBlock(void)
 			if (pBlock->Collision(&pos, m_posOld, m_fRadius, MARGINE))
 			{
 				bool bHeight = pBlock->CollisionHeight(m_pos, m_posOld, HEIGHT, MARGINE, false);
-				if (bHeight == true)
-				{
+				if (bHeight == true && pBlock->CollisionHeight(D3DXVECTOR3(m_pos.x, m_pos.y + FOOT_HEIGHT, m_pos.z), D3DXVECTOR3(m_posOld.x, m_posOld.y + FOOT_HEIGHT, m_posOld.z), HEIGHT, MARGINE, false) == false)
+				{ // ブロックに乗り上げる
 					m_pos.y = pBlock->GetPosition().y + pBlock->GetVtxMax().y;
 					m_bJump = false;
 					bHeight = true;
 					// 設置時のモーション管理
 					SetMoveMotion();
 				}
+				else if (m_pos.y + HEIGHT <= pBlock->GetPosition().y + pBlock->GetVtxMin().y)
+				{ // ブロックに潜り込む
+
+				}
 				else
-				{
+				{ // 側面で接触
 					bColl = true;
 					if (m_pos.y <= pBlock->GetPosition().y + pBlock->GetVtxMax().y)
 					{

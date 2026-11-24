@@ -6,7 +6,8 @@
 # ブロック情報
 #==================
 BLOCKINFO
-	NUMBLOCK = 2	# ブロックの種類
+	NUMBLOCK = 3	# ブロックの種類
 	MODELNAME = data/MODEL/block/block000.x
 	MODELNAME = data/MODEL/block/block001.x
+	MODELNAME = data/MODEL/block/block002.x
 END_BLOCKINFO

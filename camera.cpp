@@ -35,7 +35,7 @@
 #define CAMERA_ROLL		(120)		// カメラの回り込み間隔
 #define CAMERA_ROLL_MIN	(0)			// カメラの回り込み間隔(最小)
 #define CAMERA_ROLL_MAX	(360)		// カメラの回り込み間隔(最大)
-#define	GAME_HEIGHT		(300.0f)	// カメラ高度
+#define	GAME_HEIGHT		(100.0f)	// カメラ高度
 #define	RESULT_HEIGHT	(100.0f)	// カメラ高度
 #define CAMERA_POS		(D3DXVECTOR3(0.0f, GAME_HEIGHT, -DISTANCE))	// カメラの位置
 #define DEFAULT			(D3DXVECTOR3(0.0f, 0.0f, 0.0f))			// デフォルトの座標値
@@ -206,7 +206,10 @@ void CCamera::UpdateGame(void)
 	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
 	
 	m_posRDest.x = posPlayer.x;
-	m_posRDest.y = posPlayer.y + PLAYER_HEIGHT;
+	if (pPlayer->GetJump() == false)
+	{
+		m_posRDest.y = posPlayer.y + PLAYER_HEIGHT;
+	}
 	m_posRDest.z = posPlayer.z + FORWARD;
 
 	CDebugProc* pDebug = CManager::GetDebugProc();
@@ -217,7 +220,7 @@ void CCamera::UpdateGame(void)
 	m_posR.y += (m_posRDest.y - m_posR.y) * CORRECTION_ROT;
 	m_posR.z += (m_posRDest.z - m_posR.z) * CORRECTION_ROT;
 	m_posV.x = m_posR.x - sinf(m_rot.y) * (DISTANCE);
-	m_posV.y = GAME_HEIGHT;
+	m_posV.y = m_posR.y + GAME_HEIGHT;
 	m_posV.z = m_posR.z - cosf(m_rot.y) * (DISTANCE);
 }
 

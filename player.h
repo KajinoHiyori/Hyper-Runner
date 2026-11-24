@@ -116,6 +116,7 @@ public:
 	D3DXMATRIX GetMatrix(void) { return m_mtxWorld; }
 	float GetRadius(void) { return m_fRadius; }
 	SPEED GetSpeed(void) { return m_speed; }
+	bool GetJump(void) { return m_bJump; }
 	void ChangeSpeed(bool bChangeUP);
 	D3DXMATRIX GetRightarmMtx(void);
 

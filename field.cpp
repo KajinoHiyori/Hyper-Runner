@@ -194,7 +194,7 @@ void CField::Update(void)
 
 #ifndef ENABLE_STAGESET
 	// ƒJƒƒ‰ˆÊ’u‚É‰‚¶‚Äíœ
-	DeleteLine();
+	//DeleteLine();
 #endif // !ENABLE_STAGESET
 }
 
