@@ -446,6 +446,8 @@ void CObjectX::Draw(void)
 //=============================
 void CObjectX::Draw(D3DXMATRIX mtx)
 {
+	if (m_nIdx == -1)return;
+
 	// デバイスの取得
 	CRenderer* pRenderer = CManager::GetRenderer();
 	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();

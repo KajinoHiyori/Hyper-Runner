@@ -384,8 +384,11 @@ void CManager::Uninit(void)
 	SAFE_UNINIT(m_pCamera);
 
 	// 音声の停止
-	m_pSound->Stop();
-	
+	if (m_pSound != NULL)
+	{
+		m_pSound->Stop();
+	}
+
 	// サウンドの終了処理
 	SAFE_UNINIT(m_pSound);
 

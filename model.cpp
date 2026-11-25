@@ -115,6 +115,8 @@ void CModel::Update(void)
 //=============================
 void CModel::Draw(void)
 {
+	if (m_nIdx == -1)return;
+
 	// デバイスの取得
 	CRenderer* pRenderer = CManager::GetRenderer();
 	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();

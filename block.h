@@ -72,6 +72,7 @@ private:
 	D3DXVECTOR3 m_scl;	// 拡大率
 	bool m_bGravity;	// 重力
 	bool m_bScaing;		// スケール管理
+	int m_nStateCounter;	// ステート管理
 	float m_fScaleCounter;	// スケールカウンター
 	static char m_apModelName[MAX_BLOCK][MAX_STRING];	// モデル名
 };

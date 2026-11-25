@@ -232,9 +232,6 @@ void CPlayer::Update(void)
 		break;
 	}
 
-	// 接地へのモーション管理
-	SetLandMotion();
-
 	// モーションの更新
 	for (int nCntDiv = 0; nCntDiv < DIV_MOTION_MAX; nCntDiv++)
 	{
@@ -668,7 +665,7 @@ void CPlayer::CollisionField(void)
 	m_bJump = false;
 	m_pos.y = pField->GetHeight(m_pos);
 
-	// 設置時のモーション管理
+	// 接地時のモーション管理
 	SetMoveMotion();
 }
 
@@ -743,9 +740,9 @@ bool CPlayer::CollisionBlock(void)
 					}
 					else if (nType == BLOCKIDX_BREAK)
 					{ // 破壊可能ブロック
-						m_move.y = BOUND_HEIGHT;
 						pBlock->SetBreak();
-						m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_JUMP, true, BLEND_FRAME);
+						m_bJump = false;
+						m_bOnBlock = true;
 					}
 					else
 					{
@@ -921,7 +918,7 @@ void CPlayer::SpeedManager(void)
 //=============================
 void CPlayer::SetMoveMotion(void)
 {
-	if (m_bJumpOld == true || m_pos.y < m_posOld.y)
+	if (m_pos.y < m_posOld.y)
 	{ // 移動モーションに戻す
 		if (m_speed >= SPEED_SLOWRUN)
 		{
