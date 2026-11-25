@@ -28,6 +28,7 @@ public:
 	typedef enum
 	{
 		TYPE_NONE = 0,	// 初期化
+		TYPE_MONKYBAR,	// 雲梯
 		TYPE_PLAYER,	// プレイヤー
 		TYPE_ACTION,	// アクション
 		TYPE_FIELD,		// 地面

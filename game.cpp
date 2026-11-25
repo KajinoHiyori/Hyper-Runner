@@ -25,6 +25,7 @@
 #include "meshskin_flat.h"
 #include "meshskin_cylinder.h"
 #include "action.h"
+#include "monkybar.h"
 #include "timer.h"
 
 //=============================
@@ -143,6 +144,8 @@ HRESULT CGame::Init(void)
 
 	// ブロックを生成
 	CBlock::LoadSetting(BLOCK_SETTINGPATH);
+
+	CMonkyBar::Create(INIT_D3DVEC3);
 
 	// アイテムを生成
 	//CItem::LoadSetting(ITEM_SETTINGPATH);

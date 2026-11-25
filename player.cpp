@@ -1,6 +1,6 @@
 //========================================================
 // 
-// Player処理[leftplayer.cpp]
+// Player処理[player.cpp]
 // Author : Kajino Hiyori _Create2026/06/02
 //
 //========================================================
@@ -30,6 +30,7 @@
 #include "field.h"
 #include "magma.h"
 #include "block.h"
+#include "monkybar.h"
 
 //=============================
 // マクロ定義
@@ -97,6 +98,7 @@ CPlayer::CPlayer(CObject::PRIORITY priority) : CObject(priority)
 	m_bKockbackOld = false;	// 跳ね返り管理
 	m_bOnBlock = false;	// ブロック上にいる
 	m_bOnBlockOld = false;	// ブロック上にいる
+	m_monkyState = MONKYSTATE_NONE;	// 雲梯状態を管理
 }
 
 //=============================
@@ -437,6 +439,9 @@ void CPlayer::UpdateGame(void)
 {
 	// 移動処理
 	Move();
+
+	// 雲梯の判定
+	CollisionMonkyBar();
 
 #ifdef ENABLE_STAGESET
 	// ブロックを配置
@@ -822,6 +827,14 @@ bool CPlayer::CollisionBlock(void)
 	m_move.z = m_fSpeed;
 	m_bOnBlock = false;
 	return false;
+}
+
+//=============================
+// 雲梯判定処理
+//=============================
+void CPlayer::CollisionMonkyBar(void)
+{
+
 }
 
 //=============================

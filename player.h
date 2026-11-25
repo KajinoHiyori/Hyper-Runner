@@ -97,6 +97,12 @@ public:
 		SPEED_FASTESTRUN = 10,	// Å‘¬‚Å‘–‚é
 	}SPEED;
 
+	// ‰_’òó‘Ô‚ğŠÇ—
+	typedef enum
+	{
+		MONKYSTATE_NONE = 0,	// ‰_’ò‚É•ß‚Ü‚Á‚Ä‚¢‚È‚¢
+	}MONKYSTATE;
+
 	CPlayer(CObject::PRIORITY priority = CObject::PRIORITY_CHARACTOR);
 	~CPlayer();
 	static CPlayer* Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot);
@@ -130,6 +136,7 @@ private:
 	void CollisionField(void);
 	void CollisionMagma(CMagma* pMagma);
 	bool CollisionBlock(void);
+	void CollisionMonkyBar(void);
 	void SpeedUp(void);
 	void SpeedDown(void);
 	void SpeedManager(void);
@@ -166,6 +173,7 @@ private:
 	int m_nLineOld;	// ˆÚ“®‚µ‚Ä‚¢‚éƒ‰ƒCƒ“‚ğæ“¾
 	bool m_bKockback;	// ’µ‚Ë•Ô‚èŠÇ—
 	bool m_bKockbackOld;	// ’µ‚Ë•Ô‚èŠÇ—
+	MONKYSTATE m_monkyState;	// ‰_’òó‘Ô‚ğŠÇ—
 };
 
 #endif

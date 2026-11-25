@@ -285,6 +285,9 @@
     <ClCompile Include="timer.cpp">
       <Filter>event\cpp</Filter>
     </ClCompile>
+    <ClCompile Include="monkybar.cpp">
+      <Filter>event\cpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="color.h">
@@ -456,6 +459,9 @@
       <Filter>shadow\h</Filter>
     </ClInclude>
     <ClInclude Include="timer.h">
+      <Filter>event\h</Filter>
+    </ClInclude>
+    <ClInclude Include="monkybar.h">
       <Filter>event\h</Filter>
     </ClInclude>
   </ItemGroup>
