@@ -89,6 +89,12 @@ int CFileX::Register(const char* pFileName)
 	CRenderer* pRenderer = CManager::GetRenderer();
 	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
 
+	if (m_nNumAll == NUM_FILEX - 1)
+	{
+		SetMessageBox("指定できるXファイル総数を超えました\nこのexeを起動することはできません");
+		return -1;
+	}
+
 	// インデックスを格納
 	int nIdx = m_nNumAll;
 
@@ -102,6 +108,12 @@ int CFileX::Register(const char* pFileName)
 
 	// Xファイルの読み込み
 	D3DXLoadMeshFromX(pFileName, D3DXMESH_SYSTEMMEM, pDevice, NULL, &m_apBuffMat[nIdx], NULL, &m_adwNumMat[nIdx], &m_apMesh[nIdx]);
+
+	if (m_apBuffMat[nIdx] == NULL || m_adwNumMat[nIdx] == NULL || m_apMesh[nIdx] == NULL)
+	{
+		SetMessageBox("Xファイルが欠損しています\nこのexeを起動することはできません");
+		return -1;
+	}
 
 	// 頂点数を取得
 	int nNumVtx = m_apMesh[nIdx]->GetNumVertices();

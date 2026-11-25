@@ -70,6 +70,8 @@ HRESULT CRenderer::Init(const HWND hWnd, const BOOL bWindow)
 	// 現在のディスプレイモードを取得
 	if (FAILED(m_pD3D->GetAdapterDisplayMode(D3DADAPTER_DEFAULT, &d3ddm)))
 	{
+		// Direct3Dオブジェクトの破棄
+		SAFE_RELEASE(m_pD3D);
 		return E_FAIL;
 	}
 
@@ -109,6 +111,8 @@ HRESULT CRenderer::Init(const HWND hWnd, const BOOL bWindow)
 				&d3dpp,
 				&m_pD3DDevice)))
 			{
+				SAFE_RELEASE(m_pD3D);
+				SAFE_RELEASE(m_pD3DDevice);
 				return E_FAIL;
 			}
 		}
@@ -126,6 +130,13 @@ HRESULT CRenderer::Init(const HWND hWnd, const BOOL bWindow)
 		&m_pZBuffMT,
 		NULL);
 
+	if (m_pZBuffMT == NULL)
+	{
+		SAFE_RELEASE(m_pD3D);
+		SAFE_RELEASE(m_pD3DDevice);
+		return E_FAIL;
+	}
+
 	for (int nCntFeedback = 0; nCntFeedback < NUM_FEEDBACK; nCntFeedback++)
 	{
 		LPDIRECT3DSURFACE9 pRenderDef, pZBuffDef;	// ローカルで情報を保存
@@ -139,6 +150,18 @@ HRESULT CRenderer::Init(const HWND hWnd, const BOOL bWindow)
 			D3DPOOL_DEFAULT,
 			&m_apTextureMT[nCntFeedback],
 			NULL);
+
+		if (m_apTextureMT[nCntFeedback] == NULL)
+		{
+			SAFE_RELEASE(m_pD3D);
+			SAFE_RELEASE(m_pD3DDevice);
+			SAFE_RELEASE(m_pZBuffMT);
+			for (int nCnt = 0; nCnt < nCntFeedback - 1; nCnt++)
+			{
+				SAFE_RELEASE(m_apTextureMT[nCntFeedback]);
+			}
+			return E_FAIL;
+		}
 
 		// テクスチャレンダリング用インターフェースの生成
 		m_apTextureMT[nCntFeedback]->GetSurfaceLevel(0, &m_apRenderMT[nCntFeedback]);
@@ -365,10 +388,6 @@ void CRenderer::Draw(void)
 		m_pD3DDevice->SetTransform(D3DTS_VIEW, &mtxView);	// ビューマトリックス
 		m_pD3DDevice->SetTransform(D3DTS_PROJECTION, &mtxProjectionDef);	// プロジェクションマトリックス
 
-		// 取得したCOMインターフェースを解放
-		SAFE_RELEASE(pRenderDef);
-		SAFE_RELEASE(pZBuffDef);
-
 		// フィードバック用ポリゴンにテクスチャ0を貼り付ける
 		DrawCurrentImages();
 
@@ -391,6 +410,10 @@ void CRenderer::Draw(void)
 		// 描画終了
 		m_pD3DDevice->EndScene();
 	}
+
+	// 取得したCOMインターフェースを解放
+	SAFE_RELEASE(pRenderDef);
+	SAFE_RELEASE(pZBuffDef);
 
 	// バックバッファとフロントバッファの入れ替え
 	HRESULT hr = m_pD3DDevice->Present(NULL, NULL, NULL, NULL);

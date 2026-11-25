@@ -100,7 +100,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 		if (pManager != NULL)
 		{ // インスタンス生成に成功
 			// マネージャーの初期化
-			pManager->Init(hInstance, g_hWnd, FULL_SCREEN);
+			if (FAILED(pManager->Init(hInstance, g_hWnd, FULL_SCREEN)))
+			{
+				int nID = MessageBox(g_hWnd, "マネージャー生成に失敗\nこのexeは起動できません", WINDOW_NAME, MB_OK);
+
+				// ウィンドウを破棄する→WM_DESTROYメッセージを送る
+				DestroyWindow(g_hWnd);
+			}
 		}
 	}
 
@@ -280,4 +286,13 @@ void DestroyApp(void)
 {
 	// ウィンドウを破棄する→WM_DESTROYメッセージを送る
 	DestroyWindow(g_hWnd);
+}
+
+//=============================
+// メッセージ設定関数
+//=============================
+void SetMessageBox(const char* pChar)
+{
+	int nID = MessageBox(g_hWnd, pChar, WINDOW_NAME, MB_OK);
+	DestroyApp();
 }

@@ -63,6 +63,12 @@ int CTexture::Register(const char* pFileName)
 	CRenderer* pRenderer = CManager::GetRenderer();
 	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
 
+	if (m_nNumAll == NUM_TEXTURE - 1)
+	{
+		SetMessageBox("指定できるテクスチャ総数を過えました\nこのexeを起動することはできません");
+		return -1;
+	}
+	
 	// インデックスを格納
 	int nIdx = m_nNumAll;
 
@@ -76,6 +82,12 @@ int CTexture::Register(const char* pFileName)
 
 	// テクスチャの読み込み
 	D3DXCreateTextureFromFile(pDevice, pFileName, &m_apTexture[nIdx]);
+	if (m_apTexture[nIdx] == NULL)
+	{
+		SetMessageBox("テクスチャファイルが欠損しています\nこのexeを起動することはできません");
+		return -1;
+	}
+
 	int nLength = strlen(pFileName);
 	m_apFileName[nIdx] = new char[nLength + 1];
 	strcpy(m_apFileName[nIdx], pFileName);

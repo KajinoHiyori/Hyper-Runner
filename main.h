@@ -111,4 +111,5 @@ float AngleNormalize(float fAngle);
 bool CrossCollisionLeft(D3DXVECTOR3 pos, D3DXVECTOR3 posPoint, D3DXVECTOR3 vecLine);
 bool CrossCollisionRight(D3DXVECTOR3 pos, D3DXVECTOR3 posPoint, D3DXVECTOR3 vecLine);
 void DestroyApp(void);
+void SetMessageBox(const char* pChar);
 #endif
