@@ -288,6 +288,9 @@
     <ClCompile Include="monkybar.cpp">
       <Filter>event\cpp</Filter>
     </ClCompile>
+    <ClCompile Include="goal.cpp">
+      <Filter>event\cpp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="color.h">
@@ -462,6 +465,9 @@
       <Filter>event\h</Filter>
     </ClInclude>
     <ClInclude Include="monkybar.h">
+      <Filter>event\h</Filter>
+    </ClInclude>
+    <ClInclude Include="goal.h">
       <Filter>event\h</Filter>
     </ClInclude>
   </ItemGroup>

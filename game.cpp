@@ -27,6 +27,7 @@
 #include "action.h"
 #include "monkybar.h"
 #include "timer.h"
+#include "goal.h"
 
 //=============================
 // 静的メンバ変数宣言
@@ -36,6 +37,7 @@ CMagma* CGame::m_pMagma = NULL;		// マグマへのポインタ
 //CWall* CGame::m_apWall[MAX_GAMEWALL] = {};	// 壁のポインタ
 //CMachine* CGame::m_pMachine = NULL;	// マシンへのポインタ
 CTimer* CGame::m_pTimer = NULL;		// タイマーへのポインタ
+CGoal* CGame::m_pGoal = NULL;		// ゴールへのポインタ
 //CPause* CGame::m_pPause = NULL;		// ポーズへのポインタ
 //CGameUI* CGame::m_pGameUI = NULL;	// UIへのポインタ
 
@@ -50,6 +52,7 @@ CTimer* CGame::m_pTimer = NULL;		// タイマーへのポインタ
 #define MAGMA_POS		(D3DXVECTOR3(0.0f, -400.0f, 0.0f))	// マグマ生成位置
 #define PLAYER_START	(D3DXVECTOR3(0.0f, 0.0f, -STAGE_LENGTH))	// プレイヤー生成位置
 #define TIMER_POS		(D3DXVECTOR3(640.0f, 100.0f, 0.0f))	// タイマー生成位置
+#define GOAL_LINE		(4750.0f)	// ゴールの位置
 // ファイルパス
 #define BLOCK_SETTINGPATH	("data\\SCRIPTS\\block_game.txt")	// ゲーム内でのブロック設置情報
 #define ITEM_SETTINGPATH	("data\\SCRIPTS\\item_game.txt")	// ゲーム内でのアイテム設置情報
@@ -110,6 +113,10 @@ HRESULT CGame::Init(void)
 	if (m_pTimer != NULL) return E_FAIL;
 	m_pTimer = CTimer::Create(TIMER_POS, GAME_TIME);
 
+	// ゴールを生成
+	if (m_pGoal != NULL) return E_FAIL;
+	m_pGoal = CGoal::Create(GOAL_LINE);
+
 	//// 回収マシンを生成
 	//if (m_pMachine != NULL) return E_FAIL;
 	//m_pMachine = CMachine::Create();
@@ -167,7 +174,7 @@ void CGame::Uninit(void)
 	m_pPlayer = NULL;	// プレイヤーへのポインタ
 	m_pMagma = NULL;	// マグマへのポインタ
 	m_pTimer = NULL;		// タイマーのクリア
-
+	m_pGoal = NULL;
 	//m_pField = NULL;		// フィールドへのポインタ
 	//m_pMachine = NULL;		// マシンへのポインタ
 	//m_pPause = NULL;		// ポーズへのポインタ
@@ -192,12 +199,12 @@ void CGame::Update(void)
 	
 	if ((pKeyboard->GetTrigger(DIK_RETURN) == true || pJoypad->GetAnyButton() == true) /* && CManager::GetFadeState() == CFade::STATE_FADENONE && m_state == STATE_END*/)
 	{ // リザルトに遷移
-		CManager::GetFade()->SetFade(CFade::TYPE_ALPHA, SCREEN_CENTER, COLOR_WHITE, CScene::MODE_RESULT);
+		CManager::GetFade()->SetFade(CFade::TYPE_ALPHA, SCREEN_CENTER, COLOR_BLACK, CScene::MODE_RESULT);
 	}
 
 	if ((pKeyboard->GetTrigger(DIK_R) == true) /* && CManager::GetFadeState() == CFade::STATE_FADENONE && m_state == STATE_END*/)
 	{ // リザルトに遷移
-		CManager::GetFade()->SetFade(CFade::TYPE_ALPHA, SCREEN_CENTER, COLOR_WHITE, CScene::MODE_GAME);
+		CManager::GetFade()->SetFade(CFade::TYPE_ALPHA, SCREEN_CENTER, COLOR_BLACK, CScene::MODE_GAME);
 	}
 }
 

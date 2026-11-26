@@ -159,6 +159,7 @@
     <ClCompile Include="field.cpp" />
     <ClCompile Include="fileX.cpp" />
     <ClCompile Include="game.cpp" />
+    <ClCompile Include="goal.cpp" />
     <ClCompile Include="input.cpp" />
     <ClCompile Include="item.cpp" />
     <ClCompile Include="item_speeddown.cpp" />
@@ -219,6 +220,7 @@
     <ClInclude Include="field.h" />
     <ClInclude Include="fileX.h" />
     <ClInclude Include="game.h" />
+    <ClInclude Include="goal.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="item.h" />
     <ClInclude Include="item_speeddown.h" />

@@ -31,6 +31,7 @@
 #include "magma.h"
 #include "block.h"
 #include "monkybar.h"
+#include "goal.h"
 
 //=============================
 // マクロ定義
@@ -456,6 +457,9 @@ void CPlayer::UpdateGame(void)
 
 	// マグマとの判定
 	CollisionMagma(static_cast<CGame*>(CManager::GetScene())->GetMagma());
+
+	// ゴール判定
+	CollisionGoal(static_cast<CGame*>(CManager::GetScene())->GetGoal());
 }
 
 //=============================
@@ -835,6 +839,18 @@ bool CPlayer::CollisionBlock(void)
 void CPlayer::CollisionMonkyBar(void)
 {
 
+}
+
+//=============================
+// ゴール判定処理
+//=============================
+void CPlayer::CollisionGoal(CGoal* pGoal)
+{
+	CFade* pFade = CManager::GetFade();
+	if (m_pos.z >= pGoal->GetLine() && pFade->GetState() == CFade::STATE_FADENONE)
+	{
+		pFade->SetFade(CFade::TYPE_ALPHA, SCREEN_CENTER, COLOR_WHITE, CScene::MODE_RESULT);
+	}
 }
 
 //=============================

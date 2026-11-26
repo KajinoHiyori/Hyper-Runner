@@ -26,6 +26,7 @@ class CShadow;	// 影クラス
 class CShadowST;	// 影クラス
 class CField;	// フィールドクラス
 class CMagma;	// マグマクラス
+class CGoal;	// ゴールクラス
 
 //=============================
 // プレイヤークラス
@@ -137,6 +138,7 @@ private:
 	void CollisionMagma(CMagma* pMagma);
 	bool CollisionBlock(void);
 	void CollisionMonkyBar(void);
+	void CollisionGoal(CGoal* pGoal);
 	void SpeedUp(void);
 	void SpeedDown(void);
 	void SpeedManager(void);

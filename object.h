@@ -36,6 +36,7 @@ public:
 		TYPE_WALL,		// 壁
 		TYPE_ITEM,		// アイテム
 		TYPE_MAGMA,		// マグマ
+		TYPE_GOAL,		// ゴール
 		TYPE_TIMER,		// タイマー
 		TYPE_PAUSE,		// ポーズ
 		TYPE_SHADOW,	// 影
