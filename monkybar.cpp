@@ -265,14 +265,26 @@ void CMonkyBar::LoadSetting(const char* pFileName)
 	SAFE_DELETE_SINGULAR(pLoadScripts);
 }
 
+#define COLLISION	(15.0f)	// 雲梯との判定処理
 //=============================
 // プレイヤーとの判定処理
 //=============================
-bool CMonkyBar::CollisionPlayer(D3DXVECTOR3 pos)
+bool CMonkyBar::Collision(D3DXVECTOR3 pos)
 {
-	bool bColl = false;
+	D3DXVECTOR3 posBar = CObjectX::GetPosition();
+	D3DXVECTOR3 vtxMin = CObjectX::GetVtxMin();
+	D3DXVECTOR3 vtxMax = CObjectX::GetVtxMax();
+	float fLenHeight = sqrtf((posBar.y - pos.y) * (posBar.y - pos.y));
+	float fLengthDepth = sqrtf((posBar.z - pos.z) * (posBar.z - pos.z));
+	if (posBar.x + vtxMin.x <= posBar.x		// X方向[左端]
+		&& posBar.x + vtxMax.x >= posBar.x	// X方向[右端]
+		&& fLenHeight <= COLLISION			// Y方向の判定
+		&& fLengthDepth <= COLLISION)	// Z方向の判定
+	{
+		return true;
+	}
 
-	return bColl;
+	return false;
 }
 
 //=============================

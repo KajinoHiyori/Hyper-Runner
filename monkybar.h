@@ -39,19 +39,6 @@ public:
 		STATE_MAX
 	}STATE;
 
-	// 色の変更[出現時のみ適応]
-	typedef enum
-	{
-		COLORCHANGER_NONE = -1,
-		ADDBLUE,	// B++
-		DISRED,		// R--
-		ADDGREEN,	// G++
-		DISBLUE,	// B--
-		ADDRED,		// R++
-		DISGREEN,	// G--
-		COLORCHANGER_MAX
-	}COLORCHANGER;
-
 	CMonkyBar(CObject::PRIORITY priority = CObject::PRIORITY_EVENTS);
 	~CMonkyBar();
 	static CMonkyBar* Create(D3DXVECTOR3 pos);
@@ -68,7 +55,7 @@ public:
 	static int GetNumAll(void) { return m_nNumAll; }
 	static void LoadInfo(void);
 	static void LoadSetting(const char* pFileName);
-	bool CollisionPlayer(D3DXVECTOR3 pos);
+	bool Collision(D3DXVECTOR3 pos);
 	void Release(void) { CObjectX::Release(); if (m_pShadow != NULL) { m_pShadow->Release(); } }
 
 private:

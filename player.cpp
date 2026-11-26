@@ -99,7 +99,9 @@ CPlayer::CPlayer(CObject::PRIORITY priority) : CObject(priority)
 	m_bKockbackOld = false;	// 跳ね返り管理
 	m_bOnBlock = false;	// ブロック上にいる
 	m_bOnBlockOld = false;	// ブロック上にいる
-	m_monkyState = MONKYSTATE_NONE;	// 雲梯状態を管理
+//	m_monkyState = MONKYSTATE_NONE;	// 雲梯状態を管理
+	m_monkyState = MONKYSTATE_LEFT;	// 雲梯状態を管理
+	m_moveMonky = INIT_D3DVEC3;	// 移動量[雲梯]
 }
 
 //=============================
@@ -157,7 +159,7 @@ HRESULT CPlayer::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 	}
 	if (m_apMotion[DIV_MOTION_UPPER] != NULL)
 	{
-		m_apMotion[DIV_MOTION_UPPER]->Set(MOTIONUPPER_NUTORAL, false, 0);
+		m_apMotion[DIV_MOTION_UPPER]->Set(MOTIONUPPER_MONKYBAR, false, 0);
 	}
 	m_apMotion[DIV_MOTION_UNDER]->SetFrame(MOTIONUNDER_RUN, FASTRUN_FRAME);
 
@@ -239,8 +241,14 @@ void CPlayer::Update(void)
 	for (int nCntDiv = 0; nCntDiv < DIV_MOTION_MAX; nCntDiv++)
 	{
 		if (m_apMotion[nCntDiv] == NULL) continue;
-		m_apMotion[nCntDiv]->Update();
+	//	m_apMotion[nCntDiv]->Update();
 	}
+
+	m_apMotion[DIV_MOTION_UPPER]->Update();
+
+
+	// 雲梯の判定
+	CollisionMonkyBarStart();
 
 	// 影の更新
 	if (m_pShadowST != NULL)
@@ -262,6 +270,7 @@ void CPlayer::Update(void)
 	pDebugProc->Print("Playerの位置 : (%.2f, %.2f, %.2f)\n", m_pos.x, m_pos.y, m_pos.z);
 	pDebugProc->Print("Player向き : (%.2f, %.2f, %.2f)\n", m_rot.x, m_rot.y, m_rot.z);
 	pDebugProc->Print("Player移動量 : (%.2f, %.2f, %.2f)\n", m_move.x, m_move.y, m_move.z);
+	pDebugProc->Print("Player雲梯量 : (%.2f, %.2f, %.2f)\n", m_moveMonky.x, m_moveMonky.y, m_moveMonky.z);
 	pDebugProc->Print("Player存在ライン : %d\n", m_nLine);
 	pDebugProc->Print("Player速度 : %f\n", m_fSpeed);
 	pDebugProc->Print("Playerブロック状態 : %d\n", m_bOnBlock);
@@ -438,22 +447,26 @@ void CPlayer::UpdateTutorial(void)
 //=============================
 void CPlayer::UpdateGame(void)
 {
-	// 移動処理
-	Move();
-
-	// 雲梯の判定
-	CollisionMonkyBar();
+	if (m_monkyState == MONKYSTATE_NONE || m_monkyState == MONKYSTATE_READY)
+	{ // 雲梯にぶら下がっていない場合の処理
+		// 移動処理
+		Move();
+	}
+	else
+	{ // 雲梯にぶら下がっている場合の処理
+		MoveMonky();
+	}
 
 #ifdef ENABLE_STAGESET
 	// ブロックを配置
 	SetBlock();
 #else
 	// ブロックとの判定
-	CollisionBlock();
+	//CollisionBlock();
 #endif // ENABLE_STAGESET
 
 	// 地面との判定
-	CollisionField();
+	//CollisionField();
 
 	// マグマとの判定
 	CollisionMagma(static_cast<CGame*>(CManager::GetScene())->GetMagma());
@@ -604,6 +617,18 @@ void CPlayer::Move(void)
 #endif
 }
 
+#define MONKY_ANGLEADD	(30.0f / 5.08f)	// 角度の補正値
+//=============================
+// 移動処理
+//=============================
+void CPlayer::MoveMonky(void)
+{
+	//m_moveMonky.y = 2.0f;
+	m_moveMonky.z = MONKY_ANGLEADD;
+
+	m_pos += m_moveMonky;
+}
+
 //=============================
 // 列切り替え処理
 //=============================
@@ -680,7 +705,7 @@ void CPlayer::CollisionField(void)
 
 #define PLAYER_HEIGHT	(120.0f)	// プレイヤーの身長
 //=============================
-// フィールド判定処理
+// マグマ判定処理
 //=============================
 void CPlayer::CollisionMagma(CMagma* pMagma)
 {
@@ -696,6 +721,7 @@ void CPlayer::CollisionMagma(CMagma* pMagma)
 	{
 	case CScene::MODE_GAME:	// ゲーム中
 		static_cast<CGame*>(CManager::GetScene())->DeletePlayer();
+		CManager::GetFade()->SetFade(CFade::TYPE_ALPHA, SCREEN_CENTER, COLOR_BLACK, CScene::MODE_RESULT);
 		break;
 	}
 }
@@ -834,11 +860,46 @@ bool CPlayer::CollisionBlock(void)
 }
 
 //=============================
-// 雲梯判定処理
+// 雲梯処理開始判定
 //=============================
-void CPlayer::CollisionMonkyBar(void)
+void CPlayer::CollisionMonkyBarStart(void)
 {
+	if (m_monkyState != MONKYSTATE_NONE) return;
+	// 当たり判定処理を実行
+	D3DXVECTOR3 pos = GetModelPos(MODEL_11LEFTARM);
 
+	bool bColl = false;
+	for (int nCntPriority = 0; nCntPriority < MAX_PRIORITYS; nCntPriority++)
+	{
+		CObject* pObject = GetTop(nCntPriority);	// 先頭アドレスを取得
+
+		while (pObject != NULL)
+		{ // 次のオブジェクトがある限りループ
+			CObject* pObjectNext = pObject->GetNext();	// 次のオブジェクトへのポインタを設定
+			bool bOneCollision = false;
+
+			// オブジェクトとの当たり判定
+			if (pObject->GetType() != CObject::TYPE_MONKYBAR)
+			{
+				pObject = pObjectNext;	// NULL判定を行う
+				continue;
+			}
+			// アイテムの場合
+			CMonkyBar* pBar = static_cast<CMonkyBar*>(pObject);
+			D3DXVECTOR3 posBar = pBar->GetPosition();
+			
+
+			if (pBar->Collision(pos))
+			{
+				bColl = true;
+				break;
+			}
+
+			pObject = pObjectNext;	// NULL判定を行う
+		}
+
+		if (bColl == true) return;
+	}
 }
 
 //=============================
@@ -987,6 +1048,52 @@ void CPlayer::SetBlockMotion(void)
 			m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_WALK, true, BLEND_FRAME);
 		}
 	}
+}
+
+//=============================
+// モデルの座標取得
+//=============================
+D3DXVECTOR3 CPlayer::GetModelPos(MODEL model)
+{
+	// デバイスの取得
+	CRenderer* pRenderer = CManager::GetRenderer();
+	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
+
+	D3DXMATRIX matrix;
+	D3DXMATRIX mtxRot, mtxTrans;	// 計算用マトリックス
+
+	// ワールドマトリックスの初期化(デフォルトの値にする)
+	D3DXMatrixIdentity(&matrix);
+	D3DXMatrixIdentity(&m_mtxWorld);
+
+	// 向きを反映
+	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_rot.y, m_rot.x, m_rot.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
+
+	// 位置を反映
+	D3DXMatrixTranslation(&mtxTrans, m_pos.x, m_pos.y, m_pos.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
+
+	// ワールドマトリックスの設定
+	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
+
+	// モデルごとに描画
+	for (int nCntModel = 0; nCntModel < m_nNumModel; nCntModel++)
+	{
+		if (m_apModel[nCntModel] == NULL)continue;
+		// モデルのマトリックス取得
+		matrix = m_apModel[nCntModel]->GetMtxToPos();
+
+		if (nCntModel == model)
+		{ // 右腕のマトリックス取得
+			D3DXVECTOR3 pos = INIT_D3DVEC3;
+			D3DXVECTOR3 posArm = m_apModel[nCntModel]->GetPosOffset();
+			D3DXVec3TransformCoord(&pos, &posArm, &matrix);
+			return pos;
+		}
+	}
+
+	return INIT_D3DVEC3;
 }
 
 //=============================

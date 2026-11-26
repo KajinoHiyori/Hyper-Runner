@@ -25,7 +25,7 @@
 #include "meshskin_flat.h"
 #include "meshskin_cylinder.h"
 #include "action.h"
-#include "monkybar.h"
+#include "monkybarevent.h"
 #include "timer.h"
 #include "goal.h"
 
@@ -50,7 +50,8 @@ CGoal* CGame::m_pGoal = NULL;		// ゴールへのポインタ
 #define FIELD_SPACE		(200.0f)		// フィールド間の隙間
 #define FIELD_POS(x)	(D3DXVECTOR3(FIELD_SPACE * 2.0f * (float)(x - 1), 0.0f, 0.0f))	// フィールド位置
 #define MAGMA_POS		(D3DXVECTOR3(0.0f, -400.0f, 0.0f))	// マグマ生成位置
-#define PLAYER_START	(D3DXVECTOR3(0.0f, 0.0f, -STAGE_LENGTH))	// プレイヤー生成位置
+//#define PLAYER_START	(D3DXVECTOR3(0.0f, 0.0f, -STAGE_LENGTH))	// プレイヤー生成位置
+#define PLAYER_START	(D3DXVECTOR3(0.0f, 0.0f, -500.0f))	// プレイヤー生成位置
 #define TIMER_POS		(D3DXVECTOR3(640.0f, 100.0f, 0.0f))	// タイマー生成位置
 #define GOAL_LINE		(4750.0f)	// ゴールの位置
 // ファイルパス
@@ -152,7 +153,7 @@ HRESULT CGame::Init(void)
 	// ブロックを生成
 	CBlock::LoadSetting(BLOCK_SETTINGPATH);
 
-	CMonkyBar::Create(INIT_D3DVEC3);
+	CMonkyBarEvent::Create(D3DXVECTOR3(0.0f, 130.0f, 0.0f));
 
 	// アイテムを生成
 	//CItem::LoadSetting(ITEM_SETTINGPATH);

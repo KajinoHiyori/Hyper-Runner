@@ -1,7 +1,7 @@
 //========================================================
 // 
 // Player処理[player.h]
-// Author : Kajino Hiyori _Create2026/11/04
+// Author : Kajino Hiyori
 //
 //========================================================
 #ifndef _PLAYER_H_
@@ -76,6 +76,7 @@ public:
 	typedef enum
 	{
 		MOTIONUPPER_NUTORAL = 0,	// 待機
+		MOTIONUPPER_MONKYBAR,	// 待機
 		MOTIONUPPER_MAX
 	}MOTIONUPPER;
 
@@ -101,7 +102,11 @@ public:
 	// 雲梯状態を管理
 	typedef enum
 	{
-		MONKYSTATE_NONE = 0,	// 雲梯に捕まっていない
+		MONKYSTATE_NONE = 0,	// 雲梯に掴まっていない
+		MONKYSTATE_READY,		// 雲梯に掴まることができる
+		MONKYSTATE_LEFT,		// 左手を基準にぶら下がる
+		MONKYSTATE_RIGHT,		// 右手を基準にぶら下がる
+		MONKYSTATE_MAX
 	}MONKYSTATE;
 
 	CPlayer(CObject::PRIORITY priority = CObject::PRIORITY_CHARACTOR);
@@ -133,18 +138,20 @@ private:
 	void UpdateGame(void);
 	void UpdateResult(void);
 	void Move(void);
+	void MoveMonky(void);
 	void ChangeLine(int nChangeDir);
 	void CollisionField(void);
 	void CollisionMagma(CMagma* pMagma);
 	bool CollisionBlock(void);
-	void CollisionMonkyBar(void);
+	void CollisionMonkyBarStart(void);
 	void CollisionGoal(CGoal* pGoal);
 	void SpeedUp(void);
 	void SpeedDown(void);
 	void SpeedManager(void);
 	void SetMoveMotion(void);
-	void SetBlockMotion(void);
 	void SetLandMotion(void);
+	void SetBlockMotion(void);
+	D3DXVECTOR3 GetModelPos(MODEL model);
 	HRESULT LoadScripts(void);
 	bool LoadCharactor(void);
 	bool LoadModelFile(void);
@@ -152,12 +159,12 @@ private:
 	bool LoadMotion(void);
 	bool LoadMotion(int nNumModel, int nModelStart, const char* pFileName, DIV_MOTION div, int nNumMotion);
 	void SetBlock(void);
-	D3DXVECTOR3	m_pos;		// モデルの位置
-	D3DXVECTOR3	m_posOld;	// モデルの1フレーム前の位置
-	D3DXVECTOR3	m_move;		// モデルの移動量
-	D3DXVECTOR3	m_rot;		// モデルの向き
-	D3DXVECTOR3	m_rotDest;	// モデルの目的の向き
-	D3DXMATRIX m_mtxWorld;	// ワールドマトリックス
+	D3DXVECTOR3	m_pos;			// 位置
+	D3DXVECTOR3	m_posOld;		// 1フレーム前の位置
+	D3DXVECTOR3	m_move;			// 移動量
+	D3DXVECTOR3	m_rot;			// 向き
+	D3DXVECTOR3	m_rotDest;		// 目的の向き
+	D3DXMATRIX m_mtxWorld;		// ワールドマトリックス
 	CModel* m_apModel[MODEL_MAX];	// モデルのポインタ
 	int m_nNumModel;		// モデル総数
 	CMotion* m_apMotion[DIV_MOTION_MAX];		// モーション情報
@@ -176,6 +183,7 @@ private:
 	bool m_bKockback;	// 跳ね返り管理
 	bool m_bKockbackOld;	// 跳ね返り管理
 	MONKYSTATE m_monkyState;	// 雲梯状態を管理
+	D3DXVECTOR3	m_moveMonky;	// 移動量[雲梯]
 };
 
 #endif

@@ -176,6 +176,7 @@
     <ClCompile Include="meshskin_flat.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="monkybar.cpp" />
+    <ClCompile Include="monkybarevent.cpp" />
     <ClCompile Include="motion.cpp" />
     <ClCompile Include="number2D.cpp" />
     <ClCompile Include="number3D.cpp" />
@@ -237,6 +238,7 @@
     <ClInclude Include="meshskin_flat.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="monkybar.h" />
+    <ClInclude Include="monkybarevent.h" />
     <ClInclude Include="motion.h" />
     <ClInclude Include="number2D.h" />
     <ClInclude Include="number3D.h" />
