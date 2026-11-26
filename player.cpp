@@ -246,7 +246,6 @@ void CPlayer::Update(void)
 
 	m_apMotion[DIV_MOTION_UPPER]->Update();
 
-
 	// 雲梯の判定
 	CollisionMonkyBarStart();
 
@@ -864,9 +863,9 @@ bool CPlayer::CollisionBlock(void)
 //=============================
 void CPlayer::CollisionMonkyBarStart(void)
 {
-	if (m_monkyState != MONKYSTATE_NONE) return;
 	// 当たり判定処理を実行
-	D3DXVECTOR3 pos = GetModelPos(MODEL_11LEFTARM);
+	D3DXVECTOR3 pos = GetArmPos(MODEL_11LEFTARM);
+	CManager::GetDebugProc()->Print("LeftArmPos[先端] %f, %f, %f\n", pos.x, pos.y, pos.z);
 
 	bool bColl = false;
 	for (int nCntPriority = 0; nCntPriority < MAX_PRIORITYS; nCntPriority++)
@@ -1085,9 +1084,57 @@ D3DXVECTOR3 CPlayer::GetModelPos(MODEL model)
 		matrix = m_apModel[nCntModel]->GetMtxToPos();
 
 		if (nCntModel == model)
-		{ // 右腕のマトリックス取得
+		{ // マトリックス取得
 			D3DXVECTOR3 pos = INIT_D3DVEC3;
 			D3DXVECTOR3 posArm = m_apModel[nCntModel]->GetPosOffset();
+			D3DXVec3TransformCoord(&pos, &posArm, &matrix);
+			return pos;
+		}
+	}
+
+	return INIT_D3DVEC3;
+}
+
+#define ARM01_LENGTH	(-20.0f)	// 下腕の長さ
+//=============================
+// 下腕の先端座標取得
+//=============================
+D3DXVECTOR3 CPlayer::GetArmPos(MODEL model)
+{
+	// デバイスの取得
+	CRenderer* pRenderer = CManager::GetRenderer();
+	LPDIRECT3DDEVICE9 pDevice = pRenderer->GetDevice();
+
+	D3DXMATRIX matrix;
+	D3DXMATRIX mtxRot, mtxTrans;	// 計算用マトリックス
+
+	// ワールドマトリックスの初期化(デフォルトの値にする)
+	D3DXMatrixIdentity(&matrix);
+	D3DXMatrixIdentity(&m_mtxWorld);
+
+	// 向きを反映
+	D3DXMatrixRotationYawPitchRoll(&mtxRot, m_rot.y, m_rot.x, m_rot.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
+
+	// 位置を反映
+	D3DXMatrixTranslation(&mtxTrans, m_pos.x, m_pos.y, m_pos.z);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
+
+	// ワールドマトリックスの設定
+	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
+
+	// モデルごとに描画
+	for (int nCntModel = 0; nCntModel < m_nNumModel; nCntModel++)
+	{
+		if (m_apModel[nCntModel] == NULL)continue;
+		// モデルのマトリックス取得
+		matrix = m_apModel[nCntModel]->GetMtxToPos();
+
+		if (nCntModel == model)
+		{ // マトリックス取得
+			D3DXVECTOR3 pos = INIT_D3DVEC3;
+			D3DXVECTOR3 posArm = m_apModel[nCntModel]->GetPosOffset();
+			posArm.y += ARM01_LENGTH;
 			D3DXVec3TransformCoord(&pos, &posArm, &matrix);
 			return pos;
 		}

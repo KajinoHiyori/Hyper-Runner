@@ -57,7 +57,7 @@ CMonkyBarEvent* CMonkyBarEvent::Create(D3DXVECTOR3 pos)
 	return NULL;
 }
 
-#define BAR_DEPTH	(10.0f)	// ƒo[“¯m‚ÌŠÔŠu
+#define BAR_DEPTH	(30.0f)	// ƒo[“¯m‚ÌŠÔŠu
 //=============================
 // ‰Šú‰»ˆ—
 //=============================
@@ -69,6 +69,8 @@ HRESULT CMonkyBarEvent::Init(D3DXVECTOR3 pos)
 		if (m_apBar[nCntBar] != NULL) continue;
 		m_apBar[nCntBar] = CMonkyBar::Create(D3DXVECTOR3(pos.x, pos.y, pos.x + nCntBar * BAR_DEPTH));
 	}
+
+	SetType(CObject::TYPE_MONKYBAREVENT);
 
 	return S_OK;
 }

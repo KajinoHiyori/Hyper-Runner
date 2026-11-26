@@ -276,8 +276,9 @@ bool CMonkyBar::Collision(D3DXVECTOR3 pos)
 	D3DXVECTOR3 vtxMax = CObjectX::GetVtxMax();
 	float fLenHeight = sqrtf((posBar.y - pos.y) * (posBar.y - pos.y));
 	float fLengthDepth = sqrtf((posBar.z - pos.z) * (posBar.z - pos.z));
-	if (posBar.x + vtxMin.x <= posBar.x		// X方向[左端]
-		&& posBar.x + vtxMax.x >= posBar.x	// X方向[右端]
+
+	if (posBar.x + vtxMin.x <= pos.x		// X方向[左端]
+		&& posBar.x + vtxMax.x >= pos.x	// X方向[右端]
 		&& fLenHeight <= COLLISION			// Y方向の判定
 		&& fLengthDepth <= COLLISION)	// Z方向の判定
 	{

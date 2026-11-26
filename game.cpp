@@ -153,7 +153,7 @@ HRESULT CGame::Init(void)
 	// ブロックを生成
 	CBlock::LoadSetting(BLOCK_SETTINGPATH);
 
-	CMonkyBarEvent::Create(D3DXVECTOR3(0.0f, 130.0f, 0.0f));
+	CMonkyBarEvent::Create(D3DXVECTOR3(0.0f, 110.0f, 0.0f));
 
 	// アイテムを生成
 	//CItem::LoadSetting(ITEM_SETTINGPATH);

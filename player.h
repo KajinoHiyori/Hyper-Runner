@@ -152,6 +152,7 @@ private:
 	void SetLandMotion(void);
 	void SetBlockMotion(void);
 	D3DXVECTOR3 GetModelPos(MODEL model);
+	D3DXVECTOR3 GetArmPos(MODEL model);
 	HRESULT LoadScripts(void);
 	bool LoadCharactor(void);
 	bool LoadModelFile(void);

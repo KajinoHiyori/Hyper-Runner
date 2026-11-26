@@ -29,6 +29,7 @@ public:
 	{
 		TYPE_NONE = 0,	// 初期化
 		TYPE_MONKYBAR,	// 雲梯
+		TYPE_MONKYBAREVENT,	// 雲梯一括管理
 		TYPE_PLAYER,	// プレイヤー
 		TYPE_ACTION,	// アクション
 		TYPE_FIELD,		// 地面

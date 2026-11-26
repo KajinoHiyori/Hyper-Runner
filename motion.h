@@ -63,6 +63,7 @@ public:
 	bool IsFinish(void) { return m_bFinish; }
 	void SetFrame(int nType, int nFrame);
 	void ChangeFrame(int nType, int nFrame);
+	int GetKey(void) { return m_nKey; }
 
 private:
 	void ChangeFrame(void);
