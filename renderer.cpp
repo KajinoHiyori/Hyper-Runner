@@ -17,7 +17,7 @@
 // マクロ定義
 //========================================================================
 #define FEEDBACK		(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f))	// フィードバックエフェクト用ポリゴンの色
-#define CLEAR_COLOR		(D3DCOLOR_RGBA(255, 255, 255, 0))	// 画面クリアの色
+#define CLEAR_COLOR		(D3DCOLOR_RGBA(0, 0, 0, 0))	// 画面クリアの色
 #define RATE			((float)SCREEN_HEIGHT / (float)SCREEN_WIDTH)	// 画面比率
 #define ZOOM_RATE		(0.6f)	// テクスチャ拡大率
 #define DEFAULT_RATE	(5.0f)	// 描画時のテクスチャサイズ

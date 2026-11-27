@@ -139,11 +139,6 @@ HRESULT CGame::Init(void)
 	//// ブロック情報読み込み
 	//CBlock::LoadScripts(GAMESCRIPTS_PATH);
 
-	//// 茎情報読み込み
-	//float fWidth = m_pField->GetWidth();
-	//float fDepth = m_pField->GetDepth();
-	//CStem::LoadScripts(GAMESCRIPTS_PATH, fWidth, fDepth);
-
 	//// 飾りを生成
 	//CDecoration::Create();
 
@@ -153,7 +148,7 @@ HRESULT CGame::Init(void)
 	// ブロックを生成
 	CBlock::LoadSetting(BLOCK_SETTINGPATH);
 
-	CMonkyBarEvent::Create(D3DXVECTOR3(0.0f, 110.0f, 0.0f));
+	CMonkyBarEvent::Create(D3DXVECTOR3(0.0f, 130.0f, 500.0f));
 
 	// アイテムを生成
 	//CItem::LoadSetting(ITEM_SETTINGPATH);

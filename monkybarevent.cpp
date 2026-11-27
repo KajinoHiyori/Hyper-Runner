@@ -57,7 +57,7 @@ CMonkyBarEvent* CMonkyBarEvent::Create(D3DXVECTOR3 pos)
 	return NULL;
 }
 
-#define BAR_DEPTH	(30.0f)	// ƒo[“¯m‚ÌŠÔŠu
+#define BAR_DEPTH	(74.354248f)	// ƒo[“¯m‚ÌŠÔŠu
 //=============================
 // ‰Šú‰»ˆ—
 //=============================

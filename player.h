@@ -27,6 +27,7 @@ class CShadowST;	// 影クラス
 class CField;	// フィールドクラス
 class CMagma;	// マグマクラス
 class CGoal;	// ゴールクラス
+class CMonkyBar;	// 雲梯
 
 //=============================
 // プレイヤークラス
@@ -148,9 +149,11 @@ private:
 	void SpeedUp(void);
 	void SpeedDown(void);
 	void SpeedManager(void);
+	void MonkyStateManager(int nKeyOld);
 	void SetMoveMotion(void);
 	void SetLandMotion(void);
 	void SetBlockMotion(void);
+	void SetPosFromArm(CMonkyBar* pBar, D3DXVECTOR3 posArm);
 	D3DXVECTOR3 GetModelPos(MODEL model);
 	D3DXVECTOR3 GetArmPos(MODEL model);
 	HRESULT LoadScripts(void);
@@ -184,7 +187,10 @@ private:
 	bool m_bKockback;	// 跳ね返り管理
 	bool m_bKockbackOld;	// 跳ね返り管理
 	MONKYSTATE m_monkyState;	// 雲梯状態を管理
+	MONKYSTATE m_monkyStateOld;	// 雲梯状態を管理
 	D3DXVECTOR3	m_moveMonky;	// 移動量[雲梯]
+	D3DXVECTOR3 m_posOldLeft;	// 左腕の過去位置
+	D3DXVECTOR3 m_posOldRight;	// 右腕の過去位置
 };
 
 #endif

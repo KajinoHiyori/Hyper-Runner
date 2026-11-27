@@ -32,6 +32,7 @@
 #include "block.h"
 #include "monkybar.h"
 #include "goal.h"
+#include "effect.h"
 
 //=============================
 // マクロ定義
@@ -100,8 +101,11 @@ CPlayer::CPlayer(CObject::PRIORITY priority) : CObject(priority)
 	m_bOnBlock = false;	// ブロック上にいる
 	m_bOnBlockOld = false;	// ブロック上にいる
 //	m_monkyState = MONKYSTATE_NONE;	// 雲梯状態を管理
-	m_monkyState = MONKYSTATE_LEFT;	// 雲梯状態を管理
+	m_monkyState = MONKYSTATE_READY;	// 雲梯状態を管理
+	m_monkyStateOld = MONKYSTATE_READY;	// 雲梯状態を管理
 	m_moveMonky = INIT_D3DVEC3;	// 移動量[雲梯]
+	m_posOldLeft = INIT_D3DVEC3;	// 左腕の過去位置
+	m_posOldRight = INIT_D3DVEC3;	// 右腕の過去位置
 }
 
 //=============================
@@ -159,7 +163,7 @@ HRESULT CPlayer::Init(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 	}
 	if (m_apMotion[DIV_MOTION_UPPER] != NULL)
 	{
-		m_apMotion[DIV_MOTION_UPPER]->Set(MOTIONUPPER_MONKYBAR, false, 0);
+		m_apMotion[DIV_MOTION_UPPER]->Set(MOTIONUPPER_NUTORAL, false, 0);
 	}
 	m_apMotion[DIV_MOTION_UNDER]->SetFrame(MOTIONUNDER_RUN, FASTRUN_FRAME);
 
@@ -213,6 +217,20 @@ void CPlayer::Update(void)
 	m_bJumpOld = m_bJump;
 	m_bKockbackOld = m_bKockback;
 	m_bOnBlockOld = m_bOnBlock;
+	m_monkyStateOld = m_monkyState;
+	int nKeyOld = m_apMotion[DIV_MOTION_UPPER]->GetKey();
+
+	m_posOldLeft = GetArmPos(MODEL_11LEFTARM);	// 左腕の位置
+	m_posOldRight = GetArmPos(MODEL_13RIGHTARM);	// 右腕の位置
+
+	// モーションの更新
+	for (int nCntDiv = 0; nCntDiv < DIV_MOTION_MAX; nCntDiv++)
+	{
+		if (m_apMotion[nCntDiv] == NULL) continue;
+	//	m_apMotion[nCntDiv]->Update();
+	}
+
+	m_apMotion[DIV_MOTION_UPPER]->Update();
 
 	// シーンごとに処理を分割
 	switch (mode)
@@ -237,14 +255,8 @@ void CPlayer::Update(void)
 		break;
 	}
 
-	// モーションの更新
-	for (int nCntDiv = 0; nCntDiv < DIV_MOTION_MAX; nCntDiv++)
-	{
-		if (m_apMotion[nCntDiv] == NULL) continue;
-	//	m_apMotion[nCntDiv]->Update();
-	}
-
-	m_apMotion[DIV_MOTION_UPPER]->Update();
+	// 雲梯状態管理
+	MonkyStateManager(nKeyOld);
 
 	// 雲梯の判定
 	CollisionMonkyBarStart();
@@ -263,7 +275,23 @@ void CPlayer::Update(void)
 	{
 		ChangeSpeed(false);
 	}
-	
+
+	int nKey = m_apMotion[DIV_MOTION_UPPER]->GetKey();
+	// 当たり判定処理を実行
+	D3DXVECTOR3 pos = GetArmPos(MODEL_11LEFTARM);
+	D3DXVECTOR3 pos1 = GetArmPos(MODEL_13RIGHTARM);
+	CManager::GetDebugProc()->Print("LeftArmPos[先端] %f, %f, %f\n", pos.x, pos.y, pos.z);
+	if (m_monkyState == MONKYSTATE_NONE || m_monkyState == MONKYSTATE_READY)
+	{
+	}
+	else if (nKey != nKeyOld && nKey == 0)
+	{
+		CEffect::Create(pos, INIT_D3DVEC3, COLOR_CYAN, CEffect::TYPE_000, 1000);
+	}
+	else if (nKey != nKeyOld && nKey == 2)
+	{
+		CEffect::Create(pos1, INIT_D3DVEC3, COLOR_RED, CEffect::TYPE_000, 1000);
+	}
 	// デバック表示=================================================================================
 	CDebugProc* pDebugProc = CManager::GetDebugProc();
 	pDebugProc->Print("Playerの位置 : (%.2f, %.2f, %.2f)\n", m_pos.x, m_pos.y, m_pos.z);
@@ -453,6 +481,7 @@ void CPlayer::UpdateGame(void)
 	}
 	else
 	{ // 雲梯にぶら下がっている場合の処理
+		// 雲梯用の移動処理
 		MoveMonky();
 	}
 
@@ -461,17 +490,17 @@ void CPlayer::UpdateGame(void)
 	SetBlock();
 #else
 	// ブロックとの判定
-	//CollisionBlock();
+	CollisionBlock();
 #endif // ENABLE_STAGESET
 
 	// 地面との判定
-	//CollisionField();
+	CollisionField();
 
 	// マグマとの判定
-	CollisionMagma(static_cast<CGame*>(CManager::GetScene())->GetMagma());
+	//CollisionMagma(static_cast<CGame*>(CManager::GetScene())->GetMagma());
 
 	// ゴール判定
-	CollisionGoal(static_cast<CGame*>(CManager::GetScene())->GetGoal());
+//	CollisionGoal(static_cast<CGame*>(CManager::GetScene())->GetGoal());
 }
 
 //=============================
@@ -577,7 +606,7 @@ void CPlayer::Move(void)
 
 	if ((m_apMotion[DIV_MOTION_UNDER]->GetBlendType() != MOTIONUNDER_FALLX && m_bOnBlock == false) && bFall == true && m_bJump == true)
 	{ // 落下モーションでない
-		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_FALLX, BLEND_FRAME, true);
+		m_apMotion[DIV_MOTION_UNDER]->Set(MOTIONUNDER_FALLX, true, BLEND_FRAME);
 	}
 
 #else
@@ -616,14 +645,30 @@ void CPlayer::Move(void)
 #endif
 }
 
-#define MONKY_ANGLEADD	(30.0f / 5.08f)	// 角度の補正値
+#define MONKY_ANGLEADD	(2.4755413f)	// 角度の補正値
 //=============================
 // 移動処理
 //=============================
 void CPlayer::MoveMonky(void)
 {
-	//m_moveMonky.y = 2.0f;
-	m_moveMonky.z = MONKY_ANGLEADD;
+	int nKey = m_apMotion[DIV_MOTION_UPPER]->GetKey();
+	// 腕の位置に応じて移動量を変更
+	D3DXVECTOR3 posLeft = GetArmPos(MODEL_11LEFTARM);
+	D3DXVECTOR3 posRight = GetArmPos(MODEL_13RIGHTARM);
+
+	if (m_monkyState == MONKYSTATE_LEFT)
+	{ // 左腕を基点に移動
+		m_moveMonky.z = -(posLeft.z - m_posOldLeft.z);
+	}
+	else if (m_monkyState == MONKYSTATE_RIGHT)
+	{ // 右腕を基点に移動
+		m_moveMonky.z = -(posRight.z - m_posOldRight.z);
+	}
+
+	if (m_moveMonky.z >= 2.0f)
+	{
+		D3DXVECTOR3 pos = INIT_D3DVEC3;
+	}
 
 	m_pos += m_moveMonky;
 }
@@ -863,9 +908,20 @@ bool CPlayer::CollisionBlock(void)
 //=============================
 void CPlayer::CollisionMonkyBarStart(void)
 {
+	if ((m_monkyState == m_monkyStateOld && m_monkyState != MONKYSTATE_READY) || m_monkyState == MONKYSTATE_NONE) return;
+
+	D3DXVECTOR3 pos = INIT_D3DVEC3;
+	if (m_monkyState == MONKYSTATE_LEFT || m_monkyState == MONKYSTATE_READY)
+	{ // 左腕で判定
+		pos = GetArmPos(MODEL_11LEFTARM);
+	}
+	else if (m_monkyState == MONKYSTATE_RIGHT)
+	{ // 右腕で判定
+		pos = GetArmPos(MODEL_13RIGHTARM);
+	}
+
 	// 当たり判定処理を実行
-	D3DXVECTOR3 pos = GetArmPos(MODEL_11LEFTARM);
-	CManager::GetDebugProc()->Print("LeftArmPos[先端] %f, %f, %f\n", pos.x, pos.y, pos.z);
+	CManager::GetDebugProc()->Print("ArmPos[先端] %f, %f, %f\n", pos.x, pos.y, pos.z);
 
 	bool bColl = false;
 	for (int nCntPriority = 0; nCntPriority < MAX_PRIORITYS; nCntPriority++)
@@ -891,6 +947,14 @@ void CPlayer::CollisionMonkyBarStart(void)
 			if (pBar->Collision(pos))
 			{
 				bColl = true;
+				//腕の位置からモデルの位置を設定
+				if (m_apMotion[DIV_MOTION_UPPER]->GetType() != MOTIONUPPER_MONKYBAR)
+				{
+					m_apMotion[DIV_MOTION_UPPER]->Set(MOTIONUPPER_MONKYBAR, false, 0);
+					m_monkyState = MONKYSTATE_LEFT;
+				}
+				SetPosFromArm(pBar, pos);
+				CEffect::Create(m_pos, INIT_D3DVEC3, COLOR_GREEN, CEffect::TYPE_001, 1000);
 				break;
 			}
 
@@ -1003,6 +1067,32 @@ void CPlayer::SpeedManager(void)
 }
 
 //=============================
+// 雲梯状態管理
+//=============================
+void CPlayer::MonkyStateManager(int nKeyOld)
+{
+	if (m_apMotion[DIV_MOTION_UPPER]->GetType() != MOTIONUPPER_MONKYBAR) return;
+	int nKey = m_apMotion[DIV_MOTION_UPPER]->GetKey();
+	//if (nKeyOld == 2 && nKey == 3 && m_monkyState == MONKYSTATE_LEFT)
+	//{
+	//	m_monkyState = MONKYSTATE_RIGHT;
+	//}
+	//else if (nKeyOld == 0 && nKey == 1 && m_monkyState == MONKYSTATE_RIGHT)
+	//{
+	//	m_monkyState = MONKYSTATE_LEFT;
+	//}
+
+	if (nKeyOld == 3 && nKey == 0)
+	{
+		m_monkyState = MONKYSTATE_LEFT;
+	}
+	else if (nKeyOld == 1 && nKey == 2)
+	{
+		m_monkyState = MONKYSTATE_RIGHT;
+	}
+}
+
+//=============================
 // 移動へのモーション管理
 //=============================
 void CPlayer::SetMoveMotion(void)
@@ -1093,6 +1183,17 @@ D3DXVECTOR3 CPlayer::GetModelPos(MODEL model)
 	}
 
 	return INIT_D3DVEC3;
+}
+
+//=============================
+// 腕の座標からモデルの座標を算出
+//=============================
+void CPlayer::SetPosFromArm(CMonkyBar* pBar, D3DXVECTOR3 posArm)
+{
+	D3DXVECTOR3 posBack = GetModelPos(MODEL_00LOWERBACK);
+	float fDiffZ = posArm.z - posBack.z;
+	m_pos.z = pBar->GetPosition().z - fDiffZ;
+	m_pos.y = -(posArm.y - m_pos.y) + pBar->GetPosition().y + pBar->GetVtxMin().y;
 }
 
 #define ARM01_LENGTH	(-20.0f)	// 下腕の長さ

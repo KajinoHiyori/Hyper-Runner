@@ -15,6 +15,7 @@
 #include "scene.h"
 #include "game.h"
 #include "field.h"
+#include "debugproc.h"
 
 //=============================
 // マクロ定義
@@ -150,6 +151,38 @@ void CEffect::Update(void)
 	//case CScene::MODE_RESULT:	// リザルト
 	//
 	//	break;
+	}
+
+	// 寿命の更新
+	m_nLife--;
+
+	// 移動量の更新
+	D3DXVECTOR3 pos = CBillboard::GetPosition();
+
+	// 重力の有無
+	if (m_bGravity == true)
+	{
+		m_move.y -= GRAVITY * 0.5f;
+	}
+
+	// 色の変更
+	D3DXCOLOR col = CBillboard::GetColor();
+	//col.a -= DIS_ALPHA;
+	SetColor(col);
+
+	// 移動量更新
+	pos += m_move;
+
+	CManager::GetDebugProc()->Print("EffectPos %f. %f. %f\n", pos.x, pos.y, pos.z);
+
+	// 位置情報の更新
+	CBillboard::SetPosition(pos);
+
+	// 削除処理
+	if (m_nLife <= 0 || col.a < 0.0f)
+	{
+		// 自身の破棄
+		Release();
 	}
 }
 

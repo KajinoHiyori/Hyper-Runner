@@ -265,7 +265,7 @@ void CMonkyBar::LoadSetting(const char* pFileName)
 	SAFE_DELETE_SINGULAR(pLoadScripts);
 }
 
-#define COLLISION	(15.0f)	// ‰_’ò‚Æ‚Ì”»’èˆ—
+#define COLLISION	(20.0f)	// ‰_’ò‚Æ‚Ì”»’èˆ—
 //=============================
 // ƒvƒŒƒCƒ„[‚Æ‚Ì”»’èˆ—
 //=============================

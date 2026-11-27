@@ -100,6 +100,27 @@ void CMotion::Set(int nType, bool bBlendMotion, int nFrameBlend)
 		m_nKey = 0;									// 現在のキーを初期化
 		m_nCounter = 0;								// モーションカウンターのクリア
 	}
+
+	if (m_bBlend == true) return;
+	
+	// 全モデル(パーツ)ごとに位置、向きを更新
+	for (int nCntModel = 0; nCntModel < m_nNumModel; nCntModel++)
+	{
+		float fPosX = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel].fPosX;	// 位置X
+		float fPosY = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel].fPosY;	// 位置Y
+		float fPosZ = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel].fPosZ;	// 位置Z
+		float fRotX = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel].fRotX;	// 向きX
+		float fRotY = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel].fRotY;	// 向きY
+		float fRotZ = m_aInfo[m_nType].aKeyInfo[m_nKey].aKey[nCntModel].fRotZ;	// 向きZ
+
+		// モデルの位置を更新
+		D3DXVECTOR3 posOffset = m_ppModel[nCntModel]->GetPosOffset();
+		m_ppModel[nCntModel]->SetPosition(D3DXVECTOR3(fPosX + posOffset.x, fPosY + posOffset.y, fPosZ + posOffset.z));
+
+		// モデルの角度を更新
+		D3DXVECTOR3 rotOffset = m_ppModel[nCntModel]->GetRotOffset();
+		m_ppModel[nCntModel]->SetRotation(D3DXVECTOR3(fRotX + rotOffset.x, fRotY + rotOffset.y, fRotZ + rotOffset.z));
+	}
 }
 
 //=============================

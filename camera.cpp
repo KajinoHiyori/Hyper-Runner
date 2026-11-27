@@ -202,27 +202,38 @@ void CCamera::UpdateGame(void)
 
 	CPlayer* pPlayer = static_cast<CGame*>(CManager::GetScene())->GetPlayer();
 	if (pPlayer == NULL) return;
-	
+
 	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
-	
-	m_posRDest.x = posPlayer.x;
-	m_posRDest.y = posPlayer.y + PLAYER_HEIGHT;
-	//if (pPlayer->GetJump() == false)
-	//{
-	//	m_posRDest.y = posPlayer.y + PLAYER_HEIGHT;
-	//}
-	m_posRDest.z = posPlayer.z + FORWARD;
-
-	CDebugProc* pDebug = CManager::GetDebugProc();
-	pDebug->Print("rotDest.y %f\n", m_rotDest.y);
-
-	// 視点情報更新
-	m_posR.x += (m_posRDest.x - m_posR.x) * CORRECTION_ROT;
-	m_posR.y += (m_posRDest.y - m_posR.y) * CORRECTION_ROT;
-	m_posR.z += (m_posRDest.z - m_posR.z) * CORRECTION_ROT;
-	m_posV.x = m_posR.x - sinf(m_rot.y) * (DISTANCE);
+	m_rot.y = HALF_D3DXPI;
+	m_posR = posPlayer;
+	m_posV.x = -500.0f;
 	m_posV.y = m_posR.y + GAME_HEIGHT;
-	m_posV.z = m_posR.z - cosf(m_rot.y) * (DISTANCE);
+	m_posR.y = m_posV.y;
+	m_posV.z = m_posR.z;
+
+	//CPlayer* pPlayer = static_cast<CGame*>(CManager::GetScene())->GetPlayer();
+	//if (pPlayer == NULL) return;
+	//
+	//D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
+	//
+	//m_posRDest.x = posPlayer.x;
+	//m_posRDest.y = posPlayer.y + PLAYER_HEIGHT;
+	////if (pPlayer->GetJump() == false)
+	////{
+	////	m_posRDest.y = posPlayer.y + PLAYER_HEIGHT;
+	////}
+	//m_posRDest.z = posPlayer.z + FORWARD;
+
+	//CDebugProc* pDebug = CManager::GetDebugProc();
+	//pDebug->Print("rotDest.y %f\n", m_rotDest.y);
+
+	//// 視点情報更新
+	//m_posR.x += (m_posRDest.x - m_posR.x) * CORRECTION_ROT;
+	//m_posR.y += (m_posRDest.y - m_posR.y) * CORRECTION_ROT;
+	//m_posR.z += (m_posRDest.z - m_posR.z) * CORRECTION_ROT;
+	//m_posV.x = m_posR.x - sinf(m_rot.y) * (DISTANCE);
+	//m_posV.y = m_posR.y + GAME_HEIGHT;
+	//m_posV.z = m_posR.z - cosf(m_rot.y) * (DISTANCE);
 }
 
 //=============================
