@@ -23,6 +23,11 @@ CMonkyBarEvent::CMonkyBarEvent(CObject::PRIORITY priority) : CObject(priority)
 	{ // バーのクリア
 		m_apBar[nCntBar] = NULL;
 	}
+
+	m_fLeft = 0.0f;		// 左端
+	m_fRight = 0.0f;	// 右端
+	m_fDepth = 0.0f;	// 奥
+	m_fFront = 0.0f;	// 手前
 }
 
 //=============================
@@ -68,7 +73,13 @@ HRESULT CMonkyBarEvent::Init(D3DXVECTOR3 pos)
 	{
 		if (m_apBar[nCntBar] != NULL) continue;
 		m_apBar[nCntBar] = CMonkyBar::Create(D3DXVECTOR3(pos.x, pos.y, pos.x + nCntBar * BAR_DEPTH));
+
 	}
+	// 各情報を指定
+	m_fFront = pos.z + m_apBar[0]->GetVtxMin().z;
+	m_fDepth = pos.z + m_apBar[MAX_MONKYBAR - 1]->GetVtxMax().z;
+	m_fLeft = pos.x + m_apBar[0]->GetVtxMin().x;
+	m_fRight = pos.x + m_apBar[0]->GetVtxMax().x;
 
 	SetType(CObject::TYPE_MONKYBAREVENT);
 

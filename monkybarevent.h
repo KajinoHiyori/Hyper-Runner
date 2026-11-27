@@ -42,6 +42,10 @@ public:
 
 private:
 	CMonkyBar* m_apBar[MAX_MONKYBAR];	// 雲梯の本数
+	float m_fLeft;	// 左端
+	float m_fRight;	// 右端
+	float m_fDepth;	// 奥
+	float m_fFront;	// 手前
 };
 
 #endif
