@@ -31,6 +31,7 @@
 #include "magma.h"
 #include "block.h"
 #include "monkybar.h"
+#include "monkybarevent.h"
 #include "goal.h"
 #include "effect.h"
 
@@ -259,7 +260,7 @@ void CPlayer::Update(void)
 	MonkyStateManager(nKeyOld);
 
 	// 雲梯の判定
-	CollisionMonkyBarStart();
+	CollisionMonkyBarStart(nKeyOld);
 
 	// 影の更新
 	if (m_pShadowST != NULL)
@@ -906,22 +907,27 @@ bool CPlayer::CollisionBlock(void)
 //=============================
 // 雲梯処理開始判定
 //=============================
-void CPlayer::CollisionMonkyBarStart(void)
+void CPlayer::CollisionMonkyBarStart(int nKeyOld)
 {
 	if ((m_monkyState == m_monkyStateOld && m_monkyState != MONKYSTATE_READY) || m_monkyState == MONKYSTATE_NONE) return;
 
 	D3DXVECTOR3 pos = INIT_D3DVEC3;
-	if (m_monkyState == MONKYSTATE_LEFT || m_monkyState == MONKYSTATE_READY)
+	int nKey = m_apMotion[DIV_MOTION_UPPER]->GetKey();
+	if (nKey != nKeyOld && nKey == 0)
 	{ // 左腕で判定
 		pos = GetArmPos(MODEL_11LEFTARM);
 	}
-	else if (m_monkyState == MONKYSTATE_RIGHT)
+	else if (nKey != nKeyOld && nKey == 2)
 	{ // 右腕で判定
 		pos = GetArmPos(MODEL_13RIGHTARM);
 	}
+	else
+	{
+		return;
+	}
 
 	// 当たり判定処理を実行
-	CManager::GetDebugProc()->Print("ArmPos[先端] %f, %f, %f\n", pos.x, pos.y, pos.z);
+	//CManager::GetDebugProc()->Print("ArmPos[先端] %f, %f, %f\n", pos.x, pos.y, pos.z);
 
 	bool bColl = false;
 	for (int nCntPriority = 0; nCntPriority < MAX_PRIORITYS; nCntPriority++)
@@ -954,7 +960,7 @@ void CPlayer::CollisionMonkyBarStart(void)
 					m_monkyState = MONKYSTATE_LEFT;
 				}
 				SetPosFromArm(pBar, pos);
-				CEffect::Create(m_pos, INIT_D3DVEC3, COLOR_GREEN, CEffect::TYPE_001, 1000);
+				CEffect::Create(GetArmPos(MODEL_11LEFTARM), INIT_D3DVEC3, COLOR_GREEN, CEffect::TYPE_001, 1000);
 				break;
 			}
 
@@ -1193,7 +1199,7 @@ void CPlayer::SetPosFromArm(CMonkyBar* pBar, D3DXVECTOR3 posArm)
 	D3DXVECTOR3 posBack = GetModelPos(MODEL_00LOWERBACK);
 	float fDiffZ = posArm.z - posBack.z;
 	m_pos.z = pBar->GetPosition().z - fDiffZ;
-	m_pos.y = -(posArm.y - m_pos.y) + pBar->GetPosition().y + pBar->GetVtxMin().y;
+	m_pos.y = -(posArm.y - m_pos.y) + pBar->GetPosition().y - pBar->GetVtxMin().y;
 }
 
 #define ARM01_LENGTH	(-20.0f)	// 下腕の長さ

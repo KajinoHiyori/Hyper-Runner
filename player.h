@@ -28,6 +28,7 @@ class CField;	// フィールドクラス
 class CMagma;	// マグマクラス
 class CGoal;	// ゴールクラス
 class CMonkyBar;	// 雲梯
+class CMonkyBarEvent;	// 雲梯一括管理
 
 //=============================
 // プレイヤークラス
@@ -144,7 +145,8 @@ private:
 	void CollisionField(void);
 	void CollisionMagma(CMagma* pMagma);
 	bool CollisionBlock(void);
-	void CollisionMonkyBarStart(void);
+	void CollisionMonkyBarEvent(void);
+	void CollisionMonkyBarStart(int nKeyOld);
 	void CollisionGoal(CGoal* pGoal);
 	void SpeedUp(void);
 	void SpeedDown(void);
